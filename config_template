@@ -1,0 +1,30 @@
+const config  = {
+    "development": {
+        "appName": "",
+        "hostname": "",
+        "port": ,
+        "db":{
+            "host": "",
+            "port": ,
+            "user": "",
+            "password": "",
+            "schema": ""
+        },
+        "version": "0.0.1"
+    },
+    "production": {
+        "appName": "",
+        "hostname": "",
+        "port": ,
+         "db":{
+            "host": "",
+            "port": ,
+            "user": "",
+            "password": "",
+            "schema": ""
+        },
+        "version": "0.0.1"
+    }
+}
+
+module.exports = config;
