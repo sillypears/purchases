@@ -1,0 +1,33 @@
+{
+  "name": "keyboard-purchases",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ./index.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/sillypears/purchases.git"
+  },
+  "author": "sillypears",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/sillypears/purchases/issues"
+  },
+  "homepage": "https://github.com/sillypears/purchases#readme",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "koa": "^2.13.1",
+    "koa-better-body": "^3.3.9",
+    "koa-bodyparser": "^4.3.0",
+    "koa-ejs": "^4.3.0",
+    "koa-favicon": "^2.1.0",
+    "koa-logger": "^3.2.1",
+    "koa-response-time": "^2.1.0",
+    "koa-router": "^10.0.0",
+    "koa-static": "^5.0.0",
+    "mariadb": "^2.5.4"
+  }
+}

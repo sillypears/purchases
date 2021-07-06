@@ -1,0 +1,18 @@
+<!-- views/purchase.html -->
+<div class="row">
+    <div class="col-md-6">
+        <%= purchase.id %>
+    </div>
+</div>
+
+<div id='ticker'>
+    <% if (ticker.makerId) { %>
+        <div class="alert-success">Added id: <%= ticker.makerId %>
+        </div>
+    <% } %>
+    <% if (ticker.error) { %>
+        <div class="alert-danger">
+            <%= ticker.error %>
+        </div>
+    <% } %>
+</div>

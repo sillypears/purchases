@@ -1,0 +1,68 @@
+<html>
+
+<head>
+    <title>
+        <%= title %>
+    </title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous" />
+    <link rel="stylesheet" href="/css/style.css" />
+    <style>
+        .highlight {
+            background-color: grey;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="nav navbar-expand-lg navbar-dark bg-dark">
+        <!-- <a class="navbar-brand" href="#"><img width="30" height="30" src="/img/brand.gif" /></a> -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="nav-link" id="navbar-home" href="/">Home</a>
+                </li>
+
+                <!-- <li class="nav-item">
+                    <a class="nav-link" id="navbar-raffles" href="/add-purchase">Add Purchase</a>
+                </li> -->
+
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Add!
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <a class="dropdown-item" href="/add-purchase">Purchase</a>
+                        <a class="dropdown-item" href="/add-maker">Maker</a>
+                        <a class="dropdown-item" href="/add-vendor">Vendor</a>
+
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <h1 class="h1">
+        <%= title %>
+    </h1>
+    <%- body %>
+        <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.1/umd/popper.min.js"
+            integrity="sha512-ubuT8Z88WxezgSqf3RLuNi5lmjstiJcyezx34yIU2gAHonIi27Na7atqzUZCOoY4CExaoFumzOsFQ2Ch+I/HCw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+            integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
+            crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <script src="/js/index.js"></script>
+
+        <footer class="footer">
+        </footer>
+</body>
+
+</html>
