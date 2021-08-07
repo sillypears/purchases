@@ -1,9 +1,8 @@
-<!-- views/index.html -->
-<a href="https://instagram.com/<%= maker.instagram %>" target="_blank"><img
-    class="ig-link" src="/img/ig.png"></a>
+<!-- views/makers.html -->
+
 <div class="container">
     <div class="row">
-        <% purchases.forEach((purchase, index)=> { %>
+        <% vendors.forEach((vendor, index)=> { %>
             <% if (index % 4==0 && index !=0) { %>
     </div>
     <div class="row">
@@ -13,17 +12,18 @@
                     <div class="card-body">
 
                         <div class="card-title">
-                                <%= purchase.detail %>
-
+                            <a href="/vendor/id/<%= vendor.id %>">
+                                <%= vendor.display_name %>
+                            </a>
                         </div>
                         <div class="card-text">
-                            <%= purchase.entity %>
+                            $<%= vendor.total %>
                         </div>
                     </div>
-                    <div class="card-footer">
-                        $<%= (purchase.total).toFixed(2) %>
-                    </div>
-
+                        <div class="card-footer">
+                            <a href="https://instagram.com/<%= vendor.link %>" target="_blank"><img class="card-link ig-link" src="/img/www.png"></a>
+                        </div>
+                    
                 </div>
             </div>
             <% }) %>

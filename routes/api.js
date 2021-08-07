@@ -1,8 +1,10 @@
+const env = process.env.NODE_ENV || "dev"
+require('dotenv').config({ path: `../.env.${env}` })
 const Router = require('koa-router');
 const fs = require('fs')
-const config = require('../.config');
-const env = process.env.NODE_ENV || 'development';
+
 const db = require('../db');
+const models = require('../models/models');
 
 var router = new Router({
     prefix: '/api'
@@ -10,52 +12,76 @@ var router = new Router({
 
 // api
 router.get('/', async (ctx, next) => {
+    // #swagger.ignore = true
     ctx.body = {
-        'version': config[env].version
+        'version': process.env.VERSION
     }
 });
 
 // api/makers
 router.get('/makers', async (ctx, next) => {
-    try {
-        conn = await db.getConnection();
-        let makers = await conn.query('SELECT * FROM keyboard.makers;')
-        return ctx.body = {
-            'makers': makers
-        }
-    } catch (err) {
-        ctx.body = { 'status': 'Failure', 'error': err }
-    } finally {
-        if (conn) return conn.release();
-    }
-});
+    // #swagger.tags = ["Makers"]
+    // #swagger.description = "Maker endpoints"
 
-// api/maker
-router.get('/maker', async (ctx, next) => {
     try {
-        conn = await db.getConnection();
-        let maker = await conn.query('SELECT * FROM keyboard.makers ORDER BY id DESC LIMIT 1;')
-        ctx.body = {
-            'maker': maker[0]
-        }
+        let makers = await models.getMakers();
+        ctx.body = makers
         ctx.status = 200
     } catch (err) {
         ctx.body = { 'status': 'Failure', 'error': err }
         ctx.status = 500
-    } finally {
-        if (conn) return conn.release();
+    }
+});
+
+
+// api/makers
+router.get('/makersprice', async (ctx, next) => {
+    // #swagger.tags = ["Makers"]
+    // #swagger.description = "Maker endpoints"
+
+    try {
+        let makers = await models.getMakerTotals(makers);
+        console.log(makers)
+        ctx.body = makers
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = { 'status': 'Failure', 'error': err }
+        ctx.status = 500
+    }
+});
+
+
+// api/maker
+router.get('/maker', async (ctx, next) => {
+    // #swagger.tags = ["Makers"]
+    // #swagger.description = "Maker endpoints"
+    /* #swagger.responses[200] = { 
+        schema: { $ref: "#/definitions/Maker" },
+        description: 'A Maker!' 
+    } */
+    try {
+        let maker = await models.getMaker()
+        ctx.body = maker[0]
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = { 'status': 'Failure', 'error': err }
+        ctx.status = 500
     }
 });
 
 // api/id/:id
 router.get('/maker/id/:id', async (ctx, next) => {
+    // #swagger.tags = ["Makers"]
+    // #swagger.description = "Maker endpoints"
+    // #swagger.parameters['id'] = { description: 'Maker\'s ID' }
+    /* #swagger.responses[200] = { 
+        schema: { $ref: "#/definitions/Maker" },
+        description: 'A Maker!' 
+    } */
     try {
-        conn = await db.getConnection();
-        let maker = await conn.query(`SELECT * FROM keyboard.makers m WHERE m.id = ${ctx.params.id}`)
+        let maker = await models.getMakerById(ctx.params.id);
         if (maker) {
-            ctx.body = {
-                'maker': maker[0]
-            }
+            ctx.body = maker[0]
             ctx.status = 200
         } else {
             throw err;
@@ -63,21 +89,24 @@ router.get('/maker/id/:id', async (ctx, next) => {
     } catch (err) {
         ctx.body = { 'status': 'Failure', 'error': err }
         ctx.status = 422
-    } finally {
-        if (conn) return conn.release();
     }
 
 });
 
 // api/name/:name
 router.get('/maker/name/:name', async (ctx, next) => {
+    // #swagger.tags = ["Makers"]
+    // #swagger.description = "Maker endpoints"
+    // #swagger.parameters['name'] = { description: 'Maker\'s short-name' }
+    /* #swagger.responses[200] = { 
+        schema: { $ref: "#/definitions/Maker" },
+        description: 'A Maker!' 
+    } */
     try {
-        conn = await db.getConnection();
-        let maker = await conn.query(`SELECT * FROM keyboard.makers m WHERE m.name = '${ctx.params.name}'`)
+
+        let maker = await models.getMakerByName(ctx.params.name);
         if (maker) {
-            ctx.body = {
-                'maker': maker[0]
-            }
+            ctx.body = maker[0]
             ctx.status = 200
         } else {
             throw err;
@@ -93,20 +122,25 @@ router.get('/maker/name/:name', async (ctx, next) => {
 
 // api/maker
 router.post('/maker', async (ctx, next) => {
-
+    // #swagger.tags = ["Makers"]
+    // #swagger.description = "Maker endpoints"
+    /* #swagger.responses[201] = { 
+        schema: { $ref: "#/definitions/MakerAdd" },
+        description: 'A Maker!' 
+    } */
     try {
         let name = ctx.request.body.name;
         let displayName = ctx.request.body.displayName;
         let instagram = ctx.request.body.instagram;
         conn = await db.getConnection();
         if ((name) && (displayName) && (instagram)) {
-            let makerId = await conn.query(`INSERT INTO keyboard.makers (name, display_name, instagram) VALUES ('${name}', '${displayName}', '${instagram}');`)
+            let makerId = await conn.query(`INSERT INTO keyboard.makers (name, display_name, instagram) VALUES ('${name}', ${conn.escape(displayName)}, '${instagram}');`)
             if (makerId) {
                 ctx.body = {
                     'status': "OK",
                     'makerId': makerId.insertId
                 }
-                ctx.status = 200
+                ctx.status = 201
 
             } else {
                 throw err;
@@ -132,24 +166,85 @@ router.post('/maker', async (ctx, next) => {
     }
 });
 
+
 // api/vendors
 router.get('/vendors', async (ctx, next) => {
+    // #swagger.tags = ["Vendors"]
+    // #swagger.description = "Vendor endpoints"
     try {
-        conn = await db.getConnection(0)
-        let vendors = await conn.query('SELECT * FROM keyboard.vendors;')
-        return ctx.body = {
-            'vendors': vendors
-        }
+        let vendors = await models.getVendors();
+        ctx.body = vendors
+        ctx.status = 200
     } catch (err) {
         console.log(err)
         ctx.body = { 'status': 'Failure', 'error': err }
-    } finally {
-        if (conn) return conn.release();
+        ctx.status = 500
     }
 });
 
-// api/maker
+// api/makers
+router.get('/vendorsprice', async (ctx, next) => {
+    // #swagger.tags = ["Vendors"]
+    // #swagger.description = "Vendor endpoints"
+    try {
+        let vendors = await models.getVendorTotals();
+        ctx.body = vendors
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = { 'status': 'Failure', 'error': err }
+        ctx.status = 500
+    }
+});
+// api/vendor
+router.get('/vendor', async (ctx, next) => {
+    // #swagger.tags = ["Vendors"]
+    // #swagger.description = "Vendor endpoints"
+    try {
+        let vendor = await models.getVendor();
+        ctx.body = vendor
+        ctx.status = 200
+    } catch (err) {
+        console.log(err)
+        ctx.body = { 'status': 'Failure', 'error': err }
+        ctx.status = 500
+    }
+});
+
+// api/vendor/id/:id
+router.get('/vendor/id/:id', async (ctx, next) => {
+    // #swagger.tags = ["Vendors"]
+    // #swagger.description = "Vendor endpoints"
+    // #swagger.parameters['id'] = { description: 'Vendor\'s ID' }
+
+    try {
+        let vendor = await models.getVendorById(ctx.params.id);
+        return ctx.body = vendor
+
+    } catch (err) {
+        console.log(err)
+        ctx.body = { 'status': 'Failure', 'error': err }
+    }
+});
+
+// api/vendor/name/:name
+router.get('/vendor/name/:name', async (ctx, next) => {
+    // #swagger.tags = ["Vendors"]
+    // #swagger.description = "Vendor endpoints"
+    // #swagger.parameters['name'] = { description: 'Vendor\'s short-name' }
+
+    try {
+        let vendor = await models.getVendorByName(ctx.params.name);
+        return ctx.body = vendor
+
+    } catch (err) {
+        console.log(err)
+        ctx.body = { 'status': 'Failure', 'error': err }
+    }
+});
+
 router.post('/vendor', async (ctx, next) => {
+    // #swagger.tags = ["Vendors"]
+    // #swagger.description = "Vendor endpoints"
     console.log(ctx.request.body)
     try {
         let name = ctx.request.body.name;
@@ -157,7 +252,7 @@ router.post('/vendor', async (ctx, next) => {
         let link = ctx.request.body.site;
         conn = await db.getConnection();
         if ((name) && (displayName) && (link)) {
-            let vendorId = await conn.query(`INSERT INTO keyboard.vendors (name, display_name, link) VALUES ('${name}', '${displayName}', '${link}');`)
+            let vendorId = await conn.query(`INSERT INTO keyboard.vendors (name, display_name, link) VALUES ('${name}', ${conn.escape(displayName)}, '${link}');`)
             if (vendorId) {
                 console.log(vendorId)
                 ctx.body = {
@@ -192,44 +287,43 @@ router.post('/vendor', async (ctx, next) => {
 
 // api/categories
 router.get('/categories', async (ctx, next) => {
+    // #swagger.tags = ["Categories"]
+    // #swagger.description = "Category endpoints"
     try {
-        conn = await db.getConnection(0)
-        let categories = await conn.query('SELECT * FROM keyboard.categories;')
-        return ctx.body = {
-            'categories': categories
-        }
+        let categories = await models.getCategories();
+        console.log(categories)
+        ctx.body = categories
+        ctx.status = 200
     } catch (err) {
         console.log(err)
         ctx.body = { 'status': 'Failure', 'error': err }
-    } finally {
-        if (conn) return conn.release();
+        ctx.status = 500
     }
 });
 
 // api/saletypes
 router.get('/saletypes', async (ctx, next) => {
+    // #swagger.tags = ["Sales"]
+    // #swagger.description = "Sale endpoints"
     try {
-        conn = await db.getConnection(0)
-        let saleTypes = await conn.query('SELECT * FROM keyboard.sale_types;')
-        return ctx.body = {
-            'saleTypes': saleTypes
-        }
+        let saleTypes = await models.getSaleTypes();
+        ctx.body = saleTypes
+        ctx.status = 200
     } catch (err) {
         console.log(err)
         ctx.body = { 'status': 'Failure', 'error': err }
-    } finally {
-        if (conn) return conn.release();
+        ctx.status = 500
     }
 });
 
 // api/purchases
 router.get('/purchases', async (ctx, next) => {
+    // #swagger.tags = ["Purchases"]
+    // #swagger.description = "Purchase endpoints"
     try {
-        conn = await db.getConnection(0)
-        let purchases = await conn.query('SELECT * FROM keyboard.purchases;')
-        ctx.body = {
-            'purchases': purchases
-        }
+
+        let purchases = await models.getPurchases()
+        ctx.body = purchases
         ctx.status = 200
     } catch (err) {
         console.log(err)
@@ -238,13 +332,13 @@ router.get('/purchases', async (ctx, next) => {
             'error': err
         }
         ctx.status = 400
-    } finally {
-        if (conn) return conn.release();
     }
 });
 
 // api/purchase
 router.get('/purchase', async (ctx, next) => {
+    // #swagger.tags = ["Purchases"]
+    // #swagger.description = "Purchase endpoints"
     try {
         conn = await db.getConnection(0);
         let purchase = await conn.query(`SELECT * FROM keyboard.purchases ORDER BY id DESC limit 1`);
@@ -266,6 +360,10 @@ router.get('/purchase', async (ctx, next) => {
 
 // api/purchase/:id
 router.get('/purchase/:id', async (ctx, next) => {
+    // #swagger.tags = ["Purchases"]
+    // #swagger.description = "Purchase endpoints"
+    // #swagger.parameters['id'] = { description: 'Purchase ID' }
+
     try {
         conn = await db.getConnection(0);
         let purchase = await conn.query(`SELECT * FROM keyboard.purchases WHERE id = ${ctx.params.id}`);
@@ -283,12 +381,16 @@ router.get('/purchase/:id', async (ctx, next) => {
 });
 
 router.get('/orderset/:id', async (ctx, next) => {
+    // #swagger.tags = ["Purchases"]
+    // #swagger.description = "Purchase endpoints"
+    // #swagger.parameters['id'] = { description: 'OrderSet ID' }
+
     try {
         conn = await db.getConnection(0);
         let orders = await conn.query(`SELECT * FROM keyboard.purchases WHERE orderSet = ${ctx.params.id}`);
         let orderTotal = 0.00
         for (let order of orders) {
-            
+
             orderTotal += order.price + order.adjustments
         }
         ctx.body = {
@@ -308,8 +410,8 @@ router.get('/orderset/:id', async (ctx, next) => {
 });
 // api/purchase
 router.post('/purchase', async (ctx, next) => {
-    console.log(ctx.request.body)
-
+    // #swagger.tags = ["Purchases"]
+    // #swagger.description = "Purchase endpoints"
     try {
         let category = ctx.request.body.category
         let detail = ctx.request.body.detail
@@ -322,11 +424,8 @@ router.post('/purchase', async (ctx, next) => {
         let purchaseDate = ctx.request.body.purchaseDate
         let expectedDate = ctx.request.body.expectedDate
         let orderSet = ctx.request.body.orderSet
-        if (category) { }
-        console.log(`INSERT INTO keyboard.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, '${detail}', '${set}', ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, 0, '${purchaseDate}', '${expectedDate}', ${orderSet});`)
-
-        conn = await db.getConnection(0);
-        let purchaseId = await conn.query(`INSERT INTO keyboard.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, '${detail}', '${set}', ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, 0, '${purchaseDate}', '${expectedDate}', ${orderSet});`)
+        let purchaseId = await models.insertPurchase(category, detail, set, maker, vendor, price, adjustments, saletype, 0, purchaseDate, expectedDate, orderSet);
+        // conn.query(`INSERT INTO keyboard.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, '${detail}', '${set}', ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, 0, '${purchaseDate}', '${expectedDate}', ${orderSet});`)
         ctx.body = {
             'status': "OK",
             'purchaseId': purchaseId.insertId

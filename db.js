@@ -1,15 +1,14 @@
-const config = require('./.config');
+const env = process.env.NODE_ENV || "dev"
+require('dotenv').config({path: `../.env.${env}`})
 const mariadb = require('mariadb');
-
-const env = process.env.NODE_ENV || 'development';
 
 const pool = 
     mariadb.createPool({
-        host: config[env].db.host,
-        port: config[env].db.port,
-        user: config[env].db.user,
-        password: config[env].db.password,
-        database: config[env].db.schema,
+        host: process.env.DB_HOST,
+        port: process.env.DB_PORT,
+        user: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        database: process.env.DB_SCHEMA,
         connectionLimit: 5
     });
 

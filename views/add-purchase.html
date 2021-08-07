@@ -1,6 +1,6 @@
 <!-- views/index.html -->
 
-<form class="form" action="/purchase" method="POST">
+<form class="form" action="/add-purchase"  enctype="multipart/form-data" method="POST">
     <select class="select" id="category" name="category">
         <option id="option-default" name="default" value="-1">Select Category</option>
         <% for ( let category of categories) { %>
@@ -22,7 +22,7 @@
         <option id="option-default" name="default" value="-1">Select Vendor</option>
 
         <% for ( let vendor of vendors) { %>
-            <option id="option-<%= vendor.name %>" name="vendor" value=<%= vendor.id %> ><%= vendor.display_name %> </option>
+            <option id="option-<%= vendor.name %>" name="vendor" value=<%= vendor.id  %> ><%= vendor.display_name %> </option>
         <% }; %>
     </select><br />
     <input type="number" id="price" name="price" step="0.01" placeholder="Price $"/><br />
@@ -39,12 +39,13 @@
     <input type="text" id="purchaseDate" class="date" name="purchaseDate" placeholder="Purchase Date" onfocus="(this.type='date')"/><br />
     <input type="text" id="expectedDate" class="date" name="expectedDate" placeholder="Expected Date" onfocus="(this.type='date')"/><br />
     <input type="number" id="orderSet" name="orderSet" placeholder="Set Number" value="<%= maxSet %>"/><br />
+    <input type="file" id="image" name="image" /><br />
     <button type="submit" id="submit" class="btn-success">Add Purchase!</button>
 </form>
 
 <div id='ticker'>
-    <% if (ticker.makerId) { %>
-        <div class="alert-success">Added id: <%= ticker.makerId %>
+    <% if (ticker.insertId) { %>
+        <div class="alert-success">Added id: <%= ticker.insertId %>
         </div>
     <% } %>
     <% if (ticker.error) { %>

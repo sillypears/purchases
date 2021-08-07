@@ -1,143 +1,161 @@
+const env = process.env.NODE_ENV || "dev"
+require('dotenv').config({ path: `../.env.${env}` })
 const router = require('koa-router')();
-const config = require('../.config');
-const env = process.env.NODE_ENV || "development"
 const axios = require('axios');
 const db = require('../db');
+const models = require('../models/models');
+const multer = require('@koa/multer')
+const koaSwagger = require('koa2-swagger-ui');
+const upload = multer()
 
 router.get('/', async (ctx, next) => {
-    let purchases = await axios.get(`http://${config[env].hostname}:${config[env].port}/api/purchases`);
-    console.log(purchases.data.purchases)
+    let purchases = await models.getPurchases()
     return ctx.render('index', {
         title: "Purchases",
-        purchases: purchases.data.purchases
+        purchases: purchases
     });
 });
 
+// router.get('/swagger', koaSwagger({
+//         routePrefix: '/swagger', // host at /swagger instead of default /docs
+//         swaggerOptions: {
+//             url: `http://localhost:${process.env.PORT}/swagger_output.json`, // example path to json
+//         },
+//     })
+// );
 
-router.get('/maker', async (ctx, next) => {
+router.get('/makers', async (ctx, next) => {
+
+    let makers = await models.getMakerTotals();
+    return ctx.render('makers', {
+        title: "Makers",
+        makers: makers
+    });
+});
+
+router.get('/maker/:type/:id', async (ctx, next) => {
+    let maker = await models.getMakerTotal(ctx.params.type, ctx.params.id)
+    let purchases = await models.getMakerPurchases(ctx.params.type, ctx.params.id)
+
     return ctx.render('maker', {
-        title: "Add Maker",
-        ticker: ""
+        title: `Maker - ${maker.display_name} -$${maker.total}`,
+        maker: maker,
+        purchases: purchases
     });
 });
 
-router.post('/maker', async (ctx, next) => {
-    let res = await axios.post(`http://${config[env].hostname}:${config[env].port}/api/maker`, ctx.request.body)
-    if (res.status === 200) {
-        return ctx.render('maker', {
-            title: "Add Maker",
-            ticker: res.data
-        });
-    } else {
-        return ctx.render('maker', {
-            title: "Add Maker",
-            ticker: {
-                'status': res.status,
-                'message': "error",
-                'error': "Duplicate Entry"
-            }
-        });
-    }
+// router.get('/maker/name/:name', async (ctx, next) => {
+//     let maker = await models.getMakerTotal("name", ctx.params.name)
+//     return ctx.render('maker', {
+//         title: `Maker - ${maker.display_name}`,
+//         maker: maker
+//     });
+
+// });
+
+router.get('/vendors', async (ctx, next) => {
+
+    let vendors = await models.getVendorTotals();
+    return ctx.render('vendors', {
+        title: "Vendors",
+        vendors: vendors
+    });
 });
 
-router.get('/add-purchase', async(ctx, next) => {
-    let m = await axios.get(`http://${config[env].hostname}:${config[env].port}/api/makers`);
-    let v = await axios.get(`http://${config[env].hostname}:${config[env].port}/api/vendors`);
-    let c = await axios.get(`http://${config[env].hostname}:${config[env].port}/api/categories`);
-    let s = await axios.get(`http://${config[env].hostname}:${config[env].port}/api/saletypes`);
-    let maxSet = -1;
-    try {
-        conn = await db.getConnection();
-        let max = await conn.query('SELECT MAX(order_set) as latest FROM keyboard.purchases;');
-        maxSet = (max[0].latest > 0) ? max[0].latest : 0;
-    } catch (err) {
-        console.log(err)
-    } finally {
-        if (conn) conn.release();
-    }
+router.get('/vendor/:type/:id', async (ctx, next) => {
+    let vendor = await models.getVendorTotal(ctx.params.type, ctx.params.id)
+    let purchases = await models.getVendorPurchases(ctx.params.type, ctx.params.id)
+
+    return ctx.render('vendor', {
+        title: `Vendor - ${vendor.display_name} -$${vendor.total}`,
+        vendor: vendor,
+        purchases: purchases
+    });
+});
+
+
+router.get('/add-purchase', async (ctx, next) => {
+    let m = await models.getMakers();
+    let v = await models.getVendors();
+    let c = await models.getCategories();
+    let s = await models.getSaleTypes();
+    let maxSet = await models.getLatestSet();
     return ctx.render('add-purchase', {
         title: "Add Purchase",
         ticker: "",
-        makers: m.data.makers,
-        vendors: v.data.vendors,
-        categories: c.data.categories,
-        saleTypes: s.data.saleTypes,
+        makers: m,
+        vendors: v,
+        categories: c,
+        saleTypes: s,
         maxSet: maxSet
     });
-}); 
+});
 
+router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
+    let a = ctx.request.body
+    let insertId = await models.insertPurchase(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet);
+    // let insertId = await models.insertPurchaseImage(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, ctx.file);
 
-
-router.post('/add-purchase', async(ctx, next) => {
-    console.log(`a ${ctx.request.body}`)
-    let insertId 
-    let res = await axios.post(`http://${config[env].hostname}:${config[env].port}/api/purchase`, ctx.request.body)
-    if (res.status === 200) {
-        insertId = res.data.insertId
-    } 
-    let m = await axios.get(`http://${config[env].hostname}:${config[env].port}/api/makers`);
-    let v = await axios.get(`http://${config[env].hostname}:${config[env].port}/api/vendors`);
-    let c = await axios.get(`http://${config[env].hostname}:${config[env].port}/api/categories`);
-    let s = await axios.get(`http://${config[env].hostname}:${config[env].port}/api/saletypes`);
-    let maxSet = -1;
+    console.log(insertId)
+    let m = await models.getMakers();
+    let v = await models.getVendors();
+    let c = await models.getCategories();
+    let s = await models.getSaleTypes();
+    let maxSet = await models.getLatestSet();
 
     return ctx.render('add-purchase', {
         title: "Add Purchase",
         ticker: insertId,
-        makers: m.data.makers,
-        vendors: v.data.vendors,
-        categories: c.data.categories,
-        saleTypes: s.data.saleTypes,
+        makers: m,
+        vendors: v,
+        categories: c,
+        saleTypes: s,
         maxSet: maxSet
     });
-}); 
+});
 
-router.get('/purchase/:id', async(ctx, next) => {
-    let purchase = await axios.get(`http://${config[env].hostname}:${config[env].port}/api/purchase/${ctx.params.id}`);
+router.get('/purchase/:id', async (ctx, next) => {
+    let purchase = await axios.get(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/purchase/${ctx.params.id}`);
     return ctx.render('purchase', {
         title: `Purchase #${ctx.params.id}`,
         ticker: "",
         purchase: purchase.data
     });
-}); 
+});
 
-router.get('/add-maker', async(ctx, next) => {
+router.get('/add-maker', async (ctx, next) => {
 
     return ctx.render('add-maker', {
         title: "Add Maker!",
         ticker: ""
     });
-}); 
+});
 
-
-
-router.post('/add-maker', async(ctx, next) => {
+router.post('/add-maker', async (ctx, next) => {
     let insertId = -1
-    let res = await axios.post(`http://${config[env].hostname}:${config[env].port}/api/maker`, ctx.request.body)
+    let res = await axios.post(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/maker`, ctx.request.body)
     if (res.status === 200) {
-        console.log(res)
         ticker = { makerId: res.data.makerId }
     } else {
         ticker = { error: res.data.reason }
     }
-    console.log(insertId)
     return ctx.render('add-maker', {
         title: "Add Maker!",
         ticker: ticker
     });
-}); 
+});
 
-router.get('/add-vendor', async(ctx, next) => {
+router.get('/add-vendor', async (ctx, next) => {
 
     return ctx.render('add-vendor', {
         title: "Add Vendor!",
         ticker: ""
     });
-}); 
+});
 
-router.post('/add-vendor', async(ctx, next) => {
+router.post('/add-vendor', async (ctx, next) => {
     let ticker
-    let res = await axios.post(`http://${config[env].hostname}:${config[env].port}/api/vendor`, ctx.request.body)
+    let res = await axios.post(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/vendor`, ctx.request.body)
     if (res.status === 200) {
         console.log(res)
         ticker = { vendorId: res.data.vendorId }
@@ -149,5 +167,5 @@ router.post('/add-vendor', async(ctx, next) => {
         title: "Add Vendor!",
         ticker: ticker
     });
-}); 
+});
 module.exports = router;

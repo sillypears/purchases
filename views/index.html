@@ -2,13 +2,40 @@
 
 
 <div class="container">
-    <% for (let purchase of purchases) { %>
-    <div class="card">
-        <div class="card-body">
-            <div class="card-title" ><%= purchase.entity %></div>
-            <span class="col-md-6"><a href="/purchase/<%= purchase.id %>" class="card-text" > <%= purchase.detail %></a></span>
-            <span class="col-md-6"><a href="/orderset/<%= purchase.orderSet %>" class="card-text"><%= purchase.orderSet %></a></span>
-        </div>    
-    </div>  
-    <% } %>
+    <div class="row">
+        <% purchases.forEach((purchase, index)=> { %>
+            <% if (index % 4==0 && index !=0) { %>
+    </div>
+    <div class="row">
+        <% } %>
+            <div class="col-md-3 d-flex align-items-stretch">
+                <div class="card text-center">
+                    <div class="card-body">
+
+                        <div class="card-title">
+                            <%= purchase.entity %>
+                        </div>
+                        <div class="card-text">
+                            <%= purchase.detail %>
+                        </div>
+                    </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <span class="text-center col-md-2">
+                                    <a href="https://instagram.com/<%= purchase.instagram %>" target="_blank"><img class="card-link ig-link" src="/img/ig.png"></a>
+                                </span>
+                                <span class="text-center col-md-2">
+                                    <a href="<%= purchase.link %>" target="_blank"><img class="card-link www-link" src="/img/www.png"></a>
+                                </span>
+                                <span class="text-right col-md-8">
+                                    $<%= (purchase.price+purchase.adjustments).toFixed(2) %>
+                                </span>
+                            </div>
+                        </div>
+                    
+                </div>
+            </div>
+            <% }) %>
+    </div>
+</div>
 </div>

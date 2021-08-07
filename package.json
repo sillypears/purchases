@@ -18,7 +18,10 @@
   },
   "homepage": "https://github.com/sillypears/purchases#readme",
   "dependencies": {
+    "@koa/multer": "^3.0.0",
     "axios": "^0.21.1",
+    "dotenv": "^10.0.0",
+    "jest": "^27.0.6",
     "koa": "^2.13.1",
     "koa-better-body": "^3.3.9",
     "koa-bodyparser": "^4.3.0",
@@ -28,6 +31,14 @@
     "koa-response-time": "^2.1.0",
     "koa-router": "^10.0.0",
     "koa-static": "^5.0.0",
-    "mariadb": "^2.5.4"
+    "koa2-swagger-ui": "^5.2.0",
+    "mariadb": "^2.5.4",
+    "multer": "^1.4.2",
+    "swagger-autogen": "^2.11.1",
+    "swagger-ui": "^3.51.2"
+  },
+  "devDependencies": {
+    "babel-jest": "^27.0.6",
+    "regenerator-runtime": "^0.13.7"
   }
 }

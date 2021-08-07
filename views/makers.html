@@ -1,0 +1,33 @@
+<!-- views/makers.html -->
+
+<div class="container">
+    <div class="row">
+        <% makers.forEach((maker, index)=> { %>
+            <% if (index % 4==0 && index !=0) { %>
+    </div>
+    <div class="row">
+        <% } %>
+            <div class="col-md-3 d-flex align-items-stretch">
+                <div class="card text-center">
+                    <div class="card-body">
+
+                        <div class="card-title">
+                            <a href="/maker/id/<%= maker.id %>">
+                                <%= maker.display_name %>
+                            </a>
+                        </div>
+                        <div class="card-text">
+                            $<%= maker.total %>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="https://instagram.com/<%= maker.instagram %>" target="_blank"><img
+                                class="card-link ig-link" src="/img/ig.png"></a>
+                    </div>
+
+                </div>
+            </div>
+            <% }) %>
+    </div>
+</div>
+</div>
