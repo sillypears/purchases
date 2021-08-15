@@ -1,10 +1,29 @@
 <!-- views/purchase.html -->
 <div class="row">
-    <div class="col-md-6">
-        <%= purchase.id %>
+    <div class="col">
+        <%=purchase.detail%>
     </div>
-</div>
+    <div class="col">
+        <%=purchase.entity%>
+    </div>
+    <div class="col">
+        <%= new Date(purchase.purchaseDate).toLocaleDateString("en-US") %>
+    </div>
+    <div class="col">
+        <%=purchase.maker%>
+    </div>
+    <div class="col">
+        <%=purchase.vendor%>
+    </div>
+    <div class="col">
+        <% if (purchase.received) { %>
+            <span class="btn-success">Yes</span>
+        <% } else { %> 
+            <span class="btn-danger">No</span>
+        <% } %>  
+    </div>
 
+</div>
 <div id='ticker'>
     <% if (ticker.makerId) { %>
         <div class="alert-success">Added id: <%= ticker.makerId %>

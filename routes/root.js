@@ -12,7 +12,9 @@ router.get('/', async (ctx, next) => {
     let purchases = await models.getPurchases()
     return ctx.render('index', {
         title: "Purchases",
-        purchases: purchases
+        nav: "index",
+        purchases: purchases,
+        totals: purchases.length
     });
 });
 
@@ -29,7 +31,9 @@ router.get('/makers', async (ctx, next) => {
     let makers = await models.getMakerTotals();
     return ctx.render('makers', {
         title: "Makers",
-        makers: makers
+        nav: "makers",
+        makers: makers,
+        totals: makers.length
     });
 });
 
@@ -39,8 +43,10 @@ router.get('/maker/:type/:id', async (ctx, next) => {
 
     return ctx.render('maker', {
         title: `Maker - ${maker.display_name} -$${maker.total}`,
+        nav: "maker",
         maker: maker,
-        purchases: purchases
+        purchases: purchases,
+        totals: purchases.length
     });
 });
 
@@ -58,7 +64,9 @@ router.get('/vendors', async (ctx, next) => {
     let vendors = await models.getVendorTotals();
     return ctx.render('vendors', {
         title: "Vendors",
-        vendors: vendors
+        nav: "vendors",
+        vendors: vendors,
+        totals: vendors.length
     });
 });
 
@@ -68,8 +76,10 @@ router.get('/vendor/:type/:id', async (ctx, next) => {
 
     return ctx.render('vendor', {
         title: `Vendor - ${vendor.display_name} -$${vendor.total}`,
+        nav: "vendor",
         vendor: vendor,
-        purchases: purchases
+        purchases: purchases,
+        totals: purchases.length
     });
 });
 
@@ -82,6 +92,8 @@ router.get('/add-purchase', async (ctx, next) => {
     let maxSet = await models.getLatestSet();
     return ctx.render('add-purchase', {
         title: "Add Purchase",
+        nav: "add-purchase",
+        totals: 0,
         ticker: "",
         makers: m,
         vendors: v,
@@ -93,7 +105,7 @@ router.get('/add-purchase', async (ctx, next) => {
 
 router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
     let a = ctx.request.body
-    let insertId = await models.insertPurchase(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet);
+    let insertId = await models.insertPurchase(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, a.image);
     // let insertId = await models.insertPurchaseImage(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, ctx.file);
 
     console.log(insertId)
@@ -105,6 +117,8 @@ router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
 
     return ctx.render('add-purchase', {
         title: "Add Purchase",
+        nav: "add-purchase",
+        totals: 0,
         ticker: insertId,
         makers: m,
         vendors: v,
@@ -115,11 +129,14 @@ router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
 });
 
 router.get('/purchase/:id', async (ctx, next) => {
-    let purchase = await axios.get(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/purchase/${ctx.params.id}`);
+    // let purchase = await axios.get(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/purchase/${ctx.params.id}`);
+    let p = await models.getPurchase(ctx.params.id)
     return ctx.render('purchase', {
         title: `Purchase #${ctx.params.id}`,
+        nav: "purchase",
         ticker: "",
-        purchase: purchase.data
+        totals: 0,
+        purchase: p
     });
 });
 
@@ -127,9 +144,34 @@ router.get('/add-maker', async (ctx, next) => {
 
     return ctx.render('add-maker', {
         title: "Add Maker!",
-        ticker: ""
+        nav: "add-maker",
+        ticker: "",
+        totals: 0
+
     });
 });
+
+router.get('/add-vendor', async (ctx, next) => {
+
+    return ctx.render('add-vendor', {
+        title: "Add Vendor!",
+        nav: "add-vendor",
+        ticker: "",
+        totals: 0
+    });
+});
+
+router.get('/graph/artisan-count', async (ctx, next) => {
+    let artisanData = await models.getArtisansByCount()
+    return ctx.render('artisan-count', {
+        title: "Artisans By Count",
+        nav: "artisan-count",
+        ticker: "",
+        totals: 0,
+        data: artisanData
+
+    })
+})
 
 router.post('/add-maker', async (ctx, next) => {
     let insertId = -1
@@ -141,15 +183,9 @@ router.post('/add-maker', async (ctx, next) => {
     }
     return ctx.render('add-maker', {
         title: "Add Maker!",
-        ticker: ticker
-    });
-});
-
-router.get('/add-vendor', async (ctx, next) => {
-
-    return ctx.render('add-vendor', {
-        title: "Add Vendor!",
-        ticker: ""
+        nav: "artisan-count",
+        ticker: ticker,
+        totals: 0
     });
 });
 
@@ -165,7 +201,9 @@ router.post('/add-vendor', async (ctx, next) => {
     console.log(ticker)
     return ctx.render('add-vendor', {
         title: "Add Vendor!",
-        ticker: ticker
+        nav: "artisan-count",
+        ticker: ticker,
+        totals: 0
     });
 });
 module.exports = router;

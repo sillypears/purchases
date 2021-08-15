@@ -33,7 +33,6 @@ router.get('/makers', async (ctx, next) => {
     }
 });
 
-
 // api/makers
 router.get('/makersprice', async (ctx, next) => {
     // #swagger.tags = ["Makers"]
@@ -49,7 +48,6 @@ router.get('/makersprice', async (ctx, next) => {
         ctx.status = 500
     }
 });
-
 
 // api/maker
 router.get('/maker', async (ctx, next) => {
@@ -166,7 +164,6 @@ router.post('/maker', async (ctx, next) => {
     }
 });
 
-
 // api/vendors
 router.get('/vendors', async (ctx, next) => {
     // #swagger.tags = ["Vendors"]
@@ -259,7 +256,7 @@ router.post('/vendor', async (ctx, next) => {
                     'status': "OK",
                     'vendorId': vendorId.insertId
                 }
-                ctx.status = 200
+                ctx.status = 201
 
             } else {
                 throw err;
@@ -380,6 +377,7 @@ router.get('/purchase/:id', async (ctx, next) => {
     }
 });
 
+// api/orderset/:id
 router.get('/orderset/:id', async (ctx, next) => {
     // #swagger.tags = ["Purchases"]
     // #swagger.description = "Purchase endpoints"
@@ -408,6 +406,7 @@ router.get('/orderset/:id', async (ctx, next) => {
         if (conn) return conn.release();
     }
 });
+
 // api/purchase
 router.post('/purchase', async (ctx, next) => {
     // #swagger.tags = ["Purchases"]
@@ -424,12 +423,12 @@ router.post('/purchase', async (ctx, next) => {
         let purchaseDate = ctx.request.body.purchaseDate
         let expectedDate = ctx.request.body.expectedDate
         let orderSet = ctx.request.body.orderSet
-        let purchaseId = await models.insertPurchase(category, detail, set, maker, vendor, price, adjustments, saletype, 0, purchaseDate, expectedDate, orderSet);
-        // conn.query(`INSERT INTO keyboard.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, '${detail}', '${set}', ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, 0, '${purchaseDate}', '${expectedDate}', ${orderSet});`)
-        ctx.body = {
-            'status': "OK",
-            'purchaseId': purchaseId.insertId
-        }
+        // let purchaseId = await models.insertPurchase(category, detail, set, maker, vendor, price, adjustments, saletype, 0, purchaseDate, expectedDate, orderSet);
+        console.log(`INSERT INTO keyboard.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, '${detail}', '${set}', ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, 0, '${purchaseDate}', '${expectedDate}', ${orderSet});`)
+        // ctx.body = {
+            // 'status': "OK",
+            // 'purchaseId': purchaseId.insertId
+        // }
         ctx.status = 200
     } catch (err) {
         console.log(err)
@@ -448,5 +447,105 @@ router.post('/purchase', async (ctx, next) => {
     }
 });
 
+// api/mass-purchase
+router.post('/mass-purchase', async (ctx, next) => {
+    // #swagger.tags = ["Purchases"]
+    // #swagger.description = "Purchase endpoints"
+    try {
+        purchases = ctx.request.body
+        for (i in purchases) {
+            let purchase = purchases[i]
+            let category = await models.getCategoryIdByDisplayName(purchase.category)
+            console.log(category)
+            let detail = purchase.detail
+            let entity = purchase.entity
+            let maker = await models.getMakerIdByDisplayName(purchase.maker)
+            let vendor = await models.getVendorIdByDisplayName(purchase.vendor)
+            let price = purchase.price
+            let adjustments = purchase.adjustments
+            let saletype = await models.getSaleTypeIdByName(purchase.saleType)
+            let purchaseDate = purchase.purchaseDate
+            let receivedDate = purchase.receivedDate
+            let orderSet = purchase.orderSet
+            let purchaseId = await models.insertPurchase(category, detail, entity, maker, vendor, price, adjustments, saletype, 0, purchaseDate, receivedDate, orderSet);
+            // console.log(`INSERT INTO keyboard.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, '${detail}', '${entity}', ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, 0, '${purchaseDate}', '${receivedDate}', ${orderSet});`)
+            ctx.body = {
+                'status': "OK",
+                'purchaseId': purchaseId.insertId
+            }
+        }
+        ctx.status = 201
+    } catch (err) {
+        console.log(err)
+        if (err.code == "ER_DUP_ENTRY") {
+            ctx.body = {
+                'status': "Failure",
+                'reason': "Duplicate Entry",
+            }
+            ctx.status = 209
+        } else {
+            ctx.body = { 'status': 'Failure', 'error': err }
+            ctx.status = 422
+        }
+    } finally {
+        // if (conn) return conn.release()
+    }
+});
+
+// api/receiveToggle/:id
+router.get('/receiveToggle/:id', async (ctx, next) => {
+    
+    try {
+        
+        let received = await models.toggleReceivedStatus(ctx.params.id)
+ 
+        ctx.body = {
+            status: 'OK',
+            purchaseId: ctx.params.id,
+            message: received
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    }
+});
+
+// api/graph/artisansByCount
+router.get('/graph/artisansByCount', async (ctx, next) => {
+    try {
+        let artisansByCountData = await models.getArtisansByCount()
+        ctx.body = {
+            status:     'OK',
+            data: artisansByCountData,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status':'Failure',
+            'error': err
+        }
+    }
+});
+
+// api/graph/artisansByPrice
+router.get('/graph/artisansByPrice', async (ctx, next) => {
+    try {
+        let artisansByPriceData = await models.getArtisansByPrice()
+        ctx.body = {
+            status:     'OK',
+            data: artisansByPriceData,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status':'Failure',
+            'error': err
+        }
+    }
+});
 
 module.exports = router;
