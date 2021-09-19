@@ -129,10 +129,11 @@ router.post('/maker', async (ctx, next) => {
     try {
         let name = ctx.request.body.name;
         let displayName = ctx.request.body.displayName;
+        let archivist = ctx.request.body.archivist;
         let instagram = ctx.request.body.instagram;
         conn = await db.getConnection();
         if ((name) && (displayName) && (instagram)) {
-            let makerId = await conn.query(`INSERT INTO keyboard.makers (name, display_name, instagram) VALUES ('${name}', ${conn.escape(displayName)}, '${instagram}');`)
+            let makerId = await conn.query(`INSERT INTO keyboard.makers (name, display_name, instagram, archivist_name) VALUES ('${name}', ${conn.escape(displayName)}, '${instagram}', '${archivist}');`)
             if (makerId) {
                 ctx.body = {
                     'status': "OK",
@@ -248,7 +249,7 @@ router.post('/vendor', async (ctx, next) => {
         let displayName = ctx.request.body.displayName;
         let link = ctx.request.body.site;
         conn = await db.getConnection();
-        if ((name) && (displayName) && (link)) {
+        if ((name) && (displayName)) {
             let vendorId = await conn.query(`INSERT INTO keyboard.vendors (name, display_name, link) VALUES ('${name}', ${conn.escape(displayName)}, '${link}');`)
             if (vendorId) {
                 console.log(vendorId)
@@ -426,8 +427,8 @@ router.post('/purchase', async (ctx, next) => {
         // let purchaseId = await models.insertPurchase(category, detail, set, maker, vendor, price, adjustments, saletype, 0, purchaseDate, expectedDate, orderSet);
         console.log(`INSERT INTO keyboard.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, '${detail}', '${set}', ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, 0, '${purchaseDate}', '${expectedDate}', ${orderSet});`)
         // ctx.body = {
-            // 'status': "OK",
-            // 'purchaseId': purchaseId.insertId
+        // 'status': "OK",
+        // 'purchaseId': purchaseId.insertId
         // }
         ctx.status = 200
     } catch (err) {
@@ -494,11 +495,11 @@ router.post('/mass-purchase', async (ctx, next) => {
 
 // api/receiveToggle/:id
 router.get('/receiveToggle/:id', async (ctx, next) => {
-    
+
     try {
-        
+
         let received = await models.toggleReceivedStatus(ctx.params.id)
- 
+
         ctx.body = {
             status: 'OK',
             purchaseId: ctx.params.id,
@@ -514,38 +515,125 @@ router.get('/receiveToggle/:id', async (ctx, next) => {
     }
 });
 
+// api/update/:field
+router.post('/update/:field', async (ctx, next) => {
+    try {
+        let field = ctx.params.field
+        let detail = ctx.request.body.detail
+        let id = ctx.request.body.id
+        let updateId = await models.updateField(field, detail, id)
+        ctx.body = {
+            status: 'OK',
+            updateId: updateId
+        }
+        ctx.status = 200
+    } catch (e) {
+        console.log(e)
+        ctx.body = {
+            status: 'Failure',
+            error: e
+        }
+        ctx.status = 422
+
+    }
+})
+
 // api/graph/artisansByCount
 router.get('/graph/artisansByCount', async (ctx, next) => {
     try {
         let artisansByCountData = await models.getArtisansByCount()
+        headers = []
+        for (let x in artisansByCountData) {
+            if (!headers.includes(artisansByCountData[x].entity)) {
+                headers.push(artisansByCountData[x].entity)
+            }
+        }
         ctx.body = {
-            status:     'OK',
+            status: 'OK',
+            headers: headers,
             data: artisansByCountData,
         }
         ctx.status = 200
     } catch (err) {
         ctx.body = {
-            'status':'Failure',
+            'status': 'Failure',
             'error': err
         }
     }
 });
 
+// api/graph/makerByCount
+router.get('/graph/makerByCount', async (ctx, next) => {
+    try {
+        let makerByCountData = await models.getMakerByCount()
+        headers = []
+        for (let x in makerByCountData) {
+            if (!headers.includes(makerByCountData[x].display_name)) {
+                headers.push(makerByCountData[x].display_name)
+            }
+        }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: makerByCountData,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+
 // api/graph/artisansByPrice
 router.get('/graph/artisansByPrice', async (ctx, next) => {
     try {
         let artisansByPriceData = await models.getArtisansByPrice()
+        headers = []
+        for (let x in artisansByPriceData) {
+            if (!headers.includes(artisansByPriceData[x].entity)) {
+                headers.push(artisansByPriceData[x].entity)
+            }
+        }
         ctx.body = {
-            status:     'OK',
+            status: 'OK',
+            headers: headers,
             data: artisansByPriceData,
         }
         ctx.status = 200
     } catch (err) {
         ctx.body = {
-            'status':'Failure',
+            'status': 'Failure',
             'error': err
         }
     }
 });
+
+// api/graph/makerByPrice
+router.get('/graph/makerByPrice', async (ctx, next) => {
+    try {
+        let makerByPriceData = await models.getMakerByPrice()
+        headers = []
+        for (let x in makerByPriceData) {
+            if (!headers.includes(makerByPriceData[x].display_name)) {
+                headers.push(makerByPriceData[x].display_name)
+            }
+        }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: makerByPriceData,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
 
 module.exports = router;

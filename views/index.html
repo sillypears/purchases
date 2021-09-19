@@ -1,23 +1,19 @@
 <!-- views/index.html -->
 
 
-<div class="container">
-    <div class="row">
+<div class="container-fluid ">
+    <div class="row no-gutters ">
         <% purchases.forEach((purchase, index)=> { %>
-            <% if (index % 4==0 && index !=0) { %>
-    </div>
-    <div class="row">
-        <% } %>
-            <div class="col-md-3 d-flex align-items-stretch">
+
+            <div class=" d-flex align-items-stretch">
                 <div id="card-<%= purchase.id %>" class="card text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
                     <span  class="toggle-icon clickable text-left" data-id="<%= purchase.id %>" ><i title="Toggle Status" class="fa fa-times">&nbsp;o</i></span>
                     <div class="card-body">
-
                         <div class="card-title">
-                            <a href="/purchase/<%= purchase.id %>" ><img class="card-image" src="<%= purchase.image %>" title="<%= purchase.vendor_name %> "/></a>
+                            <a href="/purchase/<%= purchase.id %>" ><img class="card-image" loading="lazy" src="<% if (purchase.image) {%> <%= purchase.image %> <%} else { %>/img/missing.png<% } %>" title="<%= purchase.vendor_name %> "/></a>
                         </div>
                         <div class="card-text">
-                            <%= purchase.entity %>
+                            <%= purchase.sculpt %>
                             <br />
                             <%= purchase.detail %>
                         </div>

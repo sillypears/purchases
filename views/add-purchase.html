@@ -3,13 +3,14 @@
 <form class="form" action="/add-purchase"  enctype="multipart/form-data" method="POST">
     <select class="select" id="category" name="category">
         <option id="option-default" name="default" value="-1">Select Category</option>
-        <% for ( let category of categories) { %>
-            <option id="option-<%= category.name %>" name="category" value="<%= category.id %>" ><%= category.display_name %> </option>
+        <% for ( let category of categories) { %><
+            <option id="option-<%= category.name %>" name="category" value="<%= category.id %>" <% if (category.display_name == "Artisan") { %> selected <% } %> ><%= category.display_name %> </option>
         <% }; %>
     </select><br />
     <input type="text" id="detail" name="detail" placeholder="Detail"/><br />
-    <input type="text" id="set" name="set" placeholder="Set"/><br />
-    
+    <input type="text" id="archivist" name="archivist" placeholder="Keycap Archivist Sculpt"/><br />
+    <input type="text" id="set" name="set" placeholder="Display Name"/><br />
+
     <select class="select" id="maker" name="maker">
         <option id="option-default" name="default" value="-1">Select Maker</option>
 

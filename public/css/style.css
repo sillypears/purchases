@@ -1,10 +1,23 @@
+.container-fluid {
+    margin: 20px 50px;
+}
 .card {
-    width: 18rem;
+    width: 11rem;
+    margin: 0px 0px 10px 10px;
+}
+
+.card-big {
+    width: 75%;
     margin: 0px 0px 10px 10px;
 }
 
 .card-image {
-    width: 10rem;
+    width: 150px;
+
+}
+
+.big-card-image {
+    width: 32em;
 }
 
 .ig-link, .www-link {

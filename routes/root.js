@@ -90,6 +90,7 @@ router.get('/add-purchase', async (ctx, next) => {
     let c = await models.getCategories();
     let s = await models.getSaleTypes();
     let maxSet = await models.getLatestSet();
+    console.log(maxSet)
     return ctx.render('add-purchase', {
         title: "Add Purchase",
         nav: "add-purchase",
@@ -105,7 +106,11 @@ router.get('/add-purchase', async (ctx, next) => {
 
 router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
     let a = ctx.request.body
-    let insertId = await models.insertPurchase(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, a.image);
+    if (typeof a.adjustments !== 'number') { 
+        a.adjustments = 0 
+    }
+    console.log(`adjustments: ${a.adjustments} --`)
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, a.image);
     // let insertId = await models.insertPurchaseImage(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, ctx.file);
 
     console.log(insertId)
@@ -130,13 +135,17 @@ router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
 
 router.get('/purchase/:id', async (ctx, next) => {
     // let purchase = await axios.get(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/purchase/${ctx.params.id}`);
-    let p = await models.getPurchase(ctx.params.id)
+    let purch = await models.getPurchase(ctx.params.id)
+    let n = await models.getNextPurchaseId(ctx.params.id)
+    let p = await models.getPrevPurchaseId(ctx.params.id)
     return ctx.render('purchase', {
         title: `Purchase #${ctx.params.id}`,
         nav: "purchase",
         ticker: "",
         totals: 0,
-        purchase: p
+        purchase: purch,
+        next: n || 0,
+        prev: p || 0
     });
 });
 

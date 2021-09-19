@@ -1,37 +1,79 @@
 <!-- views/purchase.html -->
-<div class="row">
-    <div class="col">
-        <%=purchase.detail%>
-    </div>
-    <div class="col">
-        <%=purchase.entity%>
-    </div>
-    <div class="col">
-        <%= new Date(purchase.purchaseDate).toLocaleDateString("en-US") %>
-    </div>
-    <div class="col">
-        <%=purchase.maker%>
-    </div>
-    <div class="col">
-        <%=purchase.vendor%>
-    </div>
-    <div class="col">
-        <% if (purchase.received) { %>
-            <span class="btn-success">Yes</span>
-        <% } else { %> 
-            <span class="btn-danger">No</span>
-        <% } %>  
-    </div>
+<div class="row no-gutters justify-content-center align-items-center text-center">
+    <div id="card-<%= purchase.id %>"
+        class="card-big border-top border-right text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
+        <span class="row">
+            <span class="toggle-icon col-md-1 clickable text-center" data-id="<%= purchase.id %>"><i
+                    title="Toggle Status" class="fa fa-times">o</i></span>
+        </span>
+        <div class="card-body">
 
+            <div class="card-title">
+                <a href="/purchase/<%= purchase.id %>"><img class="big-card-image"
+                        src="<% if (purchase.image) {%> <%= purchase.image %> <%} else { %>/img/missing.png<% } %>"
+                        title="<%= purchase.vendor_name %> " /></a>
+            </div>
+            <div class="card-text">
+                <span id="sculpt-<%= purchase.id%>" class="entity_display font-weight-bold editableField"
+                    contenteditable="true" data-id="<%= purchase.id %>" data-type="entity_display">
+                    <%= purchase.sculpt %>
+                </span>
+                | <span id="archivist-<%= purchase.id%>" class="entity font-weight-light editableField"
+                    title="archivist" contenteditable="true" data-id="<%= purchase.id %>" data-type="entity">
+                    <%= purchase.entity %>
+                </span>
+                <br />
+                <span id="detail-<%= purchase.id%>" class="detail editableField" contenteditable="true"
+                    data-id="<%= purchase.id %>" data-type="detail">
+                    <%= purchase.detail %>
+                </span>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <span class="text-left col-md-1">
+                    <a href="https://instagram.com/<%= purchase.instagram %>" target="_blank"><img
+                            class="card-link ig-link" src="/img/ig.png"></a>
+                </span>
+                <span class="text-left col-md-1">
+                    <a href="<%= purchase.link %>" target="_blank"><img class="card-link www-link"
+                            src="/img/www.png"></a>
+                </span>
+                <span class="text-right col-md-9">
+                    <%= purchase.saleType %>
+                </span>
+                <span class="text-right col-md-1">
+                    $<%= (purchase.price).toFixed(2) %>+$<%= (purchase.adjustments).toFixed(2) %>
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row no-gutters justify-content-center align-items-center text-center">
+    <div class="col-md-2">
+        <% if (prev) { %>
+            <div class="font-weight-bold">
+                <a class="align-bottom" href="/purchase/<%= prev.id %>">PREV
+                </a>
+            </div>
+            <% } %>
+    </div>
+    <div class="col-md-8">&nbsp;</div>
+    <div class="col-md-2">
+        <% if (next) { %>
+            <span class="font-weight-bold "><a class="" href="/purchase/<%= next.id %>">NEXT</a></span>
+            <% } %>
+    </div>
 </div>
 <div id='ticker'>
     <% if (ticker.makerId) { %>
         <div class="alert-success">Added id: <%= ticker.makerId %>
         </div>
-    <% } %>
-    <% if (ticker.error) { %>
-        <div class="alert-danger">
-            <%= ticker.error %>
-        </div>
-    <% } %>
+        <% } %>
+            <% if (ticker.error) { %>
+                <div class="alert-danger">
+                    <%= ticker.error %>
+                </div>
+                <% } %>
 </div>

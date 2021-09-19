@@ -1,5 +1,4 @@
 $(function(){
-
     $('.toggle-icon').on('click',function() {
         console.log(this.dataset.id)
         $.ajax({
@@ -17,4 +16,25 @@ $(function(){
             }
           });
       })
+      $('.sculpt').on('click', function() {
+          console.log(this.textContent)
+      })
+      $('.archivist').on('click', function() {
+        console.log(this.textContent)
+    })
+    $('.editableField').on('blur', function(event){
+        event.preventDefault()
+        $.ajax({
+            url: `/api/update/${this.dataset.type}`,
+            type: 'POST', 
+            data: {
+                detail: $(this).text(),
+                id: this.dataset.id
+            },
+            dataType: 'jsonp',
+            success: function(result){
+                console.log($(this).text())
+            }
+          });
+    })
 })  

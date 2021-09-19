@@ -22,19 +22,23 @@ def connect_db():
         print(f"Error connecting to MariaDB Platform: {e}")
 
 def get_data(maker):
-    url = f"https://raw.githubusercontent.com/keycap-archivist/database/master/db/{maker}.json"
-    res = requests.get(url=url)
-    if res.status_code == 200:
-        return json.loads(res.text)
-    else:
+    try:
+        if ' ' in maker:
+            maker = maker.replace(' ', '-')
+        url = f"https://raw.githubusercontent.com/keycap-archivist/database/master/db/{maker}.json"
+        res = requests.get(url=url)
+        if res.status_code == 200:
+            return json.loads(res.text)
+    except Exception as e:
         return None
 
 def parse_src(data, maker, sculpt, cw):
     img = ''
     for x in data['sculpts']:
-        if x['name'] == sculpt:
+        if x['name'].lower() == sculpt.lower():
+
             for color in x['colorways']:
-                if color['name'] == cw:
+                if color['name'].lower().strip() == cw.lower().strip():
                     img = color['img']
     return img
 
@@ -49,26 +53,30 @@ def main():
     cur = conn.cursor()
     cur.execute('SELECT * FROM keyboard.makers')
     makers = cur.fetchall()
-    cur.execute('select * from keyboard.all_purchases')
+    cur.execute('select * from keyboard.all_purchases  ORDER BY id ASC')
     purchases = cur.fetchall()
     keycap = {}
     for maker in makers:
-        keycap[maker[0]] = maker[4]
+        # print(maker[0], maker[4])
+        if maker[4] != "":
+            keycap[maker[0]] = maker[4]
 
     for purchase in purchases:
         # print(purchase)
-        p_id = purchase[0]
-        sculpt = purchase[3]
-        cw = purchase[2]
-        m_id = purchase[5]
-        maker = keycap[m_id]
-        d = get_data(maker)
-        if d:
-            i = parse_src(d, maker, sculpt, cw)
-            if i:
-                # print(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}")
-                print(maker, sculpt, cw)
-                cur.execute(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}")
+        m_id = purchase[6]
+        if m_id in keycap:
+            p_id = purchase[0]
+            sculpt = purchase[3]
+            cw = purchase[2]
+            maker = keycap[m_id]
+            pic = purchase[19]
+            d = get_data(maker)
+            if d:
+                i = parse_src(d, maker.strip(), sculpt.strip(), cw.strip())
+                if i != pic:
+                    # print(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}")
+                    print(maker, sculpt, cw, i)
+                    cur.execute(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}")
     conn.commit()
     conn.close()
     # sys.exit()
