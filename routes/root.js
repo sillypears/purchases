@@ -183,34 +183,32 @@ router.get('/graph/artisan-count', async (ctx, next) => {
 })
 
 router.post('/add-maker', async (ctx, next) => {
-    let insertId = -1
-    let res = await axios.post(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/maker`, ctx.request.body)
-    if (res.status === 200) {
-        ticker = { makerId: res.data.makerId }
+    let ticker;
+    let makerId = await models.insertMaker(ctx.request.body.name, ctx.request.body.displayName, ctx.request.body.archivist, ctx.request.body.instagram)
+    if (makerId.insertId > 0) {
+        ticker = { makerId: makerId.insertId }
     } else {
-        ticker = { error: res.data.reason }
+        ticker = { error: "Unsuccessful adding maker" }
     }
     return ctx.render('add-maker', {
         title: "Add Maker!",
-        nav: "artisan-count",
+        nav: "add-maker",
         ticker: ticker,
         totals: 0
     });
 });
 
 router.post('/add-vendor', async (ctx, next) => {
-    let ticker
-    let res = await axios.post(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/vendor`, ctx.request.body)
-    if (res.status === 200) {
-        console.log(res)
-        ticker = { vendorId: res.data.vendorId }
+    let ticker;
+    let vendorId = await models.insertVendor(ctx.request.body.name, ctx.request.body.displayName, ctx.request.body.site)
+    if (vendorId.insertId > 0) {
+        ticker = { vendorId: vendorId.insertId }
     } else {
-        ticker = { error: res.data.reason }
+        ticker = { error: "Unsuccessful adding vendor" }
     }
-    console.log(ticker)
     return ctx.render('add-vendor', {
         title: "Add Vendor!",
-        nav: "artisan-count",
+        nav: "add-vendor",
         ticker: ticker,
         totals: 0
     });

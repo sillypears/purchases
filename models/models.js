@@ -97,7 +97,7 @@ module.exports = {
     },
     getPurchase: async (id) => {
         conn = await db.getConnection();
-        let purchase = await conn.query(`SELECT p.id, c.display_name as category, p.detail, p.entity, p.entity_display as sculpt, m.display_name as maker, v.display_name as vendor, p.price,p.adjustments, s.display_name as saleType, p.received, p.purchaseDate, p.image FROM keyboard.purchases p LEFT JOIN keyboard.categories c ON c.id = p.category LEFT JOIN keyboard.makers m ON m.id = p.maker JOIN keyboard.vendors v ON v.id = p.vendor LEFT JOIN keyboard.sale_types s ON s.id = p.saleType WHERE p.id = ${id}`)
+        let purchase = await conn.query(`SELECT p.id, c.display_name as category, p.detail, p.entity, p.entity_display as sculpt, m.display_name as maker, m.archivist_name as archivist, v.display_name as vendor, p.price,p.adjustments, s.display_name as saleType, p.received, p.purchaseDate, p.image FROM keyboard.purchases p LEFT JOIN keyboard.categories c ON c.id = p.category LEFT JOIN keyboard.makers m ON m.id = p.maker JOIN keyboard.vendors v ON v.id = p.vendor LEFT JOIN keyboard.sale_types s ON s.id = p.saleType WHERE p.id = ${id}`)
         if (conn) conn.release()
         return purchase[0]
     },
@@ -133,6 +133,21 @@ module.exports = {
         let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, image) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(set)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, '${purchaseDate}', '${expectedDate}', ${orderSet}, ${image.buffer});`)
         if (conn) conn.release();
         return purchaseId
+    },
+    insertMaker: async (name, display_name, ka_name, ig) => {
+        conn = await db.getConnection();
+        let makerId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.makers (name, display_name, instagram, archivist_name) VALUES ('${name}', ${conn.escape(display_name)}, '${ig}', '${ka_name}');`)
+        if (conn) conn.release()
+        console.log(makerId)
+        return makerId
+
+    },
+    insertVendor: async (name, display_name, website) => {
+        conn = await db.getConnection();
+        let vendorId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.vendors (name, display_name, link) VALUES (${conn.escape(name)}, ${conn.escape(display_name)}, '${website}');`)
+        if (conn) conn.release()
+        console.log(vendorId)
+        return vendorId
     },
     updateField: async (field, detail, id) => {
         conn = await db.getConnection();
