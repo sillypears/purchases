@@ -59,6 +59,12 @@ module.exports = {
         if (conn) conn.release()
         return makers
     },
+    getMakerByName: async (name) => {
+        conn = await db.getConnection();
+        let maker = await conn.query(`SELECT m.id, SUM(p.price) FROM ${process.env.DB_SCHEMA}.makers m LEFT JOIN ${process.env.DB_SCHEMA}.purchases p ON p.maker = m.id WHERE name = '${name}';`)
+        if (conn) conn.release()
+        return maker
+    },
     getMakerIdByDisplayName: async (name) => {
         conn = await db.getConnection();
         let makers = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.makers WHERE display_name = '${name}';`)
@@ -92,6 +98,12 @@ module.exports = {
     getPurchases: async () => {
         conn = await db.getConnection();
         let purchases = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases ORDER BY purchaseDate DESC`)
+        if (conn) conn.release()
+        return purchases
+    },
+    getPurchasesThatAreMissing: async () => {
+        conn = await db.getConnection();
+        let purchases = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE received = 0 ORDER BY purchaseDate DESC`)
         if (conn) conn.release()
         return purchases
     },
@@ -134,9 +146,9 @@ module.exports = {
         if (conn) conn.release();
         return purchaseId
     },
-    insertMaker: async (name, display_name, ka_name, ig) => {
+    insertMaker: async (name, display_name, ka_name, ka_id, ig) => {
         conn = await db.getConnection();
-        let makerId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.makers (name, display_name, instagram, archivist_name) VALUES ('${name}', ${conn.escape(display_name)}, '${ig}', '${ka_name}');`)
+        let makerId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.makers (name, display_name, instagram, archivist_name, archivist_id) VALUES ('${name}', ${conn.escape(display_name)}, '${ig}', '${ka_name}', '${ka_id}');`)
         if (conn) conn.release()
         console.log(makerId)
         return makerId
@@ -157,17 +169,17 @@ module.exports = {
     },
     getMakerTotals: async () => {
         conn = await db.getConnection();
-        let makers = await conn.query(`SELECT m.*,coalesce(SUM(p.price + p.adjustments), 0) as total FROM ${process.env.DB_SCHEMA}.makers m LEFT JOIN ${process.env.DB_SCHEMA}.purchases p ON m.id = p.maker GROUP BY m.id ORDER BY m.name ASC`)
+        let makers = await conn.query(`SELECT m.*,coalesce(SUM(p.price), 0) as total FROM ${process.env.DB_SCHEMA}.makers m LEFT JOIN ${process.env.DB_SCHEMA}.purchases p ON m.id = p.maker GROUP BY m.id ORDER BY m.name ASC`)
         if (conn) conn.release()
         return makers
     },
     getMakerTotal: async (source, makerId) => {
         let sql = ``
         if (source == "id") {
-            sql = `SELECT m.*,coalesce(SUM(p.price + p.adjustments), 0) as total FROM ${process.env.DB_SCHEMA}.makers m LEFT JOIN ${process.env.DB_SCHEMA}.purchases p ON m.id = p.maker WHERE m.id = ${makerId} GROUP BY m.id`
+            sql = `SELECT m.*,coalesce(SUM(p.price), 0) as total FROM ${process.env.DB_SCHEMA}.makers m LEFT JOIN ${process.env.DB_SCHEMA}.purchases p ON m.id = p.maker WHERE m.id = ${makerId} GROUP BY m.id ORDER BY p.purchaseDate DESC`
         }
         if (source == "name") {
-            sql = `SELECT m.*,coalesce(SUM(p.price + p.adjustments), 0) as total FROM ${process.env.DB_SCHEMA}.makers m LEFT JOIN ${process.env.DB_SCHEMA}.purchases p ON m.id = p.maker WHERE m.name = ${makerId} GROUP BY m.id `
+            sql = `SELECT m.*,coalesce(SUM(p.price), 0) as total FROM ${process.env.DB_SCHEMA}.makers m LEFT JOIN ${process.env.DB_SCHEMA}.purchases p ON m.id = p.maker WHERE m.name = ${makerId} GROUP BY m.id ORDER BY p.purchaseDate DESC`
         }
         conn = await db.getConnection();
         let maker = await conn.query(sql)
@@ -197,10 +209,10 @@ module.exports = {
         let sql = ``
 
         if (source == "id") {
-            sql = `SELECT p.*,(p.price + p.adjustments) as total FROM ${process.env.DB_SCHEMA}.purchases p LEFT JOIN ${process.env.DB_SCHEMA}.makers m ON m.id = p.maker WHERE m.id = ${id}`
+            sql = `SELECT p.*,m.archivist_name as archivist, m.instagram as instagram FROM ${process.env.DB_SCHEMA}.purchases p LEFT JOIN ${process.env.DB_SCHEMA}.makers m ON m.id = p.maker WHERE m.id = ${id} ORDER BY p.purchaseDate DESC`
         }
         if (source == "name") {
-            sql = `SELECT p.*,(p.price + p.adjustments) FROM ${process.env.DB_SCHEMA}.purchases p LEFT JOIN ${process.env.DB_SCHEMA}.makers m ON m.id = p.maker WHERE m.name = ${id} `
+            sql = `SELECT p.*,m.archivist_name as archivist, m.instagram as instagram FROM ${process.env.DB_SCHEMA}.purchases p LEFT JOIN ${process.env.DB_SCHEMA}.makers m ON m.id = p.maker WHERE m.name = ${id} ORDER BY p.purchaseDate DESC`
         }
         conn = await db.getConnection();
         let purchases = await conn.query(sql)

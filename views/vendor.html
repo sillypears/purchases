@@ -1,32 +1,54 @@
 <!-- views/index.html -->
+<h1 class="h1">
+    <%= title %> <span class="small">
+            <% if (totals> 0) { %> (<%= totals %>) <% } %>
+        </span>
+</h1>
 <a href="<%= vendor.instagram %>" target="_blank"><img
     class="ig-link" src="/img/www.png"></a>
-<div class="container">
-    <div class="row">
-        <% purchases.forEach((purchase, index)=> { %>
-            <% if (index % 4==0 && index !=0) { %>
-    </div>
-    <div class="row">
-        <% } %>
-            <div class="col-md-3 d-flex align-items-stretch">
-                <div class="card text-center">
-                    <div class="card-body">
-
-                        <div class="card-title">
-                                <%= purchase.detail %>
-
+    <div class="container-fluid ">
+        <div class="row no-gutters ">
+            <% purchases.forEach((purchase, index)=> { %>
+    
+                <div class=" d-flex align-items-stretch" title="<%= purchase.purchaseDate.toDateString() %>">
+                    <div id="card-<%= purchase.id %>"
+                        class="card text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
+                        <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"><i title="Toggle Status"
+                                class="fa fa-times">&nbsp;o</i></span>
+                        <div class="card-body">
+                            <div class="card-title">
+                                <a href="/purchase/<%= purchase.id %>"><img class="card-image" loading="lazy"
+                                        src="<% if (purchase.image) {%> <%= purchase.image %> <%} else { %>/img/missing.png<% } %>"
+                                        title="<%= purchase.vendor_name %> " /></a>
+                            </div>
+                            <div class="card-text">
+                                <%= purchase.sculpt %>
+                                    <br />
+                                    <%= purchase.detail %>
+                            </div>
                         </div>
-                        <div class="card-text">
-                            <%= purchase.entity %>
+                        <div class="card-footer">
+                            <div class="row">
+                                <span class="text-center col-md-2">
+                                    <a href="https://instagram.com/<%= purchase.instagram %>" target="_blank"><img
+                                            class="card-link ig-link" src="/img/ig.png"></a>
+                                </span>
+                                <span class="text-center col-md-2">
+                                    <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>"
+                                        target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
+                                </span>
+                                <!-- <span class="text-center col-md-2">
+                                    <a href="<%= purchase.link %>" target="_blank"><img class="card-link www-link"
+                                            src="/img/www.png"></a>
+                                </span> -->
+                                <span class="text-right col-md-6">
+                                    <!-- $<%= (purchase.price+purchase.adjustments).toFixed(2) %> -->
+                                </span>
+                            </div>
                         </div>
+    
                     </div>
-                    <div class="card-footer">
-                        $<%= (purchase.total).toFixed(2) %>
-                    </div>
-
                 </div>
-            </div>
-            <% }) %>
+                <% }) %>
+        </div>
     </div>
-</div>
-</div>

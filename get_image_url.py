@@ -53,7 +53,7 @@ def main():
     cur = conn.cursor()
     cur.execute('SELECT * FROM keyboard.makers')
     makers = cur.fetchall()
-    cur.execute('select * from keyboard.all_purchases  ORDER BY id ASC')
+    cur.execute('select * from keyboard.all_purchases  ORDER BY id DESC')
     purchases = cur.fetchall()
     keycap = {}
     for maker in makers:
@@ -72,6 +72,7 @@ def main():
             pic = purchase[19]
             d = get_data(maker)
             if d:
+                print( maker, sculpt, cw)
                 i = parse_src(d, maker.strip(), sculpt.strip(), cw.strip())
                 if i != pic:
                     # print(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}")

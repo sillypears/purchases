@@ -1,4 +1,9 @@
 <!-- views/artisan-count.html -->
+<h1 class="h1">
+    <%= title %> <span class="small">
+            <% if (totals> 0) { %> (<%= totals %>) <% } %>
+        </span>
+</h1>
 <div class="row">
     <div id="artisan-count-chart" class="col-lg-6" style="width:960px; height:540px" data-json="">
 

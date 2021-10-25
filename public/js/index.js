@@ -22,6 +22,7 @@ $(function(){
       $('.archivist').on('click', function() {
         console.log(this.textContent)
     })
+    $('div#missing').hide()
     $('.editableField').on('blur', function(event){
         event.preventDefault()
         $.ajax({
@@ -37,4 +38,29 @@ $(function(){
             }
           });
     })
+    $('#toggle-box').change(function(){
+        swap()
+    })
 })  
+
+function swap(){
+    const trans = 500
+    const allDiv = $('div#all').css('display')
+    const missingDiv = $('div#missing').css('display')
+    console.log(`swapping ${allDiv} and ${missingDiv}`)
+    if (allDiv != "none") { 
+        $('div#all').hide(trans)
+        $('div#missing').show(trans)
+    } else {
+        $('div#all').show(trans)
+        $('div#missing').hide(trans)
+    }
+    if (missingDiv != "none") { 
+        $('div#missing').hide(trans)
+        $('div#all').show(trans)
+
+    } else {
+        $('div#missing').show(trans)
+        $('div#all').hide(trans)
+    }
+}

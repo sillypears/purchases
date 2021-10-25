@@ -1,5 +1,9 @@
 <!-- views/add-vendor.html -->
-
+<h1 class="h1">
+    <%= title %> <span class="small">
+            <% if (totals> 0) { %> (<%= totals %>) <% } %>
+        </span>
+</h1>
 <form class="form" action="/add-vendor" method="POST">
     <input type="text" id="name" name="name" placeholder="Short Name"/><br />
     <input type="text" id="displayName" name="displayName" placeholder="Display Name"/><br />

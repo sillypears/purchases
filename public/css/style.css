@@ -1,8 +1,12 @@
+body {
+    background-color: lightgrey;
+}
+
 .container-fluid {
     margin: 20px 50px;
 }
 .card {
-    width: 11rem;
+    width: 13rem;
     margin: 0px 0px 10px 10px;
 }
 

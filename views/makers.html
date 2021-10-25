@@ -1,5 +1,9 @@
 <!-- views/makers.html -->
-
+<h1 class="h1">
+    <%= title %> <span class="small">
+            <% if (totals> 0) { %> (<%= totals %>) <% } %>
+        </span>
+</h1>
 <div class="container">
     <div class="row">
         <% makers.forEach((maker, index)=> { %>
@@ -13,10 +17,11 @@
 
                         <div class="card-title">
                             <a href="/maker/id/<%= maker.id %>">
-                                <%= maker.display_name %>
-                            </a>
+                                <img class='card-image' src="<% if (maker.archivist_id) {%> https://raw.githubusercontent.com/keycap-archivist/website/master/src/assets/img/logos/<%= maker.archivist_id %>.jpg <%} else { %>/img/missing.png<% } %>"
+                                title="<%= maker.display_name %> " /></a>                            </a>
                         </div>
                         <div class="card-text">
+                            <%= maker.display_name %>
                             $<%= maker.total %>
                         </div>
                     </div>

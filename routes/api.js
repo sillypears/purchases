@@ -118,6 +118,34 @@ router.get('/maker/name/:name', async (ctx, next) => {
 
 });
 
+// api/pricebyname/:name
+router.get('/maker/name/:name', async (ctx, next) => {
+    // #swagger.tags = ["Makers"]
+    // #swagger.description = "Maker endpoints"
+    // #swagger.parameters['name'] = { description: 'Maker\'s short-name' }
+    /* #swagger.responses[200] = { 
+        schema: { $ref: "#/definitions/Maker" },
+        description: 'A Maker!' 
+    } */
+    try {
+
+        let maker = await models.getMakerMoneyByName(ctx.params.name);
+        if (maker) {
+            ctx.body = maker[0]
+            ctx.status = 200
+        } else {
+            throw err;
+        }
+    } catch (err) {
+        ctx.body = { 'status': 'Failure', 'error': err }
+        ctx.status = 422
+    } finally {
+        if (conn) return conn.release();
+    }
+
+});
+
+
 // api/maker
 router.post('/maker', async (ctx, next) => {
     // #swagger.tags = ["Makers"]
@@ -518,8 +546,8 @@ router.get('/receiveToggle/:id', async (ctx, next) => {
 // api/update/:field
 router.post('/update/:field', async (ctx, next) => {
     try {
-        let field = ctx.params.field
-        let detail = ctx.request.body.detail
+        let field = ctx.params.field.trim()
+        let detail = ctx.request.body.detail.trim()
         let id = ctx.request.body.id
         let updateId = await models.updateField(field, detail, id)
         ctx.body = {

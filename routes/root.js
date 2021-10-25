@@ -10,6 +10,18 @@ const upload = multer()
 
 router.get('/', async (ctx, next) => {
     let purchases = await models.getPurchases()
+    let missingPurchases = await models.getPurchasesThatAreMissing()
+    return ctx.render('index', {
+        title: "Purchases",
+        nav: "index",
+        purchases: purchases,
+        missingPurchases: missingPurchases,
+        totals: purchases.length
+    });
+});
+
+router.get('/missing', async (ctx, next) => {
+    let purchases = await models.getPurchasesThatAreMissing()
     return ctx.render('index', {
         title: "Purchases",
         nav: "index",
@@ -106,8 +118,8 @@ router.get('/add-purchase', async (ctx, next) => {
 
 router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
     let a = ctx.request.body
-    if (typeof a.adjustments !== 'number') { 
-        a.adjustments = 0 
+    if (a.adjustments < 0) { 
+        a.adjustments = 0
     }
     console.log(`adjustments: ${a.adjustments} --`)
     let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, a.image);
@@ -184,7 +196,7 @@ router.get('/graph/artisan-count', async (ctx, next) => {
 
 router.post('/add-maker', async (ctx, next) => {
     let ticker;
-    let makerId = await models.insertMaker(ctx.request.body.name, ctx.request.body.displayName, ctx.request.body.archivist, ctx.request.body.instagram)
+    let makerId = await models.insertMaker(ctx.request.body.name, ctx.request.body.displayName, ctx.request.body.ka_name, ctx.request.body.ka_id, ctx.request.body.instagram)
     if (makerId.insertId > 0) {
         ticker = { makerId: makerId.insertId }
     } else {

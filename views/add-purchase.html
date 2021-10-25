@@ -1,5 +1,9 @@
 <!-- views/index.html -->
-
+<h1 class="h1">
+    <%= title %> <span class="small">
+            <% if (totals> 0) { %> (<%= totals %>) <% } %>
+        </span>
+</h1>
 <form class="form" action="/add-purchase"  enctype="multipart/form-data" method="POST">
     <select class="select" id="category" name="category">
         <option id="option-default" name="default" value="-1">Select Category</option>
