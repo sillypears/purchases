@@ -41,8 +41,8 @@
         <% }; %>
     </select><br />
 
-    <input type="text" id="purchaseDate" class="date" name="purchaseDate" placeholder="Purchase Date" onfocus="(this.type='date'); (this.value=new Date().toISOString().split('T')[0])"/><br />
-    <input type="text" id="expectedDate" class="date" name="expectedDate" placeholder="Expected Date" onfocus="(this.type='date')"/><br />
+    <input type="text" id="purchaseDate" class="date" name="purchaseDate" placeholder="Purchase Date" onfocus="(this.type='date'); let nowp = new Date(); (this.value=nowp.toISOString().split('T')[0])"/><br />
+    <input type="text" id="expectedDate" class="date" name="expectedDate" placeholder="Expected Date" onfocus="(this.type='date'); let nowe = new Date(); nowe.setDate(nowe.getDate()+7); (this.value=nowe.toISOString().split('T')[0])"/><br />
     <input type="number" id="orderSet" name="orderSet" placeholder="Set Number" value="<%= maxSet %>"/><br />
     <input type="text" id="image" name="image" placeholder="Link to image" /><br />
     <button type="submit" id="submit" class="btn-success">Add Purchase!</button>
