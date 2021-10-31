@@ -30,14 +30,6 @@ router.get('/missing', async (ctx, next) => {
     });
 });
 
-// router.get('/swagger', koaSwagger({
-//         routePrefix: '/swagger', // host at /swagger instead of default /docs
-//         swaggerOptions: {
-//             url: `http://localhost:${process.env.PORT}/swagger_output.json`, // example path to json
-//         },
-//     })
-// );
-
 router.get('/makers', async (ctx, next) => {
 
     let makers = await models.getMakerTotals();
