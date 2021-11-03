@@ -30,6 +30,25 @@
                                 <br />
                                 <%= purchase.detail %>
                         </div>
+                        
+                    </div>
+                    <div class="card-footer">
+                        <div class="row">
+                            <div class="will-sell col-md-6 clickable" data-id="<%= purchase.id %>" data-type="willSell">
+                                <% if (purchase.willSell) {%>
+                                    <div id="sell-<%= purchase.id %>" class="bg-primary" title="Sell">Sell</div>
+                                    <% } else { %>
+                                        <div id="sell-<%= purchase.id %>"class="bg-warning" title="Not Sell">Keep</div>
+                                    <% } %>
+                            </div>
+                            <div class="is-sold col-md-6" data-id="<%= purchase.id %>" data-type="isSold">
+                                <% if (purchase.isSold) {%>
+                                        <div id="sold-<%= purchase.id %>"class="bg-success" title="Sold">Sold</div>
+                                    <% } else { %>
+                                        <div id="sold-<%= purchase.id %>" class="bg-secondary" title="Have">Have</div>
+                                    <% } %>
+                            </div>
+                        </div>
                     </div>
                     <div class="card-footer">
                         <div class="row">

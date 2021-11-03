@@ -22,6 +22,47 @@ $(function(){
       $('.archivist').on('click', function() {
         console.log(this.textContent)
     })
+    $('.will-sell').on('click', function() {
+        console.log(this.dataset.id, this.dataset.type)
+        $.ajax({
+            'url': `/api/sellToggle/${this.dataset.id}`,
+            'type': 'GET',
+            'success': function(result){
+                if (result.message == 1){
+                    $(`#sell-${result.purchaseId}`).addClass('bg-primary')
+                    $(`#sell-${result.purchaseId}`).removeClass('bg-warning')
+                    $(`#sell-${result.purchaseId}`).text('Sell')
+                } else {
+                    $(`#sell-${result.purchaseId}`).addClass('bg-warning')
+                    $(`#sell-${result.purchaseId}`).removeClass('bg-primary')
+                    $(`#sell-${result.purchaseId}`).text('Keep')
+
+
+                }
+            }
+          });
+    })
+    $('.is-sold').on('click', function() {
+        console.log(this.dataset.id, this.dataset.type)
+        $.ajax({
+            'url': `/api/soldToggle/${this.dataset.id}`,
+            'type': 'GET',
+            'success': function(result){
+                if (result.message == 1){
+                    $(`#sold-${result.purchaseId}`).addClass('bg-success')
+                    $(`#sold-${result.purchaseId}`).removeClass('bg-secondary')
+                    $(`#sold-${result.purchaseId}`).text('Sold')
+
+                } else {
+                    $(`#sold-${result.purchaseId}`).addClass('bg-secondary')
+                    $(`#sold-${result.purchaseId}`).removeClass('bg-success')
+                    $(`#sold-${result.purchaseId}`).text('Have')
+
+
+                }
+            }
+          });
+    })
     $('div#missing').hide()
     $('.editableField').on('blur', function(event){
         event.preventDefault()

@@ -543,6 +543,50 @@ router.get('/receiveToggle/:id', async (ctx, next) => {
     }
 });
 
+// api/sellToggle/:id
+router.get('/sellToggle/:id', async (ctx, next) => {
+
+    try {
+
+        let sell = await models.toggleSellStatus(ctx.params.id)
+
+        ctx.body = {
+            status: 'OK',
+            purchaseId: ctx.params.id,
+            message: sell
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    }
+});
+
+// api/soldToggle/:id
+router.get('/soldToggle/:id', async (ctx, next) => {
+
+    try {
+
+        let sold = await models.toggleSoldStatus(ctx.params.id)
+
+        ctx.body = {
+            status: 'OK',
+            purchaseId: ctx.params.id,
+            message: sold
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    }
+});
+
 // api/update/:field
 router.post('/update/:field', async (ctx, next) => {
     try {
