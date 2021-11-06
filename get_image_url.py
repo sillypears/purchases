@@ -57,7 +57,6 @@ def main():
     purchases = cur.fetchall()
     keycap = {}
     for maker in makers:
-        # print(maker[0], maker[4])
         if maker[4] != "":
             keycap[maker[0]] = maker[4]
 
