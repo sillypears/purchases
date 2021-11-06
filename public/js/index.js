@@ -29,12 +29,12 @@ $(function(){
             'type': 'GET',
             'success': function(result){
                 if (result.message == 1){
-                    $(`#sell-${result.purchaseId}`).addClass('bg-primary')
-                    $(`#sell-${result.purchaseId}`).removeClass('bg-warning')
+                    $(`#sell-${result.purchaseId}`).addClass('bg-secondary')
+                    $(`#sell-${result.purchaseId}`).removeClass('bg-success')
                     $(`#sell-${result.purchaseId}`).text('Sell')
                 } else {
-                    $(`#sell-${result.purchaseId}`).addClass('bg-warning')
-                    $(`#sell-${result.purchaseId}`).removeClass('bg-primary')
+                    $(`#sell-${result.purchaseId}`).addClass('bg-success')
+                    $(`#sell-${result.purchaseId}`).removeClass('bg-secondary')
                     $(`#sell-${result.purchaseId}`).text('Keep')
 
 
@@ -49,13 +49,13 @@ $(function(){
             'type': 'GET',
             'success': function(result){
                 if (result.message == 1){
-                    $(`#sold-${result.purchaseId}`).addClass('bg-success')
-                    $(`#sold-${result.purchaseId}`).removeClass('bg-secondary')
+                    $(`#sold-${result.purchaseId}`).addClass('bg-secondary')
+                    $(`#sold-${result.purchaseId}`).removeClass('bg-success')
                     $(`#sold-${result.purchaseId}`).text('Sold')
 
                 } else {
-                    $(`#sold-${result.purchaseId}`).addClass('bg-secondary')
-                    $(`#sold-${result.purchaseId}`).removeClass('bg-success')
+                    $(`#sold-${result.purchaseId}`).addClass('bg-success')
+                    $(`#sold-${result.purchaseId}`).removeClass('bg-secondary')
                     $(`#sold-${result.purchaseId}`).text('Have')
 
 

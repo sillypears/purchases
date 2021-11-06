@@ -1,13 +1,16 @@
 <!-- views/index.html -->
 
-<div class="row">
+<div class="row no-gutters">
     <div class="col-md-3">
-    <h1 class="h1">
-        <%= title %> <span class="small"><% if (totals> 0) { %> (<%= totals %>) <% } %></span>
-    </h1>
+        <h1 class="h1">
+            <%= title %> <span class="small">
+                    <% if (totals> 0) { %> (<%= totals %>) <% } %>
+                </span>
+        </h1>
     </div>
-    <div class="col-md-9 text-left align-middle">
-        <input id="toggle-box" type="checkbox" checked data-toggle="toggle" data-size="sm" data-on="All" data-off="Missing" data-offstyle="danger">
+    <div class="col-md-9">
+        <input id="toggle-box" type="checkbox" checked data-toggle="toggle" data-size="sm" data-on="All"
+            data-off="Missing" data-offstyle="danger">
     </div>
 </div>
 <div id="all" class="container-fluid ">
@@ -30,37 +33,42 @@
                                 <br />
                                 <%= purchase.detail %>
                         </div>
-                        
+
                     </div>
                     <div class="card-footer">
                         <div class="row">
-                            <div class="will-sell col-md-6 clickable" data-id="<%= purchase.id %>" data-type="willSell">
+                            <div class="will-sell toggle-icon col-md-6 clickable" data-id="<%= purchase.id %>"
+                                data-type="willSell">
                                 <% if (purchase.willSell) {%>
-                                    <div id="sell-<%= purchase.id %>" class="bg-primary" title="Sell">Sell</div>
+                                    <div id="sell-<%= purchase.id %>"
+                                        class="bg-secondary font-weight-bold text-white small" title="Sell">Sell</div>
                                     <% } else { %>
-                                        <div id="sell-<%= purchase.id %>"class="bg-warning" title="Not Sell">Keep</div>
-                                    <% } %>
+                                        <div id="sell-<%= purchase.id %>"
+                                            class="bg-success font-weight-bold text-white small" title="Keep">Keep</div>
+                                        <% } %>
                             </div>
-                            <div class="is-sold col-md-6" data-id="<%= purchase.id %>" data-type="isSold">
+                            <div class="is-sold toggle-icon col-md-6" data-id="<%= purchase.id %>" data-type="isSold">
                                 <% if (purchase.isSold) {%>
-                                        <div id="sold-<%= purchase.id %>"class="bg-success" title="Sold">Sold</div>
+                                    <div id="sold-<%= purchase.id %>"
+                                        class="bg-secondary font-weight-bold text-white small" title="Sold">Sold</div>
                                     <% } else { %>
-                                        <div id="sold-<%= purchase.id %>" class="bg-secondary" title="Have">Have</div>
-                                    <% } %>
+                                        <div id="sold-<%= purchase.id %>"
+                                            class="bg-success font-weight-bold text-white small" title="Have">Have</div>
+                                        <% } %>
                             </div>
                         </div>
                     </div>
                     <div class="card-footer">
                         <div class="row">
-                            <span class="text-center col-md-2">
+                            <span class="text-center col-md-4">
                                 <a href="https://instagram.com/<%= purchase.instagram %>" target="_blank"><img
                                         class="card-link ig-link" src="/img/ig.png"></a>
                             </span>
-                            <span class="text-center col-md-2">
+                            <span class="text-center col-md-4">
                                 <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>"
                                     target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
                             </span>
-                            <span class="text-center col-md-2">
+                            <span class="text-center col-md-4">
                                 <a href="<%= purchase.link %>" target="_blank"><img class="card-link www-link"
                                         src="/img/www.png"></a>
                             </span>
