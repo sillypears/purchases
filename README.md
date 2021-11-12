@@ -7,3 +7,6 @@
   * You may want to add stock/null values for things that you don't have unless I told the schema no null :)
 
 3) It mostly works most of the time
+
+4) The `get_image` python script should be cron'd or scheduled to run however frequiently you want. 
+  * It just uses the github data to avoid pulling from archivist's CDNs
