@@ -54,15 +54,6 @@ router.get('/maker/:type/:id', async (ctx, next) => {
     });
 });
 
-// router.get('/maker/name/:name', async (ctx, next) => {
-//     let maker = await models.getMakerTotal("name", ctx.params.name)
-//     return ctx.render('maker', {
-//         title: `Maker - ${maker.display_name}`,
-//         maker: maker
-//     });
-
-// });
-
 router.get('/vendors', async (ctx, next) => {
 
     let vendors = await models.getVendorTotals();
@@ -108,34 +99,6 @@ router.get('/add-purchase', async (ctx, next) => {
     });
 });
 
-router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
-    let a = ctx.request.body
-    if (a.adjustments < 0) { 
-        a.adjustments = 0
-    }
-    console.log(`adjustments: ${a.adjustments} --`)
-    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, a.image);
-    // let insertId = await models.insertPurchaseImage(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, ctx.file);
-
-    console.log(insertId)
-    let m = await models.getMakers();
-    let v = await models.getVendors();
-    let c = await models.getCategories();
-    let s = await models.getSaleTypes();
-    let maxSet = await models.getLatestSet();
-
-    return ctx.render('add-purchase', {
-        title: "Add Purchase",
-        nav: "add-purchase",
-        totals: 0,
-        ticker: insertId,
-        makers: m,
-        vendors: v,
-        categories: c,
-        saleTypes: s,
-        maxSet: maxSet
-    });
-});
 
 router.get('/purchase/:id', async (ctx, next) => {
     // let purchase = await axios.get(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/purchase/${ctx.params.id}`);
@@ -186,6 +149,35 @@ router.get('/graph/artisan-count', async (ctx, next) => {
     })
 })
 
+router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
+    let a = ctx.request.body
+    if (a.adjustments < 0) { 
+        a.adjustments = 0
+    }
+    console.log(`adjustments: ${a.adjustments} --`)
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, a.image);
+    // let insertId = await models.insertPurchaseImage(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, ctx.file);
+
+    console.log(insertId)
+    let m = await models.getMakers();
+    let v = await models.getVendors();
+    let c = await models.getCategories();
+    let s = await models.getSaleTypes();
+    let maxSet = await models.getLatestSet();
+
+    return ctx.render('add-purchase', {
+        title: "Add Purchase",
+        nav: "add-purchase",
+        totals: 0,
+        ticker: insertId,
+        makers: m,
+        vendors: v,
+        categories: c,
+        saleTypes: s,
+        maxSet: maxSet
+    });
+});
+
 router.post('/add-maker', async (ctx, next) => {
     let ticker;
     let makerId = await models.insertMaker(ctx.request.body.name, ctx.request.body.displayName, ctx.request.body.ka_name, ctx.request.body.ka_id, ctx.request.body.instagram)
@@ -205,8 +197,10 @@ router.post('/add-maker', async (ctx, next) => {
 router.post('/add-vendor', async (ctx, next) => {
     let ticker;
     let vendorId = await models.insertVendor(ctx.request.body.name, ctx.request.body.displayName, ctx.request.body.site)
-    if (vendorId.insertId > 0) {
-        ticker = { vendorId: vendorId.insertId }
+    if (vendorId > 0) {
+        ticker = { vendorId: vendorId }
+    } else if (vendorId == 0) {
+        ticker = { error: "Vendor exists!"}
     } else {
         ticker = { error: "Unsuccessful adding vendor" }
     }

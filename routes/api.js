@@ -276,9 +276,9 @@ router.post('/vendor', async (ctx, next) => {
         let name = ctx.request.body.name;
         let displayName = ctx.request.body.displayName;
         let link = ctx.request.body.site;
-        conn = await db.getConnection();
         if ((name) && (displayName)) {
-            let vendorId = await conn.query(`INSERT INTO keyboard.vendors (name, display_name, link) VALUES ('${name}', ${conn.escape(displayName)}, '${link}');`)
+            let vendorId = await models.insertVendor(name, displayName, link)
+            // let vendorId = await conn.query(`INSERT INTO keyboard.vendors (name, display_name, link) VALUES ('${name}', ${conn.escape(displayName)}, '${link}');`)
             if (vendorId) {
                 console.log(vendorId)
                 ctx.body = {
@@ -306,9 +306,7 @@ router.post('/vendor', async (ctx, next) => {
             ctx.body = { 'status': 'Failure', 'error': err }
             ctx.status = 422
         }
-    } finally {
-        if (conn) return conn.release()
-    }
+    } 
 });
 
 // api/categories
@@ -366,8 +364,8 @@ router.get('/purchase', async (ctx, next) => {
     // #swagger.tags = ["Purchases"]
     // #swagger.description = "Purchase endpoints"
     try {
-        conn = await db.getConnection(0);
-        let purchase = await conn.query(`SELECT * FROM keyboard.purchases ORDER BY id DESC limit 1`);
+        let maxId = await models.getLatestId()
+        let purchase = await models.getPurchase(maxId)
         ctx.body = {
             'purchase': purchase
         }
@@ -378,9 +376,7 @@ router.get('/purchase', async (ctx, next) => {
             'error': err
         }
         ctx.status = 400
-    } finally {
-        if (conn) return conn.release();
-    }
+    } 
 
 });
 
@@ -391,9 +387,8 @@ router.get('/purchase/:id', async (ctx, next) => {
     // #swagger.parameters['id'] = { description: 'Purchase ID' }
 
     try {
-        conn = await db.getConnection(0);
-        let purchase = await conn.query(`SELECT * FROM keyboard.purchases WHERE id = ${ctx.params.id}`);
-        ctx.body = purchase[0]
+        let purchase = await models.getPurchase(ctx.params.id);
+        ctx.body = purchase
         ctx.status = 200
     } catch (err) {
         ctx.body = {
@@ -401,20 +396,17 @@ router.get('/purchase/:id', async (ctx, next) => {
             'error': err
         }
         ctx.status = 400
-    } finally {
-        if (conn) return conn.release();
-    }
+    } 
 });
 
-// api/orderset/:id
-router.get('/orderset/:id', async (ctx, next) => {
+router.get('/orderset', async (ctx, next) => {
     // #swagger.tags = ["Purchases"]
     // #swagger.description = "Purchase endpoints"
     // #swagger.parameters['id'] = { description: 'OrderSet ID' }
 
     try {
-        conn = await db.getConnection(0);
-        let orders = await conn.query(`SELECT * FROM keyboard.purchases WHERE orderSet = ${ctx.params.id}`);
+        let orderId = await models.getLatestSet()
+        let orders = await models.getOrderSet(orderId)
         let orderTotal = 0.00
         for (let order of orders) {
 
@@ -431,9 +423,33 @@ router.get('/orderset/:id', async (ctx, next) => {
             'error': err
         }
         ctx.status = 400
-    } finally {
-        if (conn) return conn.release();
-    }
+    } 
+});
+// api/orderset/:id
+router.get('/orderset/:id', async (ctx, next) => {
+    // #swagger.tags = ["Purchases"]
+    // #swagger.description = "Purchase endpoints"
+    // #swagger.parameters['id'] = { description: 'OrderSet ID' }
+
+    try {
+        let orders = await models.getOrderSet(ctx.params.id)
+        let orderTotal = 0.00
+        for (let order of orders) {
+
+            orderTotal += order.price + order.adjustments
+        }
+        ctx.body = {
+            orders: orders,
+            total: orderTotal.toFixed(2)
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    } 
 });
 
 // api/purchase

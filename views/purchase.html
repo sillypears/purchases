@@ -41,48 +41,58 @@
                             class="card-link ig-link" src="/img/ig.png"></a>
                 </span>
                 <span class="text-left col-md-1">
-                    <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>/<%= purchase.entity.replace(/ /g, '-').toLowerCase() _%>" target="_blank"><img
-                            class="card-link ig-link" src="/img/archivist.png"></a>
+                    <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>/<%= purchase.entity.replace(/ /g, '-').toLowerCase() _%>"
+                        target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
                 </span>
                 <span class="text-left col-md-1">
                     <a href="<%= purchase.link %>" target="_blank"><img class="card-link www-link"
                             src="/img/www.png"></a>
                 </span>
-                <span class="text-right col-md-8">
+                <span class="text-right col-md-7">
                     <%= purchase.saleType %>
                 </span>
-                <span class="text-right col-md-1">
+                <span class="text-right col-md-2">
                     $<%= (purchase.price).toFixed(2) %>+$<%= (purchase.adjustments).toFixed(2) %>
                 </span>
             </div>
         </div>
-    </div>
-</div>
-
-<div class="row no-gutters justify-content-center align-items-center text-center">
-    <div class="col-md-2">
-        <% if (prev) { %>
-            <div class="font-weight-bold">
-                <a class="align-bottom" href="/purchase/<%= prev.id %>">PREV
-                </a>
+        <div class="card-footer" data-toggle="collapse" data-target="#notesId" aria-expanded="false"
+            aria-controls="notesId">
+            <div class="row">
+                <span class="text-center col-md-2">
+                    Notes<% if (purchase.notes) { %>*<% }%>:
+                </span>
+                <span id="notesId" class="collapse text-left col-md-10">
+                    <%= purchase.notes %>
+                </span>
             </div>
-            <% } %>
-    </div>
-    <div class="col-md-8">&nbsp;</div>
-    <div class="col-md-2">
-        <% if (next) { %>
-            <span class="font-weight-bold "><a class="" href="/purchase/<%= next.id %>">NEXT</a></span>
-            <% } %>
-    </div>
-</div>
-<div id='ticker'>
-    <% if (ticker.makerId) { %>
-        <div class="alert-success">Added id: <%= ticker.makerId %>
         </div>
-        <% } %>
-            <% if (ticker.error) { %>
-                <div class="alert-danger">
-                    <%= ticker.error %>
+    </div>
+
+    <div class="row no-gutters justify-content-center align-items-center text-center">
+        <div class="col-md-2">
+            <% if (prev) { %>
+                <div class="font-weight-bold">
+                    <a class="align-bottom" href="/purchase/<%= prev.id %>">PREV
+                    </a>
                 </div>
                 <% } %>
-</div>
+        </div>
+        <div class="col-md-8">&nbsp;</div>
+        <div class="col-md-2">
+            <% if (next) { %>
+                <span class="font-weight-bold "><a class="" href="/purchase/<%= next.id %>">NEXT</a></span>
+                <% } %>
+        </div>
+    </div>
+    <div id='ticker'>
+        <% if (ticker.makerId) { %>
+            <div class="alert-success">Added id: <%= ticker.makerId %>
+            </div>
+            <% } %>
+                <% if (ticker.error) { %>
+                    <div class="alert-danger">
+                        <%= ticker.error %>
+                    </div>
+                    <% } %>
+    </div>

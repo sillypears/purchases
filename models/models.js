@@ -109,38 +109,48 @@ module.exports = {
     },
     getPurchase: async (id) => {
         conn = await db.getConnection();
-        let purchase = await conn.query(`SELECT p.id, c.display_name as category, p.detail, p.entity, p.entity_display as sculpt, m.display_name as maker, m.archivist_name as archivist, v.display_name as vendor, p.price,p.adjustments, s.display_name as saleType, p.received, p.purchaseDate, p.isSold as isSold, p.willSell as willSell, p.image FROM keyboard.purchases p LEFT JOIN keyboard.categories c ON c.id = p.category LEFT JOIN keyboard.makers m ON m.id = p.maker JOIN keyboard.vendors v ON v.id = p.vendor LEFT JOIN keyboard.sale_types s ON s.id = p.saleType WHERE p.id = ${id}`)
+        let purchase = await conn.query(`SELECT * FROM keyboard.all_purchases p WHERE p.id = ${id}`)
         if (conn) conn.release()
         return purchase[0]
     },
     getNextPurchaseId: async (id) => {
         conn = await db.getConnection();
-        let purchase = await conn.query(`SELECT p.id FROM keyboard.purchases p WHERE p.id > ${id} ORDER BY p.purchaseDate ASC LIMIT 1`)
+        let purchase = await conn.query(`SELECT p.id FROM keyboard.all_purchases p WHERE p.id > ${id} ORDER BY p.purchaseDate ASC LIMIT 1`)
         if (conn) conn.release()
         return purchase[0]
     },
     getPrevPurchaseId: async (id) => {
         conn = await db.getConnection();
-        let purchase = await conn.query(`SELECT p.id FROM keyboard.purchases p WHERE p.id < ${id} ORDER BY p.purchaseDate DESC LIMIT 1`)
+        let purchase = await conn.query(`SELECT p.id FROM keyboard.all_purchases p WHERE p.id < ${id} ORDER BY p.purchaseDate DESC LIMIT 1`)
         if (conn) conn.release()
         return purchase[0]
     },
+    getLatestId: async () => {
+        conn = await db.getConnection()
+        let maxId = await conn.query(`SELECT MAX(id) as latest FROM ${process.env.DB_SCHEMA}.all_purchases`)
+        if (conn) conn.release()
+        return maxId[0].latest
+    },
     getLatestSet: async () => {
         conn = await db.getConnection();
-        let maxSet = await conn.query(`SELECT MAX(orderSet) as latest FROM ${process.env.DB_SCHEMA}.purchases;`);
+        let maxSet = await conn.query(`SELECT MAX(orderSet) as latest FROM ${process.env.DB_SCHEMA}.all_purchases;`);
         if (conn) conn.release()
-        return maxSet[0].latest+1
+        return maxSet[0].latest
+    },
+    getOrderSet: async (id) => {
+        conn = await db.getConnection()
+        let orderSet = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE orderSet = ${id}`)
+        if (conn) conn.release()
+        return orderSet
     },
     insertPurchase: async (category, detail, archivist, sculpt , maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image) => {
         conn = await db.getConnection();
-        console.log(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet});`)
         let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet});`)
         if (conn) conn.release()
         return purchaseId
     },
     insertPurchaseImage: async (category, detail, set, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image) => {
         let imgData = Buffer.from(image.buffer, 'binary')
-
         conn = await db.getConnection();
         let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, image) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(set)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, '${purchaseDate}', '${expectedDate}', ${orderSet}, ${image.buffer});`)
         if (conn) conn.release();
@@ -156,10 +166,9 @@ module.exports = {
     },
     insertVendor: async (name, display_name, website) => {
         conn = await db.getConnection();
-        let vendorId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.vendors (name, display_name, link) VALUES (${conn.escape(name)}, ${conn.escape(display_name)}, '${website}');`)
+        let vendorId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.vendors (name, display_name, link) VALUES (${conn.escape(name)}, ${conn.escape(display_name)}, '${website}') ON DUPLICATE KEY UPDATE name=${conn.escape(name)}, display_name=${conn.escape(display_name)};`)
         if (conn) conn.release()
-        console.log(vendorId)
-        return vendorId
+        return vendorId.insertId
     },
     updateField: async (field, detail, id) => {
         conn = await db.getConnection();
