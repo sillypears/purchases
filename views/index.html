@@ -1,5 +1,4 @@
 <!-- views/index.html -->
-
 <div class="row no-gutters">
     <div class="col-md-3">
         <h1 class="h1">
@@ -14,10 +13,9 @@
     </div>
 </div>
 <div id="all" class="container-fluid ">
-    <div class="row no-gutters ">
+    <div class="row  ">
         <% purchases.forEach((purchase, index)=> { %>
-
-            <div class=" d-flex align-items-stretch" title="<%= purchase.purchaseDate.toDateString() %>">
+            <div class="col" title="<%= purchase.purchaseDate.toDateString() %>">
                 <div id="card-<%= purchase.id %>"
                     class="card text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
                     <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"><i title="Toggle Status"
@@ -41,19 +39,23 @@
                                 data-type="willSell">
                                 <% if (purchase.willSell) {%>
                                     <div id="sell-<%= purchase.id %>"
-                                        class="bg-secondary font-weight-bold text-white small" title="Sell">Sell</div>
+                                        class="bg-secondary font-weight-bold text-white small" title="Sell">Sell
+                                    </div>
                                     <% } else { %>
                                         <div id="sell-<%= purchase.id %>"
-                                            class="bg-success font-weight-bold text-white small" title="Keep">Keep</div>
+                                            class="bg-success font-weight-bold text-white small" title="Keep">Keep
+                                        </div>
                                         <% } %>
                             </div>
                             <div class="is-sold toggle-icon col-md-6" data-id="<%= purchase.id %>" data-type="isSold">
                                 <% if (purchase.isSold) {%>
                                     <div id="sold-<%= purchase.id %>"
-                                        class="bg-secondary font-weight-bold text-white small" title="Sold">Sold</div>
+                                        class="bg-secondary font-weight-bold text-white small" title="Sold">Sold
+                                    </div>
                                     <% } else { %>
                                         <div id="sold-<%= purchase.id %>"
-                                            class="bg-success font-weight-bold text-white small" title="Have">Have</div>
+                                            class="bg-success font-weight-bold text-white small" title="Have">Have
+                                        </div>
                                         <% } %>
                             </div>
                         </div>
@@ -78,16 +80,16 @@
                         </div>
                     </div>
 
-                </div>
             </div>
-            <% }) %>
     </div>
+    <% }) %>
+</div>
 </div>
 <div id="missing" class="container-fluid">
-    <div class="row no-gutters ">
+    <div class="row  ">
         <% missingPurchases.forEach((purchase, index)=> { %>
 
-            <div class=" d-flex align-items-stretch" title="<%= purchase.purchaseDate.toDateString() %>">
+            <div class="col" title="<%= purchase.purchaseDate.toDateString() %>">
                 <div id="card-<%= purchase.id %>"
                     class="card text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
                     <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"><i title="Toggle Status"
