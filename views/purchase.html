@@ -56,6 +56,33 @@
                 </span>
             </div>
         </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="will-sell toggle-icon col-md-6 clickable" data-id="<%= purchase.id %>"
+                    data-type="willSell">
+                    <% if (purchase.willSell) {%>
+                        <div id="sell-<%= purchase.id %>"
+                            class="bg-secondary font-weight-bold text-white small" title="Sell">Sell
+                        </div>
+                        <% } else { %>
+                            <div id="sell-<%= purchase.id %>"
+                                class="bg-success font-weight-bold text-white small" title="Keep">Keep
+                            </div>
+                            <% } %>
+                </div>
+                <div class="is-sold toggle-icon col-md-6" data-id="<%= purchase.id %>" data-type="isSold">
+                    <% if (purchase.isSold) {%>
+                        <div id="sold-<%= purchase.id %>"
+                            class="bg-secondary font-weight-bold text-white small" title="Sold">Sold
+                        </div>
+                        <% } else { %>
+                            <div id="sold-<%= purchase.id %>"
+                                class="bg-success font-weight-bold text-white small" title="Have">Have
+                            </div>
+                            <% } %>
+                </div>
+            </div>
+        </div>
         <div class="card-footer" data-toggle="collapse" data-target="#notesId" aria-expanded="false"
             aria-controls="notesId">
             <div class="row">

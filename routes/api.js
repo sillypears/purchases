@@ -2,6 +2,9 @@ const env = process.env.NODE_ENV || "dev"
 require('dotenv').config({ path: `../.env.${env}` })
 const Router = require('koa-router');
 const fs = require('fs')
+const { spawn } = require('child_process')
+const events = require('events');
+const myEmitter = new events.EventEmitter();
 
 const db = require('../db');
 const models = require('../models/models');
@@ -306,7 +309,7 @@ router.post('/vendor', async (ctx, next) => {
             ctx.body = { 'status': 'Failure', 'error': err }
             ctx.status = 422
         }
-    } 
+    }
 });
 
 // api/categories
@@ -376,7 +379,7 @@ router.get('/purchase', async (ctx, next) => {
             'error': err
         }
         ctx.status = 400
-    } 
+    }
 
 });
 
@@ -396,7 +399,7 @@ router.get('/purchase/:id', async (ctx, next) => {
             'error': err
         }
         ctx.status = 400
-    } 
+    }
 });
 
 router.get('/orderset', async (ctx, next) => {
@@ -423,7 +426,7 @@ router.get('/orderset', async (ctx, next) => {
             'error': err
         }
         ctx.status = 400
-    } 
+    }
 });
 // api/orderset/:id
 router.get('/orderset/:id', async (ctx, next) => {
@@ -449,7 +452,7 @@ router.get('/orderset/:id', async (ctx, next) => {
             'error': err
         }
         ctx.status = 400
-    } 
+    }
 });
 
 // api/purchase
@@ -624,7 +627,26 @@ router.post('/update/:field', async (ctx, next) => {
         ctx.status = 422
 
     }
-})
+});
+
+// api/picRefresh
+router.get('/picRefresh', async (ctx, next) => {
+    var dataToSend;
+    // try {
+    var py = spawn('/usr/local/bin/python3.9', ['/opt/keyboard-purchases/get_image_url.py'])
+    // var py = spawn('ls')
+    py.on('close', function (c) {
+        dataToSend = c
+        if (dataToSend !== 0) {
+            ctx.body = { 'status': 'Fail' }
+            ctx.status = 500
+        }
+        console.log(с)
+
+    })
+    ctx.body = { 'status': 'Oke', 'message': "Refreshed all nice like" }
+    ctx.status = 200
+});
 
 // api/graph/artisansByCount
 router.get('/graph/artisansByCount', async (ctx, next) => {

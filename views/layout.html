@@ -25,7 +25,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
+            <ul class="navbar-nav me-auto">
                 <li class="nav-item">
                     <a class="nav-link" id="navbar-home" href="/">Home</a>
                 </li>
@@ -37,7 +37,7 @@
 
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Add!
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -55,7 +55,7 @@
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                         Graphs
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
@@ -64,6 +64,12 @@
                         <a class="dropdown-item" href="/add-vendor">Vendor</a> -->
 
                     </div>
+                </li>
+
+            </ul>
+            <ul class="navbar-nav me-right">
+                <li class="nav-item">
+                    <a id=picRefresh class="nav-link" href="#" onclick="picRefresh();return false;" >Refresh!</a>
                 </li>
             </ul>
         </div>
