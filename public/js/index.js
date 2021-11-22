@@ -1,4 +1,30 @@
 $(function () {
+    console.log("Hi pal. Hope your day is going nicely. Or night. You've picked a wild adventure trying to set this up.")
+    console.log(`           ████
+             ██                    
+             ████                  
+               ██                  
+               ▒▒▒▒▒▒              
+             ▒▒▒▒▒▒▒▒▒▒            
+           ▒▒▒▒▒▒▒▒▒▒▒▒            
+           ▒▒▒▒▒▒▒▒▒▒▒▒▒▒          
+           ▒▒▒▒▒▒▒▒▒▒▒▒▒▒          
+           ▒▒▒▒▒▒▒▒▒▒▒▒▒▒          
+           ▒▒▒▒▒▒▒▒▒▒▒▒▒▒          
+           ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒        
+           ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒      
+         ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒    
+         ▒▒▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒▒▒  
+       ▒▒▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒▒▒▒▒  
+       ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒      ▒▒▒▒▒▒
+     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  ▒▒  ▒▒  ▒▒▒▒
+     ▒▒▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒  ▒▒  ▒▒▒▒▒▒
+     ▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒  ▒▒      ▒▒▒▒
+     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒  ▒▒▒▒▒▒
+     ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  ▒▒▒▒▒▒▒▒▒▒
+       ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  
+         ▒▒▒▒▒▒▒▒▒▒████▒▒▒▒▒▒▒▒    
+           ▒▒▒▒▒▒▒▒██▒▒▒▒▒▒ `)
     $('.toggle-icon').on('click', function () {
         console.log(this.dataset.id)
         $.ajax({
@@ -105,4 +131,22 @@ function swap() {
         $('div#missing').show(trans)
         $('div#all').hide(trans)
     }
+}
+
+function picRefresh() {
+    console.log('refreshing')
+    $.ajax({
+        'url': `/api/picRefresh`,
+        'type': 'GET',
+        'beforeSend': function () {
+            $('#picRefresh').addClass('disabled');
+        },
+        'success': function (result) {
+
+        },
+        'complete': setTimeout(function() {
+            console.log(`Successful refresh `)
+            $('#picRefresh').removeClass('disabled')
+        }, 20000)
+    });
 }
