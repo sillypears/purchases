@@ -1,23 +1,44 @@
 <!-- views/purchase.html -->
-<h1 class="h1">
+<!-- <h1 class="h1">
     <%= title %> <span class="small">
             <% if (totals> 0) { %> (<%= totals %>) <% } %>
         </span>
-</h1>
+</h1> -->
+
+<a href="/purchase/<%= purchase.id %>/edit" class="btn btn-primary">Edit <%= purchase.id %></a>
+
 <div class="row no-gutters justify-content-center align-items-center text-center">
     <div id="card-<%= purchase.id %>"
         class="card-big border-top border-right text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
-        <span class="row">
-            <span class="toggle-icon col-md-1 clickable text-center" data-id="<%= purchase.id %>"><i
-                    title="Toggle Status" class="fa fa-times">o</i></span>
-        </span>
-        <div class="card-body">
-
-            <div class="card-title">
-                <a href="/purchase/<%= purchase.id %>"><img class="big-card-image"
-                        src="<% if (purchase.image) {%> <%= purchase.image %> <%} else { %>/img/missing.png<% } %>"
-                        title="<%= purchase.vendor_name %> " /></a>
+        <div class="card-header">
+            <div class="row">
+                <div class="col-md-4">
+                    Maker: <a class="link-primary" href="/maker/id/<%= purchase.maker_id %>">
+                        <%= purchase.maker_name %>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    Vendor: <a class="link-dark" href="/vendor/id/<%= purchase.vendor_id %>">
+                        <%= purchase.vendor_name %>
+                    </a>
+                </div>
+                <div class="col-md-4">
+                    <%= moment(purchase.purchaseDate).format('DD MMM YYYY') %>
+                </div>
             </div>
+            <span class="row">
+                <span class="toggle-icon col-md-1 clickable text-center" data-id="<%= purchase.id %>"><i
+                        title="Toggle Status" class="fa fa-times">o</i></span>
+            </span>
+
+            <div class="card-body">
+
+            </div>
+            <div class="card-title">
+                <img class="big-card-image"
+                    src="<% if (purchase.image) {%> <%= purchase.image %> <%} else { %>/img/missing.png<% } %>" />
+            </div>
+
             <div class="card-text">
                 <span id="sculpt-<%= purchase.id%>" class="entity_display font-weight-bold editableField"
                     contenteditable="true" data-id="<%= purchase.id %>" data-type="entity_display">
@@ -58,39 +79,41 @@
         </div>
         <div class="card-footer">
             <div class="row">
-                <div class="will-sell toggle-icon col-md-6 clickable" data-id="<%= purchase.id %>"
-                    data-type="willSell">
+                <div class="will-sell toggle-icon col-md-6 clickable" data-id="<%= purchase.id %>" data-type="willSell">
                     <% if (purchase.willSell) {%>
-                        <div id="sell-<%= purchase.id %>"
-                            class="bg-secondary font-weight-bold text-white small" title="Sell">Sell
+                        <div id="sell-<%= purchase.id %>" class="bg-secondary font-weight-bold text-white small"
+                            title="Sell">Sell
                         </div>
                         <% } else { %>
-                            <div id="sell-<%= purchase.id %>"
-                                class="bg-success font-weight-bold text-white small" title="Keep">Keep
+                            <div id="sell-<%= purchase.id %>" class="bg-success font-weight-bold text-white small"
+                                title="Keep">Keep
                             </div>
                             <% } %>
                 </div>
                 <div class="is-sold toggle-icon col-md-6" data-id="<%= purchase.id %>" data-type="isSold">
                     <% if (purchase.isSold) {%>
-                        <div id="sold-<%= purchase.id %>"
-                            class="bg-secondary font-weight-bold text-white small" title="Sold">Sold
+                        <div id="sold-<%= purchase.id %>" class="bg-secondary font-weight-bold text-white small"
+                            title="Sold">Sold
                         </div>
                         <% } else { %>
-                            <div id="sold-<%= purchase.id %>"
-                                class="bg-success font-weight-bold text-white small" title="Have">Have
+                            <div id="sold-<%= purchase.id %>" class="bg-success font-weight-bold text-white small"
+                                title="Have">Have
                             </div>
                             <% } %>
                 </div>
             </div>
         </div>
-        <div class="card-footer" data-toggle="collapse" data-target="#notesId" aria-expanded="false"
+        <div class="card-footer" data-bs-toggle="collapse" data-bs-target="#notesId" aria-expanded="false"
             aria-controls="notesId">
             <div class="row">
                 <span class="text-center col-md-2">
                     Notes<% if (purchase.notes) { %>*<% }%>:
                 </span>
-                <span id="notesId" class="collapse text-left col-md-10">
-                    <%= purchase.notes %>
+                <span id="notesId" class="collapse align-left col-md-8">
+                    <%= purchase.notes %> &emsp; $<%= purchase.salePrice %>
+                </span>
+                <span id="soldPrice" class="collapse align-left col-md-2">
+                    
                 </span>
             </div>
         </div>

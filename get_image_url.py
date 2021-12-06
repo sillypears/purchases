@@ -29,14 +29,16 @@ def get_data(maker):
         res = requests.get(url=url)
         if res.status_code == 200:
             return json.loads(res.text)
+        else:
+            print(f"Couldn't get ${maker}")
     except Exception as e:
+        print(f"{e}")
         return None
 
 def parse_src(data, maker, sculpt, cw):
     img = ''
     for x in data['sculpts']:
         if x['name'].lower() == sculpt.lower():
-
             for color in x['colorways']:
                 if color['name'].lower().strip() == cw.lower().strip():
                     img = color['img']
@@ -53,22 +55,24 @@ def main():
     cur = conn.cursor()
     cur.execute('SELECT * FROM keyboard.makers')
     makers = cur.fetchall()
-    cur.execute('select * from keyboard.all_purchases  ORDER BY id DESC')
+    cur.execute('select * from keyboard.all_purchases ORDER BY id DESC')
     purchases = cur.fetchall()
     keycap = {}
     for maker in makers:
         if maker[4] != "":
             keycap[maker[0]] = maker[4]
-
+    print(f"Makers: {len(makers)}")
+    print(f"Purchases: {len(purchases)}")
     for purchase in purchases:
         # print(purchase)
-        m_id = purchase[6]
+        m_id = purchase[7]
+        print
         if m_id in keycap:
             p_id = purchase[0]
-            sculpt = purchase[3]
-            cw = purchase[2]
+            sculpt = purchase[4]
+            cw = purchase[3]
             maker = keycap[m_id]
-            pic = purchase[19]
+            pic = purchase[20]
             d = get_data(maker)
             if d:
                 print( maker, sculpt, cw)

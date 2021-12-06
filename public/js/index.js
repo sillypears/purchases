@@ -42,7 +42,32 @@ $(function () {
             }
         });
     })
-
+    $.ajax({
+        'url': '/api/picRefreshStatus',
+        'type': 'GET',
+        'success': function (result) {
+            console.log(result.message)
+            if (result.message) {
+                $('#picRefresh').addClass('disabled');
+            } else {
+                $('#picRefresh').removeClass('disabled');
+            }
+        }
+    })
+    setInterval(function () {
+        $.ajax({
+            'url': '/api/picRefreshStatus',
+            'type': 'GET',
+            'success': function (result) {
+                console.log(result.message)
+                if (result.message) {
+                    $('#picRefresh').addClass('disabled');
+                } else {
+                    $('#picRefresh').removeClass('disabled');
+                }
+            }
+        })
+    }, 5000)
     $('.sculpt').on('click', function () {
         console.log(this.textContent)
     })
@@ -144,7 +169,7 @@ function picRefresh() {
         'success': function (result) {
 
         },
-        'complete': setTimeout(function() {
+        'complete': setTimeout(function () {
             console.log(`Successful refresh `)
             $('#picRefresh').removeClass('disabled')
         }, 20000)

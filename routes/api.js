@@ -2,7 +2,10 @@ const env = process.env.NODE_ENV || "dev"
 require('dotenv').config({ path: `../.env.${env}` })
 const Router = require('koa-router');
 const fs = require('fs')
+const util = require('util')
 const { spawn } = require('child_process')
+const exec = util.promisify(require('child_process').exec);
+
 const events = require('events');
 const myEmitter = new events.EventEmitter();
 
@@ -641,17 +644,62 @@ router.get('/picRefresh', async (ctx, next) => {
             ctx.body = { 'status': 'Fail' }
             ctx.status = 500
         }
-        console.log(с)
 
     })
     ctx.body = { 'status': 'Oke', 'message': "Refreshed all nice like" }
     ctx.status = 200
 });
 
+// api/picRefreshStatus
+router.get('/picRefreshStatus', async (ctx, next) => {
+    var status;
+    var statusMessage;
+    const {
+        err,
+        stdout,
+        stderr,
+    } = await exec('ps -ef | grep get_image_url | grep -v grep| wc -l');
+    if (stdout > 0) {
+        ctx.body = {
+            'message': true
+        }
+    } else {
+        ctx.body = {
+            'message': false
+        }
+        ctx.status = 200
+    }
+
+})
+
 // api/graph/artisansByCount
 router.get('/graph/artisansByCount', async (ctx, next) => {
     try {
         let artisansByCountData = await models.getArtisansByCount()
+        headers = ['Sculpt', 'Count']
+        // for (let x in artisansByCountData) {
+        //     if (!headers.includes(artisansByCountData[x].entity)) {
+        //         headers.push(artisansByCountData[x].entity)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: artisansByCountData,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+// api/graph/haveArtisansByCount
+router.get('/graph/haveArtisansByCount', async (ctx, next) => {
+    try {
+        let artisansByCountData = await models.getHaveArtisansByCount()
         headers = []
         for (let x in artisansByCountData) {
             if (!headers.includes(artisansByCountData[x].entity)) {
@@ -676,12 +724,12 @@ router.get('/graph/artisansByCount', async (ctx, next) => {
 router.get('/graph/makerByCount', async (ctx, next) => {
     try {
         let makerByCountData = await models.getMakerByCount()
-        headers = []
-        for (let x in makerByCountData) {
-            if (!headers.includes(makerByCountData[x].display_name)) {
-                headers.push(makerByCountData[x].display_name)
-            }
-        }
+        headers = ['Sculpt', 'Count']
+        // for (let x in makerByCountData) {
+        //     if (!headers.includes(makerByCountData[x].display_name)) {
+        //         headers.push(makerByCountData[x].display_name)
+        //     }
+        // }
         ctx.body = {
             status: 'OK',
             headers: headers,
@@ -696,17 +744,40 @@ router.get('/graph/makerByCount', async (ctx, next) => {
     }
 });
 
+// api/graph/makerHaveByCount
+router.get('/graph/makerHaveByCount', async (ctx, next) => {
+    try {
+        let makerByCountData = await models.getMakerHaveByCount()
+        headers = ['Sculpt', 'Count']
+        // for (let x in makerByCountData) {
+        //     if (!headers.includes(makerByCountData[x].display_name)) {
+        //         headers.push(makerByCountData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: makerByCountData,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
 
 // api/graph/artisansByPrice
 router.get('/graph/artisansByPrice', async (ctx, next) => {
     try {
         let artisansByPriceData = await models.getArtisansByPrice()
-        headers = []
-        for (let x in artisansByPriceData) {
-            if (!headers.includes(artisansByPriceData[x].entity)) {
-                headers.push(artisansByPriceData[x].entity)
-            }
-        }
+        headers = ['Sculpt', 'Price']
+        // for (let x in artisansByPriceData) {
+        //     if (!headers.includes(artisansByPriceData[x].entity)) {
+        //         headers.push(artisansByPriceData[x].entity)
+        //     }
+        // }
         ctx.body = {
             status: 'OK',
             headers: headers,
@@ -725,16 +796,136 @@ router.get('/graph/artisansByPrice', async (ctx, next) => {
 router.get('/graph/makerByPrice', async (ctx, next) => {
     try {
         let makerByPriceData = await models.getMakerByPrice()
-        headers = []
-        for (let x in makerByPriceData) {
-            if (!headers.includes(makerByPriceData[x].display_name)) {
-                headers.push(makerByPriceData[x].display_name)
-            }
-        }
+        headers = ['Sculpt', 'Price']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
         ctx.body = {
             status: 'OK',
             headers: headers,
             data: makerByPriceData,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+// api/graph/getPricingTable
+router.get('/graph/getPricingTable', async (ctx, next) => {
+    try {
+        let pricingTable = await models.getPricingTable()
+        headers = ['MAX', 'MIN', 'AVG']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: pricingTable,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+// api/graph/topSculpts
+router.get('/graph/topSculpts', async (ctx, next) => {
+    try {
+        let sculptTable = await models.getTopSculpts()
+        headers = ['Sculpt', 'Count']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: sculptTable,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+// api/graph/totalSculpts
+router.get('/graph/totalSculpts', async (ctx, next) => {
+    try {
+        let sculptTotal = await models.getTotalSculpts()
+        headers = ['Sculpts', 'Count']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: sculptTotal,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+// api/graph/topMakers
+router.get('/graph/topMakers', async (ctx, next) => {
+    try {
+        let makerTable = await models.getTopMakers()
+        headers = ['Maker', 'Count']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: makerTable,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+// api/graph/totalMakers
+router.get('/graph/totalMakers', async (ctx, next) => {
+    try {
+        let makerTotal = await models.getTotalMakers()
+        headers = ['Makers', 'Count']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: makerTotal,
         }
         ctx.status = 200
     } catch (err) {

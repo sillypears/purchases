@@ -1,5 +1,6 @@
 body {
     background-color: lightgrey;
+    font-family: "Rubik", sans-serif;
 }
 
 .container-fluid {
@@ -39,4 +40,17 @@ body {
 
 .toggle-icon {
     cursor: pointer;
+  }
+
+  .spoiler-text {
+    color: transparent;
+    cursor: grab;
+    user-select: none;
+    transition: background 0.3s ease 0.2s, color 0.2s ease 0.25s;
+  }
+  
+  .spoiler-text:hover,
+  .spoiler-text:focus {
+    background: #e8e8e8;
+    color: inherit;
   }

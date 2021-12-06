@@ -1,9 +1,16 @@
 <!-- views/index.html -->
-<h1 class="h1">
-    <%= title %> <span class="small">
-            <% if (totals> 0) { %> (<%= totals %>) <% } %>
-        </span>
-</h1>
+<div class="row">
+    <div class="col-md-11">
+        <h1 class="h1">
+            <%= title %> <span class="small">
+                    <% if (totals> 0) { %> (<%= totals %>) <% } %>
+                </span>
+        </h1>
+    </div>
+    <div class="col-md-1">
+        <a href="/maker/id/<%= maker.id %>/edit" class="btn btn-primary">Edit Maker</a>
+    </div>
+</div>
 <a href="https://instagram.com/<%= maker.instagram %>" target="_blank"><img class="ig-link" src="/img/ig.png"></a>
 <div class="container-fluid ">
     <div class="row ">

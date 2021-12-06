@@ -7,6 +7,7 @@ const models = require('../models/models');
 const multer = require('@koa/multer')
 const koaSwagger = require('koa2-swagger-ui');
 const upload = multer()
+const moment = require('moment')
 
 router.get('/', async (ctx, next) => {
     let purchases = await models.getPurchases()
@@ -54,6 +55,17 @@ router.get('/maker/:type/:id', async (ctx, next) => {
     });
 });
 
+router.get('/maker/id/:id/edit', async (ctx, next) => {
+    let maker = await models.getMakerById(ctx.params.id)
+    return ctx.render('edit-maker', {
+        title: `Maker - ${maker.display_name} -$${maker.total}`,
+        nav: "maker",
+        maker: maker,
+        ticker: ''
+    });
+});
+
+
 router.get('/vendors', async (ctx, next) => {
 
     let vendors = await models.getVendorTotals();
@@ -78,6 +90,15 @@ router.get('/vendor/:type/:id', async (ctx, next) => {
     });
 });
 
+router.get('/vendor/id/:id/edit', async (ctx, next) => {
+    let vendor = await models.getVendorById(ctx.params.id)
+    return ctx.render('edit-vendor', {
+        title: `Vendor - ${vendor.display_name} -$${vendor.total}`,
+        nav: "vendor",
+        vendor: vendor,
+        ticker: ''
+    });
+});
 
 router.get('/add-purchase', async (ctx, next) => {
     let m = await models.getMakers();
@@ -112,7 +133,31 @@ router.get('/purchase/:id', async (ctx, next) => {
         totals: 0,
         purchase: purch,
         next: n || 0,
-        prev: p || 0
+        prev: p || 0,
+        moment: moment
+    });
+});
+
+router.get('/purchase/:id/edit', async (ctx, next) => {
+    const m = await models.getMakers();
+    const v = await models.getVendors();
+    const c = await models.getCategories();
+    const s = await models.getSaleTypes();
+    const maxSet = await models.getLatestSet();
+    const purchase = await models.getPurchase(ctx.params.id)
+    console.log(purchase.purchaseDate, purchase.soldDate)
+    return ctx.render('edit-purchase', {
+        title: "Edit Purchase",
+        nav: "edit-purchase",
+        totals: 0,
+        ticker: "",
+        makers: m,
+        vendors: v,
+        categories: c,
+        saleTypes: s,
+        purchase: purchase,
+        maxSet: maxSet,
+        moment: moment
     });
 });
 
@@ -210,5 +255,39 @@ router.post('/add-vendor', async (ctx, next) => {
         ticker: ticker,
         totals: 0
     });
+});
+
+router.post('/purchase/:id/edit', async (ctx, next) => {
+    let purch = await models.updatePurchaseById(ctx.params.id, ctx.request.body)
+    if (purch) {
+        ctx.status = 301
+        ctx.redirect(`purchase/${ctx.params.id}`)    
+    } 
+    ctx.status = 209
+    ctx.redirect(`/purchase/${ctx.params.id}`)
+
+});
+
+router.post('/maker/id/:id/edit', async (ctx, next) => {
+    let purch = await models.updateMakerById(ctx.params.id, ctx.request.body)
+    if (purch) {
+        ctx.status = 301
+        ctx.redirect(`/maker/id/${ctx.params.id}`)    
+    } 
+    ctx.status = 209
+    ctx.redirect(`/maker/id/${ctx.params.id}`)
+
+});
+
+router.post('/vendor/id/:id/edit', async (ctx, next) => {
+    let purch = await models.updateVendorById(ctx.params.id, ctx.request.body)
+
+    if (purch) {
+        ctx.status = 301
+        ctx.redirect(`/vendor/id/${ctx.params.id}`)    
+    } 
+    ctx.status = 209
+    ctx.redirect(`/vendor/id/${ctx.params.id}`)
+
 });
 module.exports = router;
