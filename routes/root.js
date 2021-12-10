@@ -194,6 +194,16 @@ router.get('/graph/artisan-count', async (ctx, next) => {
     })
 })
 
+router.get('/forsale', async (ctx, next) => {
+
+    let sale = await models.getAllForSale();
+    return ctx.render('forsale', {
+        title: "Shit For Sale",
+        nav: "forsale",
+        sale: sale,
+        totals: sale.length
+    });
+});
 router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
     let a = ctx.request.body
     if (a.adjustments < 0) { 

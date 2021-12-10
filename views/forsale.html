@@ -1,0 +1,19 @@
+<h1 class="h1">
+    shit for sale
+</h1>
+
+<table class="table hover border">
+<% sale.forEach((item, index) => { %>
+    <tr>
+        <td><%= item.detail %></td>
+        <td><%= item.sculpt %></td>
+        <td>
+            <a class="link" href="/maker/id/<%= item.maker_id %>">
+                <%= item.maker_name %>
+            </a>
+        </td>
+        <td>$<%= (item.price + item.adjustments).toFixed(2) %>
+        </td>
+    </tr>
+<% }) %>
+</table>

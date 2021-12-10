@@ -413,7 +413,7 @@ module.exports = {
         }
         if (conn) conn.release()
         
-        return {'count': sculptCount, 'sculpts': sculpts.sort()}
+        return {'count': sculptCount[0], 'sculpts': sculpts.sort()}
     },
     getTopMakers: async () => {
         conn = await db.getConnection()
@@ -431,8 +431,14 @@ module.exports = {
         }
         if (conn) conn.release()
         
-        return {'count': makerCount, 'sculpts': makers.sort()}
+        return {'count': makerCount[0], 'sculpts': makers.sort()}
     },
+    getAllForSale: async () => {
+        conn = await db.getConnection()
+        let data = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE willSell = 1 AND isSold = 0 ORDER BY id DESC;`)
+        if (conn) conn.release()
+        return data
+    }
 }
 
 // Pricing table
