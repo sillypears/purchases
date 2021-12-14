@@ -5,7 +5,7 @@ $(async function () {
 
     });
 
-
+    // Price Data
     {
         const priceData = await getData("/api/graph/getPricingTable")
         let table = `<table class='table border'><thead>`
@@ -17,6 +17,7 @@ $(async function () {
         table += '</tbody></table>'
         $('#artisan-price-table').append(table)
     }
+    // Top Sculpts
     {
         const topSculptData = await getData("/api/graph/topSculpts")
         let tableSculpt = `<table class='table border hover'><thead>`
@@ -31,6 +32,7 @@ $(async function () {
         tableSculpt += '</tbody></table>'
         $('#artisan-top-sculpt').append(tableSculpt)
     }
+    // Top Makers
     {
         const topMakerData = await getData("/api/graph/topMakers")
         let tableMaker = `<table class='table border hover'><thead>`
@@ -39,12 +41,12 @@ $(async function () {
         }
         tableMaker += '</thead><tbody>'
         for (x of topMakerData.data) {
-            console.log(x)
             tableMaker += `<tr><td>${x.maker_name}</td><td>${x.total}</td></tr>`
         }
         tableMaker += '</tbody></table>'
         $('#artisan-top-maker').append(tableMaker)
     }
+    // total Maker/Sculpts
     {
         const totalMakerData = await getData("/api/graph/totalMakers")
         const totalSculptData = await getData("/api/graph/totalSculpts")
@@ -61,47 +63,64 @@ $(async function () {
         $('#artisan-total-counts').append(totalCounts)
     }
     //artisansByCount
-    const artisanData = await getData("/api/graph/haveArtisansByCount")
-    $('#artisan-count-chart').highcharts({
-        chart: {
-            type: 'pie'
-        },
-        title: {
-            text: 'Count By Sculpt'
-        },
+    {
+        const artisanData = await getData("/api/graph/haveArtisansByCount")
+        $('#artisan-count-chart').highcharts({
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Count By Sculpt'
+            },
 
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.y}</b>'
-        },
-        legend: {
-            enabled: true
-        },
-        series: [{
-            name: "Sculpts",
-            colorByPoint: true,
-            data: artisanData.data
-        }]
-    })
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y}</b>'
+            },
+            legend: {
+                enabled: true
+            },
+            series: [{
+                name: "Sculpts",
+                colorByPoint: true,
+                data: artisanData.data
+            }]
+        })
+    }
     //makerByCount
-    const makerData = await getData("/api/graph/makerHaveByCount")
-    $('#maker-count-chart').highcharts({
-        chart: {
-            type: 'pie'
-        },
-        title: {
-            text: 'Count By Maker'
-        },
+    {
+        const makerData = await getData("/api/graph/makerHaveByCount")
+        $('#maker-count-chart').highcharts({
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Count By Maker'
+            },
 
-        tooltip: {
-            pointFormat: '{series.name}: <b>{point.y}</b>'
-        },
-        series: [{
-            name: "Makers",
-            colorByPoint: true,
-            data: makerData.data
-        }]
-    })
-
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.y}</b>'
+            },
+            series: [{
+                name: "Makers",
+                colorByPoint: true,
+                data: makerData.data
+            }]
+        })
+    }
+    // Sale Types
+    {
+        const saleTypeWins = await getData("/api/graph/saleTypeWins")
+        let tableMaker = `<table class='table border hover'><thead>`
+        for (h of saleTypeWins.headers) {
+            tableMaker += `<th>${h}</th>`
+        }
+        tableMaker += '</thead><tbody>'
+        for (x of saleTypeWins.data) {
+            tableMaker += `<tr><td>${x.sale_type}</td><td>${x.count}</td></tr>`
+        }
+        tableMaker += '</tbody></table>'
+        $('#artisan-sale-types').append(tableMaker)
+    }
 });
 
 async function getData(url) {

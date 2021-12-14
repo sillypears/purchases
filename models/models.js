@@ -438,6 +438,18 @@ module.exports = {
         let data = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE willSell = 1 AND isSold = 0 ORDER BY id DESC;`)
         if (conn) conn.release()
         return data
+    },
+    getAllNotForSale: async () => {
+        conn = await db.getConnection()
+        let data = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE willSell = 0 AND isSold = 0 ORDER BY id DESC;`)
+        if (conn) conn.release()
+        return data
+    },
+    getSaleTypeWins: async () => {
+        conn = await db.getConnection()
+        let data = await conn.query(`SELECT p.sale_type, count(p.sale_type) as count FROM ${process.env.DB_SCHEMA}.all_purchases p GROUP BY p.sale_type ORDER BY count DESC`)
+        if (conn) conn.release()
+        return data
     }
 }
 
@@ -457,3 +469,8 @@ module.exports = {
 // SELECT maker_name, COUNT(maker_name) as count FROM keyboard.all_purchases WHERE isSold = 0 GROUP BY maker_name;
 
 // Total Sculpt Per Maker
+
+// Sale wins by type
+
+// SELECT p.name, count(p.name) FROM keyboard.all_purchases p GROUP BY p.name
+// SELECT p.name, count(p.name) FROM keyboard.all_purchases p WHERE isSold = 0 GROUP BY p.name

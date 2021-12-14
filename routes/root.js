@@ -204,6 +204,18 @@ router.get('/forsale', async (ctx, next) => {
         totals: sale.length
     });
 });
+
+router.get('/notforsale', async (ctx, next) => {
+
+    let sale = await models.getAllNotForSale();
+    return ctx.render('notforsale', {
+        title: "Shit Not For Sale",
+        nav: "notforsale",
+        sale: sale,
+        totals: sale.length
+    });
+});
+
 router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
     let a = ctx.request.body
     if (a.adjustments < 0) { 

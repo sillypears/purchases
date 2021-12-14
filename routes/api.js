@@ -427,6 +427,29 @@ router.get('/willSell', async (ctx, next) => {
     }
 });
 
+router.get('/willNotSell', async (ctx, next) => {
+    // #swagger.tags = ["Purchases"]
+    // #swagger.description = "Purchase endpoints"
+    // #swagger.parameters['id'] = { description: 'OrderSet ID' }
+
+    try {
+        let sells = await models.getAllNotForSale()
+
+        ctx.body = {
+            status: "ok",
+            notForSale: sells
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    }
+});
+
+
 router.get('/orderset', async (ctx, next) => {
     // #swagger.tags = ["Purchases"]
     // #swagger.description = "Purchase endpoints"
@@ -958,5 +981,25 @@ router.get('/graph/totalMakers', async (ctx, next) => {
     }
 });
 
+router.get('/graph/saleTypeWins', async (ctx, next) => {
+
+    try {
+        let sales = await models.getSaleTypeWins()
+        headers = ['Sale Type', 'Count']
+
+        ctx.body = {
+            status: "ok",
+            headers: headers,
+            data: sales
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    }
+});
 
 module.exports = router;
