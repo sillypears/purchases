@@ -10,6 +10,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Rubik">
     <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css" />
+    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
     <link rel="stylesheet" href="/css/style.css" />
     <style>
         .highlight {
@@ -19,7 +20,7 @@
 </head>
 
 <body>
-    <nav class="nav navbar-expand-lg navbar-dark bg-dark">
+    <nav class="nav fixed-top navbar-expand-lg navbar-dark bg-dark">
         <!-- <a class="navbar-brand" href="#"><img width="30" height="30" src="/img/brand.gif" /></a> -->
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,8 +62,8 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/graph/artisan-count">Artisan Count</a>
-                        <!-- <a class="dropdown-item" href="/add-maker">Maker</a>
-                        <a class="dropdown-item" href="/add-vendor">Vendor</a> -->
+                        <a class="dropdown-item" href="/totalSculpts">Sculpts</a>
+                        <!-- <a class="dropdown-item" href="/add-vendor">Vendor</a>  -->
 
                     </div>
                 </li>
@@ -85,7 +86,7 @@
     <%- body %>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"
             integrity="sha512-2rNj2KJ+D8s1ceNasTIex6z4HWyOnEYLVC3FigGOmyQCZc2eBXKgOxQmo3oKLHyfcj53uz4QMsRCWNbLd32Q1g=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
@@ -100,11 +101,14 @@
             <script src="https://code.highcharts.com/modules/accessibility.js"></script>
             <script src="/js/charts.js"></script>
             <% } %>
-                <script src="/js/index.js"></script>
+            <% if (nav=="edit-purchase" ) { %>
+                <script src="/js/edit-purchase.js"></script>
+            <% } %>
+            <script src="/js/index.js"></script>
 
 
-                <footer class="footer">
-                </footer>
+            <footer class="footer fixed-bottom">
+            </footer>
 </body>
 
 </html>

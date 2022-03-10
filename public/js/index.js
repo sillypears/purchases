@@ -25,8 +25,11 @@ $(function () {
        ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  
          ▒▒▒▒▒▒▒▒▒▒████▒▒▒▒▒▒▒▒    
            ▒▒▒▒▒▒▒▒██▒▒▒▒▒▒ `)
+
+
     $('.toggle-icon').on('click', function () {
         console.log(this.dataset.id)
+        if (this.dataset.type !== "receive") { return }
         $.ajax({
             'url': `/api/receiveToggle/${this.dataset.id}`,
             'type': 'GET',

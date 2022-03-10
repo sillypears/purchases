@@ -1,61 +1,116 @@
 <!-- views/index.html -->
-<h1 class="h1">
-    <%= title %> <span class="small">
-            <% if (totals> 0) { %> (<%= totals %>) <% } %>
-        </span>
-</h1>
-<form class="form" action="/add-purchase"  enctype="multipart/form-data" method="POST">
-    <select class="select" id="category" name="category">
-        <option id="option-default" name="default" value="-1">Select Category</option>
-        <% for ( let category of categories) { %><
-            <option id="option-<%= category.name %>" name="category" value="<%= category.id %>" <% if (category.display_name == "Artisan") { %> selected <% } %> ><%= category.display_name %> </option>
-        <% }; %>
-    </select><br />
-    <input type="text" id="detail" name="detail" placeholder="Detail"/><br />
-    <input type="text" id="archivist" name="archivist" placeholder="Keycap Archivist Sculpt"/><br />
-    <input type="text" id="set" name="set" placeholder="Display Name"/><br />
+<div class="container my-5">
 
-    <select class="select" id="maker" name="maker">
-        <option id="option-default" name="default" value="-1">Select Maker</option>
+    <h1 class="h1">
+        <%= title %> <span class="small">
+                <% if (totals> 0) { %> (<%= totals %>) <% } %>
+            </span>
+    </h1>
+    <form class="form" action="" method="POST" enctype="multipart/form-data">
+        <select class="select" id="category" name="category">
+            <option id="option-default" name="default" value="-1">Select Category</option>
+            <% for ( let category of categories) { %>
+                < <option id="option-<%= category.name %>" name="category" value="<%= category.id %>" <% if
+                    (category.display_name=="Artisan" ) { %> selected <% } %> ><%= category.display_name %>
+                            </option>
+                            <% }; %>
+        </select><br />
+        <input type="text" id="detail" name="detail" placeholder="Detail" /><br />
+        <input type="text" id="archivist" name="archivist" placeholder="Keycap Archivist Sculpt" /><br />
+        <input type="text" id="set" name="set" placeholder="Display Name" /><br />
+        <input type="text" id="ka_id" name="ka_id" placeholder="Archivist ID" /><br />
+        <select class="select" id="maker" name="maker">
+            <option id="option-default" name="default" value="-1">Select Maker</option>
 
-        <% for ( let maker of makers) { %>
-            <option id="option-<%= maker.name %>" name="maker" value=<%= maker.id %> ><%= maker.display_name %> </option>
-        <% }; %>
-    </select><br />
-    
-    <select class="select" id="vendor" name="vendor">
-        <option id="option-default" name="default" value="-1">Select Vendor</option>
+            <% for ( let maker of makers) { %>
+                <option id="option-<%= maker.name %>" name="maker" value=<%=maker.id %> ><%= maker.display_name %>
+                </option>
+                <% }; %>
+        </select><br />
 
-        <% for ( let vendor of vendors) { %>
-            <option id="option-<%= vendor.name %>" name="vendor" value=<%= vendor.id  %> ><%= vendor.display_name %> </option>
-        <% }; %>
-    </select><br />
-    <input type="number" id="price" name="price" step="0.01" placeholder="Price $"/><br />
-    <input type="number" id="adjustments" name="adjustments" step="0.01" placeholder="Adjustments $"/><br />
+        <select class="select" id="vendor" name="vendor">
+            <option id="option-default" name="default" value="-1">Select Vendor</option>
 
-    <select class="select" id="saletype" name="saletype">
-        <option id="option-default" name="default" value="-1">Select Sale Type</option>
+            <% for ( let vendor of vendors) { %>
+                <option id="option-<%= vendor.name %>" name="vendor" value=<%=vendor.id %> ><%= vendor.display_name %>
+                </option>
+                <% }; %>
+        </select><br />
+        <input type="number" id="price" name="price" step="0.01" placeholder="Price $" /><br />
+        <input type="number" id="adjustments" name="adjustments" step="0.01" placeholder="Adjustments $" /><br />
 
-        <% for ( let saleType of saleTypes) { %>
-            <option id="option-<%= saleType.name %>" name="saleType" value=<%= saleType.id %> ><%= saleType.display_name %> </option>
-        <% }; %>
-    </select><br />
+        <select class="select" id="saletype" name="saletype">
+            <option id="option-default" name="default" value="-1">Select Sale Type</option>
 
-    <input type="text" id="purchaseDate" class="date" name="purchaseDate" placeholder="Purchase Date" onfocus="(this.type='date'); let nowp = new Date(); (this.value=nowp.toISOString().split('T')[0])"/><br />
-    <input type="text" id="expectedDate" class="date" name="expectedDate" placeholder="Expected Date" onfocus="(this.type='date'); let nowe = new Date(); nowe.setDate(nowe.getDate()+7); (this.value=nowe.toISOString().split('T')[0])"/><br />
-    <input type="number" id="orderSet" name="orderSet" placeholder="Set Number" value="<%= maxSet %>"/><br />
-    <input type="text" id="image" name="image" placeholder="Link to image" /><br />
-    <button type="submit" id="submit" class="btn-success">Add Purchase!</button>
-</form>
+            <% for ( let saleType of saleTypes) { %>
+                <option id="option-<%= saleType.name %>" name="saleType" value=<%=saleType.id %> ><%=
+                        saleType.display_name %>
+                </option>
+                <% }; %>
+        </select><br />
 
-<div id='ticker'>
-    <% if (ticker.insertId) { %>
-        <div class="alert-success">Added id: <%= ticker.insertId %>
+        <input type="text" id="purchaseDate" class="date" name="purchaseDate" placeholder="Purchase Date"
+            onfocus="(this.type='date'); let nowp = new Date(); (this.value=nowp.toISOString().split('T')[0])" /><br />
+        <input type="text" id="expectedDate" class="date" name="expectedDate" placeholder="Expected Date"
+            onfocus="(this.type='date'); let nowe = new Date(); nowe.setDate(nowe.getDate()+7); (this.value=nowe.toISOString().split('T')[0])" /><br />
+        <input type="number" id="orderSet" name="orderSet" placeholder="Set Number" value="<%= maxSet %>" /><br />
+
+        <input type="file" id="image" name="image" /><br />
+
+        <button type="submit" id="submit" class="btn-success">Add Purchase!</button>
+    </form>
+
+    <div id='ticker'>
+        <% if (ticker.insertId) { %>
+            <div class="alert-success">Added id: <%= ticker.insertId %>
+            </div>
+            <% } %>
+                <% if (ticker.error) { %>
+                    <div class="alert-danger">
+                        <%= ticker.error %>
+                    </div>
+                    <% } %>
+    </div>
+
+    <div id="preview-template" style="display: none;">
+        <div class="dz-preview dz-file-preview">
+            <div class="dz-image"><IMG data-dz-thumbnail=""></div>
+            <div class="dz-details">
+                <div class="dz-size"><span data-dz-size=""></span></div>
+                <div class="dz-filename"><span data-dz-name=""></span></div>
+            </div>
+            <div class="dz-progress"><span class="dz-upload" data-dz-uploadprogress=""></span></div>
+            <div class="dz-error-message"><span data-dz-errormessage=""></span></div>
+            <div class="dz-success-mark">
+                <svg width="54px" height="54px" viewBox="0 0 54 54" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+                    <title>Check</title>
+                    <desc>Created with Sketch.</desc>
+                    <defs></defs>
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+                        <path
+                            d="M23.5,31.8431458 L17.5852419,25.9283877 C16.0248253,24.3679711 13.4910294,24.366835 11.9289322,25.9289322 C10.3700136,27.4878508 10.3665912,30.0234455 11.9283877,31.5852419 L20.4147581,40.0716123 C20.5133999,40.1702541 20.6159315,40.2626649 20.7218615,40.3488435 C22.2835669,41.8725651 24.794234,41.8626202 26.3461564,40.3106978 L43.3106978,23.3461564 C44.8771021,21.7797521 44.8758057,19.2483887 43.3137085,17.6862915 C41.7547899,16.1273729 39.2176035,16.1255422 37.6538436,17.6893022 L23.5,31.8431458 Z M27,53 C41.3594035,53 53,41.3594035 53,27 C53,12.6405965 41.3594035,1 27,1 C12.6405965,1 1,12.6405965 1,27 C1,41.3594035 12.6405965,53 27,53 Z"
+                            id="Oval-2" stroke-opacity="0.198794158" stroke="#747474" fill-opacity="0.816519475"
+                            fill="#FFFFFF" sketch:type="MSShapeGroup"></path>
+                    </g>
+                </svg>
+            </div>
+            <div class="dz-error-mark">
+                <svg width="54px" height="54px" viewBox="0 0 54 54" version="1.1" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+                    <title>error</title>
+                    <desc>Created with Sketch.</desc>
+                    <defs></defs>
+                    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+                        <g id="Check-+-Oval-2" sketch:type="MSLayerGroup" stroke="#747474" stroke-opacity="0.198794158"
+                            fill="#FFFFFF" fill-opacity="0.816519475">
+                            <path
+                                d="M32.6568542,29 L38.3106978,23.3461564 C39.8771021,21.7797521 39.8758057,19.2483887 38.3137085,17.6862915 C36.7547899,16.1273729 34.2176035,16.1255422 32.6538436,17.6893022 L27,23.3431458 L21.3461564,17.6893022 C19.7823965,16.1255422 17.2452101,16.1273729 15.6862915,17.6862915 C14.1241943,19.2483887 14.1228979,21.7797521 15.6893022,23.3461564 L21.3431458,29 L15.6893022,34.6538436 C14.1228979,36.2202479 14.1241943,38.7516113 15.6862915,40.3137085 C17.2452101,41.8726271 19.7823965,41.8744578 21.3461564,40.3106978 L27,34.6568542 L32.6538436,40.3106978 C34.2176035,41.8744578 36.7547899,41.8726271 38.3137085,40.3137085 C39.8758057,38.7516113 39.8771021,36.2202479 38.3106978,34.6538436 L32.6568542,29 Z M27,53 C41.3594035,53 53,41.3594035 53,27 C53,12.6405965 41.3594035,1 27,1 C12.6405965,1 1,12.6405965 1,27 C1,41.3594035 12.6405965,53 27,53 Z"
+                                id="Oval-2" sketch:type="MSShapeGroup"></path>
+                        </g>
+                    </g>
+                </svg>
+            </div>
         </div>
-    <% } %>
-    <% if (ticker.error) { %>
-        <div class="alert-danger">
-            <%= ticker.error %>
-        </div>
-    <% } %>
+    </div>
 </div>

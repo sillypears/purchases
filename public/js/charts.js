@@ -50,7 +50,6 @@ $(async function () {
     {
         const totalMakerData = await getData("/api/graph/totalMakers")
         const totalSculptData = await getData("/api/graph/totalSculpts")
-        console.log(totalMakerData)
         let totalCounts = `<table class='table border hover'><thead>`
         totalCounts += `<th>Total Makers</th>`
         totalCounts += `<th>Total Sculpts</th>`
@@ -65,6 +64,7 @@ $(async function () {
     //artisansByCount
     {
         const artisanData = await getData("/api/graph/haveArtisansByCount")
+        console.log(artisanData)
         $('#artisan-count-chart').highcharts({
             chart: {
                 type: 'pie'
@@ -116,10 +116,35 @@ $(async function () {
         }
         tableMaker += '</thead><tbody>'
         for (x of saleTypeWins.data) {
-            tableMaker += `<tr><td>${x.sale_type}</td><td>${x.count}</td></tr>`
+            tableMaker += `<tr><td>${x.name}</td><td>${x.y}</td></tr>`
         }
         tableMaker += '</tbody></table>'
         $('#artisan-sale-types').append(tableMaker)
+    }
+    //artisansByCount
+    {
+        const saleTypeWins = await getData("/api/graph/saleTypeWins")
+        console.log(saleTypeWins)
+        $('#artisan-pie-sales').highcharts({
+            chart: {
+                type: 'pie'
+            },
+            title: {
+                text: 'Count By Sale Type'
+            },
+
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            legend: {
+                enabled: true
+            },
+            series: [{
+                name: "Sale Type",
+                colorByPoint: true,
+                data: saleTypeWins.data
+            }]
+        })
     }
 });
 

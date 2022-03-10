@@ -6,18 +6,43 @@ const db = require('../db');
 const models = require('../models/models');
 const multer = require('@koa/multer')
 const koaSwagger = require('koa2-swagger-ui');
-const upload = multer()
 const moment = require('moment')
+const { Dropzone } = require("dropzone");
+const fs = require("fs");
+const path = require("path");
+const sharp = require('sharp')
+
+const upload = multer();
+
+router.get('/test-upload', async (ctx, next) => {
+
+    return ctx.render('test-upload', {
+        title: "test",
+        nav: "test",
+        totals: 0
+    });
+});
+
+router.post('/test-upload', upload.single('test'), async (ctx, next) => {
+    ;
+    console.log('ctx.request.file', ctx.request.file);
+    console.log('ctx.file', ctx.file);
+    console.log('ctx.request.body', ctx.request.body);
+    
+    return ctx.redirect('/') 
+});
 
 router.get('/', async (ctx, next) => {
     let purchases = await models.getPurchases()
+    let haves = await models.getPurchasesIStillHave()
     let missingPurchases = await models.getPurchasesThatAreMissing()
     return ctx.render('index', {
         title: "Purchases",
         nav: "index",
         purchases: purchases,
         missingPurchases: missingPurchases,
-        totals: purchases.length
+        allHaveTotals: haves.length,
+        allTotals: purchases.length
     });
 });
 
@@ -120,7 +145,6 @@ router.get('/add-purchase', async (ctx, next) => {
     });
 });
 
-
 router.get('/purchase/:id', async (ctx, next) => {
     // let purchase = await axios.get(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/purchase/${ctx.params.id}`);
     let purch = await models.getPurchase(ctx.params.id)
@@ -216,16 +240,26 @@ router.get('/notforsale', async (ctx, next) => {
     });
 });
 
+router.get('/totalSculpts', async (ctx, next) => {
+    let sculpts = await models.getTotalSculpts();
+    return ctx.render('totalsculpts', {
+        title: "All The Sculpts",
+        nav: "totalsculpts",
+        sculpts: sculpts.sculpts,
+        totals: sculpts.count
+    })
+});
 router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
     let a = ctx.request.body
     if (a.adjustments < 0) { 
         a.adjustments = 0
     }
-    console.log(`adjustments: ${a.adjustments} --`)
-    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, a.image);
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, a.image);
     // let insertId = await models.insertPurchaseImage(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, ctx.file);
-
-    console.log(insertId)
+    let meta = {'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name}
+    if (ctx.file) {
+        let imageSaveLocation = saveImage(ctx.file, insertId.insertId, meta);
+    }
     let m = await models.getMakers();
     let v = await models.getVendors();
     let c = await models.getCategories();
@@ -279,8 +313,14 @@ router.post('/add-vendor', async (ctx, next) => {
     });
 });
 
-router.post('/purchase/:id/edit', async (ctx, next) => {
-    let purch = await models.updatePurchaseById(ctx.params.id, ctx.request.body)
+router.post('/purchase/:id/edit', upload.single('imageUp'), async (ctx, next) => {
+    const a = ctx.request.body
+    let purch = await models.updatePurchaseById(ctx.params.id, a)
+    let meta = {'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name}
+    console.log(ctx.file)
+    if (ctx.file) {
+        let imageSaveLocation = saveImage(ctx.file, a.id, meta);
+    }
     if (purch) {
         ctx.status = 301
         ctx.redirect(`purchase/${ctx.params.id}`)    
@@ -313,3 +353,23 @@ router.post('/vendor/id/:id/edit', async (ctx, next) => {
 
 });
 module.exports = router;
+
+async function saveImage(fileObj, imageId, data) {
+
+    let ext = path.extname(fileObj.originalname)
+    const f_name = `public/img/keycaps/${imageId}_${data.maker}${data.detail}_${data.set}${ext}`
+    const img = sharp(fileObj.buffer)
+    let imageMeta = await getImgMeta(img)
+    if (imageMeta.width > 1920 || imageMeta.height > 1080 )
+    img.resize({
+        width: 1920,
+        height: 1080
+    }).toFormat("jpeg", {mozjpeg: true}).toFile(f_name)
+   // fs.writeFile(path=`/public/img/keycaps/${imageId.insertId}_${data.detail}_${data.set}.${ext}`, data=fileObj.buffer)
+
+    return 0
+}
+
+async function getImgMeta(img) {
+    return img.metadata()
+}

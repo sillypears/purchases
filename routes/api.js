@@ -108,9 +108,9 @@ router.get('/maker/name/:name', async (ctx, next) => {
     } */
     try {
 
-        let maker = await models.getMakerByName(ctx.params.name);
+        let maker = await models.getMakerSculptsByName(ctx.params.name);
         if (maker) {
-            ctx.body = maker[0]
+            ctx.body = maker
             ctx.status = 200
         } else {
             throw err;
@@ -125,7 +125,7 @@ router.get('/maker/name/:name', async (ctx, next) => {
 });
 
 // api/pricebyname/:name
-router.get('/maker/name/:name', async (ctx, next) => {
+router.get('/maker/name-money/:name', async (ctx, next) => {
     // #swagger.tags = ["Makers"]
     // #swagger.description = "Maker endpoints"
     // #swagger.parameters['name'] = { description: 'Maker\'s short-name' }
@@ -503,6 +503,24 @@ router.get('/orderset/:id', async (ctx, next) => {
     }
 });
 
+// api/getTotalSculpts
+router.get('/getTotalSculpts', async (ctx, next) => {
+    try {
+        let sculpts = await models.getTotalSculptsWithPicture()
+        console.log(sculpts)
+        ctx.body = {
+            'status': 'OK',
+            'data': sculpts
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    }
+})
 // api/purchase
 router.post('/purchase', async (ctx, next) => {
     // #swagger.tags = ["Purchases"]

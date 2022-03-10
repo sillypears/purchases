@@ -1,65 +1,90 @@
 <!-- views/index.html -->
-<h1 class="h1">
-    <%= title %> <span class="small">
-            <% if (totals> 0) { %> (<%= totals %>) <% } %>
-        </span>
-</h1>
-<form class="form" action="" method="POST">
-    <select class="select" id="category" name="category">
-        <option id="option-default" name="default"  value="-1">Select Category</option>
-        <% for ( let category of categories) { %><
-            <option id="option-<%= category.name %>" name="category" value="<%= category.id %>" <% if (category.id == purchase.category_id) { %> selected <% } %> ><%= category.display_name %> </option>
-        <% }; %>
-    </select><br />
-    <input type="text" id="detail" name="detail" size=40 placeholder="Detail" value="<%= purchase.detail %>"/><br />
-    <input type="text" id="archivist" name="archivist" size=40 placeholder="Keycap Archivist Sculpt" value="<%= purchase.entity %>"/><br />
-    <input type="text" id="set" name="set" size=40 placeholder="Display Name" value="<%= purchase.sculpt %>"/><br />
+<div class="container my-5">
 
-    <select class="select" id="maker" name="maker" >
-        <option id="option-default" name="default" value="-1">Select Maker</option>
+    <h1 class="h1">
+        <%= title %> <span class="small">
+                <% if (totals> 0) { %> (<%= totals %>) <% } %>
+            </span>
+    </h1>
+    <form class="form" action="" method="POST" enctype="multipart/form-data">
+        <select class="select" id="category" name="category">
+            <option id="option-default" name="default" value="-1">Select Category</option>
+            <% for ( let category of categories) { %>
+                < <option id="option-<%= category.name %>" name="category" value="<%= category.id %>" <% if
+                    (category.id==purchase.category_id) { %> selected <% } %> ><%= category.display_name %>
+                            </option>
+                            <% }; %>
+        </select><br />
+        <input type="text" id="detail" name="detail" size=40 placeholder="Detail"
+            value="<%= purchase.detail %>" /><br />
+        <input type="text" id="archivist" name="archivist" size=40 placeholder="Keycap Archivist Sculpt"
+            value="<%= purchase.entity %>" /><br />
+        <input type="text" id="set" name="set" size=40 placeholder="Display Name"
+            value="<%= purchase.sculpt %>" /><br />
+        <input type="text" id="ka_id" name="ka_id" size=40 placeholder="Archivist ID"
+            value="<%= purchase.ka_id %>" /><br />
+        <select class="select" id="maker" name="maker">
+            <option id="option-default" name="default" value="-1">Select Maker</option>
 
-        <% for ( let maker of makers) { %>
-            <option id="option-<%= maker.name %>" name="maker" value=<%= maker.id %> <% if (maker.id == purchase.maker_id) { %> selected <% } %>><%= maker.display_name %> </option>
-        <% }; %>
-    </select><br />
-    
-    <select class="select" id="vendor" name="vendor" >
-        <option id="option-default" name="default" value="-1">Select Vendor</option>
+            <% for ( let maker of makers) { %>
+                <option id="option-<%= maker.name %>" name="maker" value=<%=maker.id %>
+                    <% if (maker.id==purchase.maker_id) { %> selected <% } %>><%= maker.display_name %>
+                </option>
+                <% }; %>
+        </select><br />
 
-        <% for ( let vendor of vendors) { %>
-            <option id="option-<%= vendor.name %>" name="vendor" value=<%= vendor.id  %> <% if (vendor.id == purchase.vendor_id) { %> selected <% } %> ><%= vendor.display_name %> </option>
-        <% }; %>
-    </select><br />
-    <input type="number" id="price" name="price" size=40 step="0.01" placeholder="Price $" value="<%= purchase.price %>"/><br />
-    <input type="number" id="adjustments" name="adjustments" size=40 step="0.01" placeholder="Adjustments $" value="<%= purchase.adjustments %>"/><br />
+        <select class="select" id="vendor" name="vendor">
+            <option id="option-default" name="default" value="-1">Select Vendor</option>
 
-    <select class="select" id="saletype" name="saletype" >
-        <option id="option-default" name="default" value="-1">Select Sale Type</option>
+            <% for ( let vendor of vendors) { %>
+                <option id="option-<%= vendor.name %>" name="vendor" value=<%=vendor.id %>
+                    <% if (vendor.id==purchase.vendor_id) { %> selected <% } %> ><%= vendor.display_name %>
+                </option>
+                <% }; %>
+        </select><br />
+        <input type="number" id="price" name="price" size=40 step="0.01" placeholder="Price $"
+            value="<%= purchase.price %>" /><br />
+        <input type="number" id="adjustments" name="adjustments" size=40 step="0.01" placeholder="Adjustments $"
+            value="<%= purchase.adjustments %>" /><br />
 
-        <% for ( let saleType of saleTypes) { %>
-            <option id="option-<%= saleType.name %>" name="saleType" value=<%= saleType.id %> <% if (saleType.id == purchase.sale_id) { %> selected <% } %>><%= saleType.display_name %> </option>
-        <% }; %>
-    </select><br />
+        <select class="select" id="saletype" name="saletype">
+            <option id="option-default" name="default" value="-1">Select Sale Type</option>
 
-    <input type="date" id="purchaseDate" class="date" name="purchaseDate" size=40 placeholder="Purchase Date" value="<%= moment(purchase.purchaseDate).format('YYYY-MM-DD') %>"/><br />
-    <input type="date" id="expectedDate" class="date" name="expectedDate" size=40 placeholder="Expected Date" value="<%= moment(purchase.receivedDate).format('YYYY-MM-DD')  %>"/><br />
-    <input type="date" id="soldDate" class="date" name="soldDate" size=40 placeholder="Sold Date" value="<%= moment(purchase.soldDate).format('YYYY-MM-DD') %>"/><br />
-    <input type="number" id="salePrice" name="salePrice" size=40 step="0.01" placeholder="Sale Price $" value="<%= purchase.salePrice %>"/><br />
-    <input type="number" id="orderSet" name="orderSet" size=40 placeholder="Set Number" value="<%= purchase.orderSet %>"/><br />
-    <input type="text" id="image" name="image" size=80 placeholder="Link to image" value="<%= purchase.image %>"/><br />
-    <input type="textarea" id="notes" name="notes" size=80 placeholder="Notes!" value="<%= purchase.notes %>"/><br />
+            <% for ( let saleType of saleTypes) { %>
+                <option id="option-<%= saleType.name %>" name="saleType" value=<%=saleType.id %>
+                    <% if (saleType.id==purchase.sale_id) { %> selected <% } %>><%= saleType.display_name %>
+                </option>
+                <% }; %>
+        </select><br />
 
-    <button type="submit" id="submit" class="btn-success">Update Purchase!</button>
-</form>
+        <input type="date" id="purchaseDate" class="date" name="purchaseDate" size=40 placeholder="Purchase Date"
+            value="<%= moment(purchase.purchaseDate).format('YYYY-MM-DD') %>" /><br />
+        <input type="date" id="expectedDate" class="date" name="expectedDate" size=40 placeholder="Expected Date"
+            value="<%= moment(purchase.receivedDate).format('YYYY-MM-DD')  %>" /><br />
+        <input type="date" id="soldDate" class="date" name="soldDate" size=40 placeholder="Sold Date"
+            value="<%= moment(purchase.soldDate).format('YYYY-MM-DD') %>" /><br />
+        <input type="number" id="salePrice" name="salePrice" size=40 step="0.01" placeholder="Sale Price $"
+            value="<%= purchase.salePrice %>" /><br />
+        <input type="number" id="orderSet" name="orderSet" size=40 placeholder="Set Number"
+            value="<%= purchase.orderSet %>" /><br />
+        <input type="text" id="image" name="image" size=80 placeholder="Link to image"
+            value="<%= purchase.image %>" /><br />
+        <input type="textarea" id="notes" name="notes" size=80 placeholder="Notes!"
+            value="<%= purchase.notes %>" /><br />
+        <input type="file" id="imageUp" class="imageUp" /><br />
+        <button type="submit" id="submit" class="btn-success">Update Purchase!</button>
 
-<div id='ticker'>
-    <% if (ticker.insertId) { %>
-        <div class="alert-success">Added id: <%= ticker.insertId %>
-        </div>
-    <% } %>
-    <% if (ticker.error) { %>
-        <div class="alert-danger">
-            <%= ticker.error %>
-        </div>
-    <% } %>
-</div>
+    </form>
+
+
+    <div id='ticker'>
+        <% if (ticker.insertId) { %>
+            <div class="alert-success">Added id: <%= ticker.insertId %>
+            </div>
+            <% } %>
+                <% if (ticker.error) { %>
+                    <div class="alert-danger">
+                        <%= ticker.error %>
+                    </div>
+                    <% } %>
+    </div>
