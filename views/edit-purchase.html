@@ -67,8 +67,11 @@
             value="<%= purchase.salePrice %>" /><br />
         <input type="number" id="orderSet" name="orderSet" size=40 placeholder="Set Number"
             value="<%= purchase.orderSet %>" /><br />
+        <div id="img-container">
         <input type="text" id="image" name="image" size=80 placeholder="Link to image"
-            value="<%= purchase.image %>" /><br />
+            value="<%= purchase.image %>" />
+        <img src="<%= purchase.image %>" width="32px" height="32px" />
+        </div>
         <input type="textarea" id="notes" name="notes" size=80 placeholder="Notes!"
             value="<%= purchase.notes %>" /><br />
         <button type="submit" id="submit" class="btn-success">Update Purchase!</button>
