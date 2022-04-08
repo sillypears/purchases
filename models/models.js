@@ -407,7 +407,7 @@ module.exports = {
     },
     getPricingTable: async () => {
         conn = await db.getConnection()
-        let data = await conn.query(`SELECT MAX(price) as max_price, MIN(price) as min_price, AVG(price) as avg_price FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND price > 0;`)
+        let data = await conn.query(`SELECT MAX(price) as max_price, MIN(price) as min_price, AVG(price) as avg_price FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND price > 0 AND sale_type != 'charity'`)
         if (conn) conn.release()
         return data
     },
