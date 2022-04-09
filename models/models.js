@@ -157,7 +157,7 @@ module.exports = {
     },
     getPurchasesByTag: async (tag) => {
         conn = await db.getConnection()
-        let purchases = await conn.query(`SELECT p.* FROM ${process.env.DB_SCHEMA}.tags t LEFT JOIN ${process.env.DB_SCHEMA}.all_purchases p ON t.purchaseid = p.id WHERE tagname = '${tag}'`)
+        let purchases = await conn.query(`SELECT p.* FROM ${process.env.DB_SCHEMA}.tags t LEFT JOIN ${process.env.DB_SCHEMA}.all_purchases p ON t.purchaseid = p.id WHERE tagname = '${tag}' ORDER BY p.id DESC`)
         if (conn) conn.release()
         return purchases
     },

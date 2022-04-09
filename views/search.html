@@ -9,14 +9,22 @@
     <% } else { %>
         <div class="row no-gutters">
         <% purchases.forEach((purchase, index)=> { %>
-        <div class="card">
-            <div class="card-title">
-                <%= purchase.detail %> - <%= purchase.sculpt %>
+            <div class="col">
+                <div class="card">
+                    <div class="card-title">
+                        <div>
+                            <%= purchase.detail %></div>
+                        <div>
+                            <%= purchase.sculpt %>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <a href="/purchase/<%= purchase.id %>">
+                            <img class="card-img" src="<%= purchase.image ? purchase.image : 'img/missing.png' %>" />
+                        </a>
+                    </div>
+                </div>
             </div>
-            <div class="card-body">
-                <img class="card-img" src="<%= purchase.image != '' ? purchase.image : 'img/missing.png' %>" />
-            </div>
-        </card>
         <% }) %>
         </div>
     <% } %>
