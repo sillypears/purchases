@@ -190,7 +190,8 @@ router.get('/search', async (ctx, next) => {
         title: "Search",
         nav: "search",
         totals: 0,
-        purchases: {}
+        purchases: {},
+        header: ""
     })
 });
 
@@ -201,7 +202,8 @@ router.post('/search', async (ctx, next) => {
         title: `Search for '${ctx.request.body.searchTag}'`,
         nav: "search-tag",
         totals: 0,
-        purchases: purchases
+        purchases: purchases,
+        header: `Found ${purchases.length} with the '${ctx.request.body.searchTag}' tag`
     })
 });
 
@@ -275,9 +277,8 @@ router.post('/add-purchase', async (ctx, next) => {
     if (a.adjustments < 0) { 
         a.adjustments = 0
     }
-    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet);
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags);
     let meta = {'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name}
-
     let m = await models.getMakers();
     let v = await models.getVendors();
     let c = await models.getCategories();

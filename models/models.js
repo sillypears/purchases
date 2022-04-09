@@ -161,20 +161,17 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
-    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image) => {
+    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags) => {
+        let newTags = tags.split(',')
         conn = await db.getConnection();
         let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet});`)
+        console.log(purchaseId)
+        newTags.forEach(tag => {
+            let tagId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES ('${tag}', ${purchaseId.insertId})`)
+        })
         if (conn) conn.release()
         return purchaseId
     },
-    // insertPurchase: async (id, body) => {
-    //     // let purchaseId, category, detail, archivist, sculpt , maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image
-    //     console.log(body)
-    //     conn = await db.getConnection();
-    //     let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet});`)
-    //     if (conn) conn.release()
-    //     return purchaseId
-    // },
     insertPurchaseImage: async (category, detail, set, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet) => {
         let imgData = Buffer.from(image.buffer, 'binary')
         conn = await db.getConnection();
