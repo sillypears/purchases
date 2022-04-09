@@ -90,7 +90,6 @@ router.get('/maker/id/:id/edit', async (ctx, next) => {
     });
 });
 
-
 router.get('/vendors', async (ctx, next) => {
 
     let vendors = await models.getVendorTotals();
@@ -249,17 +248,15 @@ router.get('/totalSculpts', async (ctx, next) => {
         totals: sculpts.count
     })
 });
-router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
+
+router.post('/add-purchase', async (ctx, next) => {
     let a = ctx.request.body
     if (a.adjustments < 0) { 
         a.adjustments = 0
     }
-    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, a.image);
-    // let insertId = await models.insertPurchaseImage(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, ctx.file);
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet);
     let meta = {'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name}
-    if (ctx.file) {
-        let imageSaveLocation = saveImage(ctx.file, insertId.insertId, meta);
-    }
+
     let m = await models.getMakers();
     let v = await models.getVendors();
     let c = await models.getCategories();
@@ -313,21 +310,16 @@ router.post('/add-vendor', async (ctx, next) => {
     });
 });
 
-router.post('/purchase/:id/edit', upload.single('imageUp'), async (ctx, next) => {
+router.post('/purchase/:id/edit', async (ctx, next) => {
     const a = ctx.request.body
-    let purch = await models.updatePurchaseById(ctx.params.id, a)
-    let meta = {'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name}
-    console.log(ctx.file)
-    if (ctx.file) {
-        let imageSaveLocation = saveImage(ctx.file, a.id, meta);
-    }
+    const tags = await models.getTagsByPurchaseId(ctx.params.id)
+    let purch = await models.updatePurchaseById(ctx.params.id, a, tags)
     if (purch) {
         ctx.status = 301
         ctx.redirect(`purchase/${ctx.params.id}`)    
     } 
     ctx.status = 209
     ctx.redirect(`/purchase/${ctx.params.id}`)
-
 });
 
 router.post('/maker/id/:id/edit', async (ctx, next) => {
@@ -352,24 +344,5 @@ router.post('/vendor/id/:id/edit', async (ctx, next) => {
     ctx.redirect(`/vendor/id/${ctx.params.id}`)
 
 });
+
 module.exports = router;
-
-async function saveImage(fileObj, imageId, data) {
-
-    let ext = path.extname(fileObj.originalname)
-    const f_name = `public/img/keycaps/${imageId}_${data.maker}${data.detail}_${data.set}${ext}`
-    const img = sharp(fileObj.buffer)
-    let imageMeta = await getImgMeta(img)
-    if (imageMeta.width > 1920 || imageMeta.height > 1080 )
-    img.resize({
-        width: 1920,
-        height: 1080
-    }).toFormat("jpeg", {mozjpeg: true}).toFile(f_name)
-   // fs.writeFile(path=`/public/img/keycaps/${imageId.insertId}_${data.detail}_${data.set}.${ext}`, data=fileObj.buffer)
-
-    return 0
-}
-
-async function getImgMeta(img) {
-    return img.metadata()
-}

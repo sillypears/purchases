@@ -121,19 +121,19 @@ module.exports = {
     },
     getPurchase: async (id) => {
         conn = await db.getConnection();
-        let purchase = await conn.query(`SELECT * FROM keyboard.all_purchases p WHERE p.id = ${id}`)
+        let purchase = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases ap WHERE ap.id = ${id}`)
         if (conn) conn.release()
         return purchase[0]
     },
     getNextPurchaseId: async (id) => {
         conn = await db.getConnection();
-        let purchase = await conn.query(`SELECT p.id FROM keyboard.all_purchases p WHERE p.id > ${id} ORDER BY p.purchaseDate ASC LIMIT 1`)
+        let purchase = await conn.query(`SELECT p.id FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.id > ${id} ORDER BY p.purchaseDate ASC LIMIT 1`)
         if (conn) conn.release()
         return purchase[0]
     },
     getPrevPurchaseId: async (id) => {
         conn = await db.getConnection();
-        let purchase = await conn.query(`SELECT p.id FROM keyboard.all_purchases p WHERE p.id < ${id} ORDER BY p.purchaseDate DESC LIMIT 1`)
+        let purchase = await conn.query(`SELECT p.id FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.id < ${id} ORDER BY p.purchaseDate DESC LIMIT 1`)
         if (conn) conn.release()
         return purchase[0]
     },
@@ -169,10 +169,10 @@ module.exports = {
     //     if (conn) conn.release()
     //     return purchaseId
     // },
-    insertPurchaseImage: async (category, detail, set, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image) => {
+    insertPurchaseImage: async (category, detail, set, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet) => {
         let imgData = Buffer.from(image.buffer, 'binary')
         conn = await db.getConnection();
-        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, image) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(set)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, '${purchaseDate}', '${expectedDate}', ${orderSet}, ${image.buffer});`)
+        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, image) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(set)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, '${purchaseDate}', '${expectedDate}', ${orderSet};`)
         if (conn) conn.release();
         return purchaseId
     },
@@ -182,7 +182,6 @@ module.exports = {
         if (conn) conn.release()
         console.log(makerId)
         return makerId
-
     },
     insertVendor: async (name, display_name, website) => {
         conn = await db.getConnection();
@@ -262,9 +261,17 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
-    updatePurchaseById: async (id, data) => {
+    getTagsByPurchaseId: async (id) => {
+        conn = await db.getConnection();
+        let tags = await conn.query(`SELECT tagname FROM ${process.env.DB_SCHEMA}.tags WHERE purchaseid = ${id};`)
+        if (conn) conn.release()
+        return tags
+    },
+    updatePurchaseById: async (id, data, tags) => {
         let update = false
         let updateId = {}
+        let tagnames = []
+        let newTags = data.tags.split(',')
         updateId['insertId'] = -1
         conn = await db.getConnection()
         const purchdata = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.purchases WHERE id = ${id};`)
@@ -308,6 +315,20 @@ module.exports = {
              notes='${data.notes}'
              WHERE id=${id}`)
         }
+        for (let i = 0; i < tags.length; i++) (
+            tagnames.push(tags[i].tagname)
+        ) 
+        newTags.forEach(tag => {
+            if (!tagnames.includes(tag)) {
+                let tagId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES ('${tag}', ${id})`)
+            }
+        })
+        // Object.keys(newTags).forEach(function(tag) {
+        //     if (!tagnames.includes(newTags[tag])) {
+        //         const tagName = newTags[tag]
+        //         let tagId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES (${tagName}, ${id})`)
+        //     }
+        // })
         if (conn) conn.release()
         return updateId
     },
@@ -479,6 +500,13 @@ module.exports = {
         let data = await conn.query(`SELECT p.sale_type as name, count(p.sale_type) as y FROM ${process.env.DB_SCHEMA}.all_purchases p GROUP BY p.sale_type ORDER BY y DESC`)
         if (conn) conn.release()
         return data
+    },
+    deleteTag: async (tagId, tag) => {
+        conn = await db.getConnection()
+        let delId = await conn.query(`DELETE FROM ${process.env.DB_SCHEMA}.tags t WHERE t.id = ${tagId} `)
+        console.log(delId)
+        if (conn) conn.release()
+        return delId
     }
 }
 

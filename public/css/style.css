@@ -67,3 +67,9 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+.bootstrap-tagsinput .tag {
+    margin-right: 2px;
+    color: white !important;
+    background-color: #0d6efd;
+    padding: 0.2rem;
+  }

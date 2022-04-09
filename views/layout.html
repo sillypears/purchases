@@ -10,7 +10,7 @@
         rel="stylesheet">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Rubik">
     <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css" />
-    <link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css" integrity="sha512-xmGTNt20S0t62wHLmQec2DauG9T+owP9e6VU8GigI0anN7OXLip9i7IwEhelasml2osdxX71XcYm6BQunTQeQg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/css/style.css" />
     <style>
         .highlight {
@@ -94,21 +94,22 @@
             crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.js" integrity="sha512-VvWznBcyBJK71YKEKDMpZ0pCVxjNuKwApp4zLF3ul+CiflQi6aIJR+aZCP/qWsoFBA28avL5T5HA+RE+zrGQYg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <% if (nav=="artisan-count" ) { %>
             <script src="https://code.highcharts.com/highcharts.js"></script>
             <script src="https://code.highcharts.com/modules/exporting.js"></script>
             <script src="https://code.highcharts.com/modules/export-data.js"></script>
             <script src="https://code.highcharts.com/modules/accessibility.js"></script>
             <script src="/js/charts.js"></script>
-            <% } %>
-            <% if (nav=="edit-purchase" ) { %>
-                <script src="/js/edit-purchase.js"></script>
-            <% } %>
-            <script src="/js/index.js"></script>
+        <% } %>
+        <% if (nav=="edit-purchase" ) { %>
+            <script src="/js/edit-purchase.js"></script>
+        <% } %>
+        <script src="/js/index.js"></script>
 
 
-            <footer class="footer fixed-bottom">
-            </footer>
+        <footer class="footer fixed-bottom">
+        </footer>
 </body>
 
 </html>
