@@ -184,6 +184,27 @@ router.get('/purchase/:id/edit', async (ctx, next) => {
     });
 });
 
+router.get('/search', async (ctx, next) => {
+
+    return ctx.render('search', {
+        title: "Search",
+        nav: "search",
+        totals: 0,
+        purchases: {}
+    })
+});
+
+router.post('/search', async (ctx, next) => {
+
+    let purchases = await models.getPurchasesByTag(ctx.request.body.searchTag)
+    return ctx.render('search', {
+        title: `Search for '${ctx.request.body.searchTag}'`,
+        nav: "search-tag",
+        totals: 0,
+        purchases: purchases
+    })
+});
+
 router.get('/add-maker', async (ctx, next) => {
 
     return ctx.render('add-maker', {

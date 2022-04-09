@@ -672,6 +672,47 @@ router.get('/soldToggle/:id', async (ctx, next) => {
     }
 });
 
+// api/search
+router.get('/tag/search', async (ctx, next) => {
+    try {
+        let purchases = await models.getPurchasesByTag(ctx.request.body.searchTag)
+
+        ctx.body = {
+            status: 'OK',
+            purchases: purchases,
+            message: `Found ${purchases.length} purchases`
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    }
+});
+
+// api/search
+router.post('/tag/search', async (ctx, next) => {
+    try {
+        let purchases = await models.getPurchasesByTag(ctx.request.body.searchTag)
+
+        ctx.body = {
+            status: 'OK',
+            purchases: purchases,
+            message: `Found ${purchases.length} purchases`
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    }
+});
+
+
 // api/update/:field
 router.post('/update/:field', async (ctx, next) => {
     try {

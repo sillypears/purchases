@@ -155,6 +155,12 @@ module.exports = {
         if (conn) conn.release()
         return orderSet
     },
+    getPurchasesByTag: async (tag) => {
+        conn = await db.getConnection()
+        let purchases = await conn.query(`SELECT p.* FROM ${process.env.DB_SCHEMA}.tags t LEFT JOIN ${process.env.DB_SCHEMA}.all_purchases p ON t.purchaseid = p.id WHERE tagname = '${tag}'`)
+        if (conn) conn.release()
+        return purchases
+    },
     insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image) => {
         conn = await db.getConnection();
         let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet});`)
