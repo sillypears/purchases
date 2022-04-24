@@ -42,19 +42,24 @@
             </div>
 
             <div class="card-text">
-                <span id="sculpt-<%= purchase.id%>" class="entity_display font-weight-bold editableField"
-                    contenteditable="true" data-id="<%= purchase.id %>" data-type="entity_display">
-                    <%= purchase.sculpt %>
-                </span>
-                | <span id="archivist-<%= purchase.id%>" class="entity font-weight-light editableField"
-                    title="archivist" contenteditable="true" data-id="<%= purchase.id %>" data-type="entity">
-                    <%= purchase.entity %>
-                </span>
-                <br />
-                <span id="detail-<%= purchase.id%>" class="detail editableField" contenteditable="true"
-                    data-id="<%= purchase.id %>" data-type="detail">
+                <div>
+                    <span id="sculpt-<%= purchase.id%>" class="entity_display font-weight-bold editableField"
+                        contenteditable="true" data-id="<%= purchase.id %>" data-type="entity_display">
+                        <%= purchase.sculpt %>
+                    </span>
+                    | 
+                    <span id="archivist-<%= purchase.id%>" class="entity font-weight-light editableField"
+                        title="archivist" contenteditable="true" data-id="<%= purchase.id %>" data-type="entity">
+                        <%= purchase.entity %>
+                    </span>
+                </div>
+                <div id="detail-<%= purchase.id%>" class="detail editableField" contenteditable="true"
+                    data-id="<%= purchase.id %>" data-type="detail" value="<%= purchase.detail %>">
                     <%= purchase.detail %>
-                </span>
+                </div>
+            </div>
+            <div class="card-text">
+                <input id="tags" class="tags" data-role="tagsinput" value="<%= purchase.tags %>" >
             </div>
         </div>
         <div class="card-footer">
