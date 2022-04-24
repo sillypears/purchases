@@ -6,18 +6,43 @@ const db = require('../db');
 const models = require('../models/models');
 const multer = require('@koa/multer')
 const koaSwagger = require('koa2-swagger-ui');
-const upload = multer()
 const moment = require('moment')
+const { Dropzone } = require("dropzone");
+const fs = require("fs");
+const path = require("path");
+const sharp = require('sharp')
+
+const upload = multer();
+
+router.get('/test-upload', async (ctx, next) => {
+
+    return ctx.render('test-upload', {
+        title: "test",
+        nav: "test",
+        totals: 0
+    });
+});
+
+router.post('/test-upload', upload.single('test'), async (ctx, next) => {
+    ;
+    console.log('ctx.request.file', ctx.request.file);
+    console.log('ctx.file', ctx.file);
+    console.log('ctx.request.body', ctx.request.body);
+    
+    return ctx.redirect('/') 
+});
 
 router.get('/', async (ctx, next) => {
     let purchases = await models.getPurchases()
+    let haves = await models.getPurchasesIStillHave()
     let missingPurchases = await models.getPurchasesThatAreMissing()
     return ctx.render('index', {
         title: "Purchases",
         nav: "index",
         purchases: purchases,
         missingPurchases: missingPurchases,
-        totals: purchases.length
+        allHaveTotals: haves.length,
+        allTotals: purchases.length
     });
 });
 
@@ -64,7 +89,6 @@ router.get('/maker/id/:id/edit', async (ctx, next) => {
         ticker: ''
     });
 });
-
 
 router.get('/vendors', async (ctx, next) => {
 
@@ -120,7 +144,6 @@ router.get('/add-purchase', async (ctx, next) => {
     });
 });
 
-
 router.get('/purchase/:id', async (ctx, next) => {
     // let purchase = await axios.get(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/purchase/${ctx.params.id}`);
     let purch = await models.getPurchase(ctx.params.id)
@@ -159,6 +182,29 @@ router.get('/purchase/:id/edit', async (ctx, next) => {
         maxSet: maxSet,
         moment: moment
     });
+});
+
+router.get('/search', async (ctx, next) => {
+
+    return ctx.render('search', {
+        title: "Search",
+        nav: "search",
+        totals: 0,
+        purchases: {},
+        header: ""
+    })
+});
+
+router.post('/search', async (ctx, next) => {
+
+    let purchases = await models.getPurchasesByTag(ctx.request.body.searchTag)
+    return ctx.render('search', {
+        title: `Search for '${ctx.request.body.searchTag}'`,
+        nav: "search-tag",
+        totals: 0,
+        purchases: purchases,
+        header: `Found ${purchases.length} with the '${ctx.request.body.searchTag}' tag`
+    })
 });
 
 router.get('/add-maker', async (ctx, next) => {
@@ -216,16 +262,23 @@ router.get('/notforsale', async (ctx, next) => {
     });
 });
 
-router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
+router.get('/totalSculpts', async (ctx, next) => {
+    let sculpts = await models.getTotalSculpts();
+    return ctx.render('totalsculpts', {
+        title: "All The Sculpts",
+        nav: "totalsculpts",
+        sculpts: sculpts.sculpts,
+        totals: sculpts.count
+    })
+});
+
+router.post('/add-purchase', async (ctx, next) => {
     let a = ctx.request.body
     if (a.adjustments < 0) { 
         a.adjustments = 0
     }
-    console.log(`adjustments: ${a.adjustments} --`)
-    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, a.image);
-    // let insertId = await models.insertPurchaseImage(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, ctx.file);
-
-    console.log(insertId)
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags);
+    let meta = {'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name}
     let m = await models.getMakers();
     let v = await models.getVendors();
     let c = await models.getCategories();
@@ -280,14 +333,15 @@ router.post('/add-vendor', async (ctx, next) => {
 });
 
 router.post('/purchase/:id/edit', async (ctx, next) => {
-    let purch = await models.updatePurchaseById(ctx.params.id, ctx.request.body)
+    const a = ctx.request.body
+    const tags = await models.getTagsByPurchaseId(ctx.params.id)
+    let purch = await models.updatePurchaseById(ctx.params.id, a, tags)
     if (purch) {
         ctx.status = 301
         ctx.redirect(`purchase/${ctx.params.id}`)    
     } 
     ctx.status = 209
     ctx.redirect(`/purchase/${ctx.params.id}`)
-
 });
 
 router.post('/maker/id/:id/edit', async (ctx, next) => {
@@ -312,4 +366,5 @@ router.post('/vendor/id/:id/edit', async (ctx, next) => {
     ctx.redirect(`/vendor/id/${ctx.params.id}`)
 
 });
+
 module.exports = router;

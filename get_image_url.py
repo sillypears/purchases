@@ -64,15 +64,13 @@ def main():
     print(f"Makers: {len(makers)}")
     print(f"Purchases: {len(purchases)}")
     for purchase in purchases:
-        # print(purchase)
-        m_id = purchase[7]
-        print
+        m_id = purchase[8]
         if m_id in keycap:
             p_id = purchase[0]
             sculpt = purchase[4]
             cw = purchase[3]
             maker = keycap[m_id]
-            pic = purchase[20]
+            pic = purchase[21]
             d = get_data(maker)
             if d:
                 print( maker, sculpt, cw)

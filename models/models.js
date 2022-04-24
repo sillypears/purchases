@@ -59,7 +59,13 @@ module.exports = {
         if (conn) conn.release()
         return makers
     },
-    getMakerByName: async (name) => {
+    getMakerSculptsByName: async (name) => {
+        conn = await db.getConnection();
+        let maker = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE maker_name = '${name}';`)
+        if (conn) conn.release()
+        return maker
+    },
+    getMakerMoneyByName: async (name) => {
         conn = await db.getConnection();
         let maker = await conn.query(`SELECT m.id, SUM(p.price) FROM ${process.env.DB_SCHEMA}.makers m LEFT JOIN ${process.env.DB_SCHEMA}.purchases p ON p.maker = m.id WHERE name = '${name}';`)
         if (conn) conn.release()
@@ -107,21 +113,27 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
+    getPurchasesIStillHave: async () => {
+        conn = await db.getConnection();
+        let purchases = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE received = 1 AND isSold = 0 ORDER BY purchaseDate DESC`)
+        if (conn) conn.release()
+        return purchases
+    },
     getPurchase: async (id) => {
         conn = await db.getConnection();
-        let purchase = await conn.query(`SELECT * FROM keyboard.all_purchases p WHERE p.id = ${id}`)
+        let purchase = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases ap WHERE ap.id = ${id}`)
         if (conn) conn.release()
         return purchase[0]
     },
     getNextPurchaseId: async (id) => {
         conn = await db.getConnection();
-        let purchase = await conn.query(`SELECT p.id FROM keyboard.all_purchases p WHERE p.id > ${id} ORDER BY p.purchaseDate ASC LIMIT 1`)
+        let purchase = await conn.query(`SELECT p.id FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.id > ${id} ORDER BY p.purchaseDate ASC LIMIT 1`)
         if (conn) conn.release()
         return purchase[0]
     },
     getPrevPurchaseId: async (id) => {
         conn = await db.getConnection();
-        let purchase = await conn.query(`SELECT p.id FROM keyboard.all_purchases p WHERE p.id < ${id} ORDER BY p.purchaseDate DESC LIMIT 1`)
+        let purchase = await conn.query(`SELECT p.id FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.id < ${id} ORDER BY p.purchaseDate DESC LIMIT 1`)
         if (conn) conn.release()
         return purchase[0]
     },
@@ -143,24 +155,27 @@ module.exports = {
         if (conn) conn.release()
         return orderSet
     },
-    insertPurchase: async (category, detail, archivist, sculpt , maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image) => {
+    getPurchasesByTag: async (tag) => {
+        conn = await db.getConnection()
+        let purchases = await conn.query(`SELECT p.* FROM ${process.env.DB_SCHEMA}.tags t LEFT JOIN ${process.env.DB_SCHEMA}.all_purchases p ON t.purchaseid = p.id WHERE tagname = '${tag}' ORDER BY p.id DESC`)
+        if (conn) conn.release()
+        return purchases
+    },
+    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags) => {
+        let newTags = tags.split(',')
         conn = await db.getConnection();
-        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet});`)
+        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet});`)
+        console.log(purchaseId)
+        newTags.forEach(tag => {
+            let tagId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES ('${tag}', ${purchaseId.insertId})`)
+        })
         if (conn) conn.release()
         return purchaseId
     },
-    // insertPurchase: async (id, body) => {
-    //     // let purchaseId, category, detail, archivist, sculpt , maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image
-    //     console.log(body)
-    //     conn = await db.getConnection();
-    //     let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet});`)
-    //     if (conn) conn.release()
-    //     return purchaseId
-    // },
-    insertPurchaseImage: async (category, detail, set, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image) => {
+    insertPurchaseImage: async (category, detail, set, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet) => {
         let imgData = Buffer.from(image.buffer, 'binary')
         conn = await db.getConnection();
-        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, image) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(set)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, '${purchaseDate}', '${expectedDate}', ${orderSet}, ${image.buffer});`)
+        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, image) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(set)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, '${purchaseDate}', '${expectedDate}', ${orderSet};`)
         if (conn) conn.release();
         return purchaseId
     },
@@ -170,7 +185,6 @@ module.exports = {
         if (conn) conn.release()
         console.log(makerId)
         return makerId
-
     },
     insertVendor: async (name, display_name, website) => {
         conn = await db.getConnection();
@@ -250,36 +264,46 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
-    updatePurchaseById: async (id, data) => {
+    getTagsByPurchaseId: async (id) => {
+        conn = await db.getConnection();
+        let tags = await conn.query(`SELECT tagname FROM ${process.env.DB_SCHEMA}.tags WHERE purchaseid = ${id};`)
+        if (conn) conn.release()
+        return tags
+    },
+    updatePurchaseById: async (id, data, tags) => {
         let update = false
         let updateId = {}
+        let tagnames = []
+        let newTags = data.tags.split(',')
         updateId['insertId'] = -1
         conn = await db.getConnection()
         const purchdata = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.purchases WHERE id = ${id};`)
         const purch = purchdata[0]
-        if (purch.category!== data.category) {update = true}
-        if (purch.detail !== data.detail) {update = true}
-        if (purch.entity !== data.archivist) {update = true}
-        if (purch.entity_display !== data.set) {update = true}
-        if (purch.maker !== data.maker) {update = true}
-        if (purch.vendor !== data.vendor) {update = true}
-        if (purch.price !== data.price) {update = true}
-        if (purch.adjustments !== data.adjustments) {update = true}
-        if (purch.saleType !== data.saletype) {update = true}
-        if (purch.purchaseDate !== data.purchaseDate) {update = true}
-        if (purch.expectedDate !== data.expectedDate) {update = true}
-        if (purch.soldDate !== data.soldDate) {update = true}
-        if (purch.salePrice !== data.salePrice) {update = true}
-        if (purch.orderSet !== data.orderSet) {update = true}
-        if (purch.image !== data.image) {update = true}
-        if (purch.notes !== data.notes) {update = true}
+        if (purch.category !== data.category) { update = true }
+        if (purch.detail !== data.detail) { update = true }
+        if (purch.entity !== data.archivist) { update = true }
+        if (purch.entity_display !== data.set) { update = true }
+        if (purch.ka_id !== data.set) { update = true }
+        if (purch.maker !== data.maker) { update = true }
+        if (purch.vendor !== data.vendor) { update = true }
+        if (purch.price !== data.price) { update = true }
+        if (purch.adjustments !== data.adjustments) { update = true }
+        if (purch.saleType !== data.saletype) { update = true }
+        if (purch.purchaseDate !== data.purchaseDate) { update = true }
+        if (purch.expectedDate !== data.expectedDate) { update = true }
+        if (purch.soldDate !== data.soldDate) { update = true }
+        if (purch.salePrice !== data.salePrice) { update = true }
+        if (purch.orderSet !== data.orderSet) { update = true }
+        if (purch.image !== data.image) { update = true }
+        if (purch.notes !== data.notes) { update = true }
         if (update) {
-             updateId = await conn.query(`
+            updateId = await conn.query(`
              UPDATE ${process.env.DB_SCHEMA}.purchases SET 
              category=${data.category},
              detail='${data.detail}',
              entity='${data.archivist}',
              entity_display='${data.set}',
+             ka_id='${data.ka_id}',
              maker=${data.maker},
              vendor=${data.vendor},
              price=${data.price},
@@ -294,6 +318,20 @@ module.exports = {
              notes='${data.notes}'
              WHERE id=${id}`)
         }
+        for (let i = 0; i < tags.length; i++) (
+            tagnames.push(tags[i].tagname)
+        ) 
+        newTags.forEach(tag => {
+            if (!tagnames.includes(tag)) {
+                let tagId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES ('${tag}', ${id})`)
+            }
+        })
+        // Object.keys(newTags).forEach(function(tag) {
+        //     if (!tagnames.includes(newTags[tag])) {
+        //         const tagName = newTags[tag]
+        //         let tagId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES (${tagName}, ${id})`)
+        //     }
+        // })
         if (conn) conn.release()
         return updateId
     },
@@ -304,13 +342,13 @@ module.exports = {
         conn = await db.getConnection()
         const makerdata = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.makers WHERE id = ${id};`)
         const maker = makerdata[0]
-        if (maker.name !== data.name) {update = true}
-        if (maker.display_name !== data.displayName) {update = true}
-        if (maker.instagram !== data.instagram) {update = true}
-        if (maker.archivist_name !==   data.ka_name) {update = true}
-        if (maker.archivist_id !== data.ka_id) {update = true}
+        if (maker.name !== data.name) { update = true }
+        if (maker.display_name !== data.displayName) { update = true }
+        if (maker.instagram !== data.instagram) { update = true }
+        if (maker.archivist_name !== data.ka_name) { update = true }
+        if (maker.archivist_id !== data.ka_id) { update = true }
         if (update) {
-             updateId = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.makers SET name='${data.name}', display_name='${data.displayName}', archivist_name='${data.ka_name}', archivist_id='${data.ka_id}', instagram='${data.instagram}' WHERE id=${id}`)
+            updateId = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.makers SET name='${data.name}', display_name='${data.displayName}', archivist_name='${data.ka_name}', archivist_id='${data.ka_id}', instagram='${data.instagram}' WHERE id=${id}`)
         }
         if (conn) conn.release()
         return updateId
@@ -322,11 +360,11 @@ module.exports = {
         conn = await db.getConnection()
         const vendordata = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.vendors WHERE id = ${id};`)
         const vendor = vendordata[0]
-        if (vendor.name !== data.name) {update = true}
-        if (vendor.display_name !== data.displayName) {update = true}
-        if (vendor.link !== data.site) {update = true}
+        if (vendor.name !== data.name) { update = true }
+        if (vendor.display_name !== data.displayName) { update = true }
+        if (vendor.link !== data.site) { update = true }
         if (update) {
-             updateId = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.vendors SET name='${data.name}', display_name='${data.displayName}', link='${data.site}' WHERE id=${id}`)
+            updateId = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.vendors SET name='${data.name}', display_name='${data.displayName}', link='${data.site}' WHERE id=${id}`)
         }
         if (conn) conn.release()
         return updateId
@@ -334,25 +372,25 @@ module.exports = {
     toggleReceivedStatus: async (id) => {
         conn = await db.getConnection();
         let r = await conn.query(`SELECT received FROM ${process.env.DB_SCHEMA}.purchases WHERE id = ${id}`)
-        let updatedReceived = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.purchases SET received = ${r[0].received ==  0 ? 1 : 0} WHERE id = ${id}`)
+        let updatedReceived = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.purchases SET received = ${r[0].received == 0 ? 1 : 0} WHERE id = ${id}`)
         if (conn) conn.release()
-        return r[0].received ==  0 ? 1 : 0
+        return r[0].received == 0 ? 1 : 0
 
     },
     toggleSellStatus: async (id) => {
         conn = await db.getConnection();
         let r = await conn.query(`SELECT willSell FROM ${process.env.DB_SCHEMA}.purchases WHERE id = ${id}`)
-        let updatedSell = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.purchases SET willSell = ${r[0].willSell ==  0 ? 1 : 0} WHERE id = ${id}`)
+        let updatedSell = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.purchases SET willSell = ${r[0].willSell == 0 ? 1 : 0} WHERE id = ${id}`)
         if (conn) conn.release()
-        return r[0].willSell ==  0 ? 1 : 0
+        return r[0].willSell == 0 ? 1 : 0
 
     },
     toggleSoldStatus: async (id) => {
         conn = await db.getConnection();
         let r = await conn.query(`SELECT isSold FROM ${process.env.DB_SCHEMA}.purchases WHERE id = ${id}`)
-        let updatedSold = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.purchases SET isSold = ${r[0].isSold ==  0 ? 1 : 0} WHERE id = ${id}`)
+        let updatedSold = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.purchases SET isSold = ${r[0].isSold == 0 ? 1 : 0} WHERE id = ${id}`)
         if (conn) conn.release()
-        return r[0].isSold ==  0 ? 1 : 0
+        return r[0].isSold == 0 ? 1 : 0
 
     },
     getArtisansByCount: async () => {
@@ -393,7 +431,7 @@ module.exports = {
     },
     getPricingTable: async () => {
         conn = await db.getConnection()
-        let data = await conn.query(`SELECT MAX(price) as max_price, MIN(price) as min_price, AVG(price) as avg_price FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND price > 0;`)
+        let data = await conn.query(`SELECT MAX(price) as max_price, MIN(price) as min_price, AVG(price) as avg_price FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND price > 0 AND sale_type != 'charity'`)
         if (conn) conn.release()
         return data
     },
@@ -412,8 +450,23 @@ module.exports = {
             sculpts.push(sculpt.name)
         }
         if (conn) conn.release()
-        
-        return {'count': sculptCount[0], 'sculpts': sculpts.sort()}
+
+        return { 'count': sculptCount[0], 'sculpts': sculpts.sort() }
+    },
+    getTotalSculptsWithPicture: async () => {
+        conn = await db.getConnection()
+        let sculptCount = await conn.query(`SELECT COUNT(DISTINCT(sculpt)) as count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 ORDER BY count DESC;`)
+        let sculptData = await conn.query(`SELECT DISTINCT(p.sculpt) as name FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.isSold = 0 ORDER BY p.sculpt DESC`)
+        let sculpts = {}
+        for (sculpt of sculptData) {
+            sculpts[sculpt.name] = {
+                'name': sculpt.name,
+                'img': ""
+            }
+        }
+        if (conn) conn.release()
+
+        return { 'count': sculptCount[0], 'sculpts': sculpts }
     },
     getTopMakers: async () => {
         conn = await db.getConnection()
@@ -430,8 +483,8 @@ module.exports = {
             makers.push(maker.name)
         }
         if (conn) conn.release()
-        
-        return {'count': makerCount[0], 'sculpts': makers.sort()}
+
+        return { 'count': makerCount[0], 'sculpts': makers.sort() }
     },
     getAllForSale: async () => {
         conn = await db.getConnection()
@@ -447,9 +500,16 @@ module.exports = {
     },
     getSaleTypeWins: async () => {
         conn = await db.getConnection()
-        let data = await conn.query(`SELECT p.sale_type, count(p.sale_type) as count FROM ${process.env.DB_SCHEMA}.all_purchases p GROUP BY p.sale_type ORDER BY count DESC`)
+        let data = await conn.query(`SELECT p.sale_type as name, count(p.sale_type) as y FROM ${process.env.DB_SCHEMA}.all_purchases p GROUP BY p.sale_type ORDER BY y DESC`)
         if (conn) conn.release()
         return data
+    },
+    deleteTag: async (tagId, tag) => {
+        conn = await db.getConnection()
+        let delId = await conn.query(`DELETE FROM ${process.env.DB_SCHEMA}.tags t WHERE t.id = ${tagId} `)
+        console.log(delId)
+        if (conn) conn.release()
+        return delId
     }
 }
 

@@ -1,0 +1,34 @@
+<!-- views/search.html -->
+<div class="container-fluid m-5">
+    <div class="h2">
+        <%= header %>
+    </div>
+    <% if (nav == "search") { %> 
+        <form action="" method="POST">
+            <div>
+                <input type="text" id="searchTag" name="searchTag" placeholder="Search Tags" />
+            </div>
+        </form>    
+    <% } else { %>
+        <div class="row no-gutters">
+        <% purchases.forEach((purchase, index)=> { %>
+            <div class="col">
+                <div class="card">
+                    <div class="card-title">
+                        <div>
+                            <%= purchase.detail %></div>
+                        <div>
+                            <%= purchase.sculpt %>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <a href="/purchase/<%= purchase.id %>">
+                            <img class="card-img" src="<%= purchase.image ? purchase.image : 'img/missing.png' %>" />
+                        </a>
+                    </div>
+                </div>
+            </div>
+        <% }) %>
+        </div>
+    <% } %>
+</div>

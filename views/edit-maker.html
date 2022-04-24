@@ -1,22 +1,28 @@
 <!-- views/add-maker.html -->
+<div class="container my-5">
 
-<form class="form" action="" method="POST">
-    <input type="text" id="name" name="name" placeholder="Short Name" value="<%= maker.name %>"/><br />
-    <input type="text" id="displayName" name="displayName" placeholder="Display Name" value="<%= maker.display_name %>"/><br />
-    <input type="text" id="ka_name" name="ka_name" placeholder="Keycap Archivist Name" value="<%= maker.archivist_name %>"/><br />
-    <input type="text" id="ka_id" name="ka_id" placeholder="Keycap Archivist ID" value="<%= maker.archivist_id %>"/><br />
-    <input type="text" id="instagram" name="instagram" placeholder="Instagram" value="<%= maker.instagram %>"/><br />
-    <button type="submit" id="submit" class="btn-success">Update Maker!</button>
-</form>
+    <form class="form" action="" method="POST">
+        <input type="text" id="name" name="name" placeholder="Short Name" value="<%= maker.name %>" /><br />
+        <input type="text" id="displayName" name="displayName" placeholder="Display Name"
+            value="<%= maker.display_name %>" /><br />
+        <input type="text" id="ka_name" name="ka_name" placeholder="Keycap Archivist Name"
+            value="<%= maker.archivist_name %>" /><br />
+        <input type="text" id="ka_id" name="ka_id" placeholder="Keycap Archivist ID"
+            value="<%= maker.archivist_id %>" /><br />
+        <input type="text" id="instagram" name="instagram" placeholder="Instagram"
+            value="<%= maker.instagram %>" /><br />
+        <button type="submit" id="submit" class="btn-success">Update Maker!</button>
+    </form>
 
-<div id='ticker'>
-    <% if (ticker.makerId) { %>
-        <div class="alert-success">Added id: <%= ticker.makerId %>
-        </div>
-    <% } %>
-    <% if (ticker.error) { %>
-        <div class="alert-danger">
-            <%= ticker.error %>
-        </div>
-    <% } %>
+    <div id='ticker'>
+        <% if (ticker.makerId) { %>
+            <div class="alert-success">Added id: <%= ticker.makerId %>
+            </div>
+            <% } %>
+                <% if (ticker.error) { %>
+                    <div class="alert-danger">
+                        <%= ticker.error %>
+                    </div>
+                    <% } %>
+    </div>
 </div>

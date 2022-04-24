@@ -1,4 +1,6 @@
 <!-- views/purchase.html -->
+<div class="container my-5">
+
 <!-- <h1 class="h1">
     <%= title %> <span class="small">
             <% if (totals> 0) { %> (<%= totals %>) <% } %>
@@ -27,8 +29,8 @@
                 </div>
             </div>
             <span class="row">
-                <span class="toggle-icon col-md-1 clickable text-center" data-id="<%= purchase.id %>"><i
-                        title="Toggle Status" class="fa fa-times">o</i></span>
+                <span class="toggle-icon col-md-1 clickable text-center" data-id="<%= purchase.id %>" data-type="receive"><span
+                        title="Toggle Status" class="fa fa-times">💌</span></span>
             </span>
 
             <div class="card-body">
@@ -62,7 +64,7 @@
                             class="card-link ig-link" src="/img/ig.png"></a>
                 </span>
                 <span class="text-left col-md-1">
-                    <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>/<%= purchase.entity.replace(/ /g, '-').toLowerCase() _%>"
+                    <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>/<%= purchase.entity.replace(/ /g, '-').replace(/'/g, '').toLowerCase() _%>"
                         target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
                 </span>
                 <span class="text-left col-md-1">
@@ -146,3 +148,4 @@
                     </div>
                     <% } %>
     </div>
+</div>

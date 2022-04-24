@@ -42,5 +42,4 @@ app.use(Logger())
     .use(apiRouter.allowedMethods())
     .use(serve('./public'))
 
-
 app.listen(process.env.PORT, () => console.log(`running on ${process.env.PORT}`))
