@@ -31,6 +31,11 @@
             <input type="text" id="tags" name="tags" class="tags" size=40 placeholder="Tags" data-role="tagsinput" value="<%= purchase.tags %>" />
         </div>
         <div>
+            <input type="number" id="series_num" name="series_num" size=5 placeholder="total" value=<%= purchase.series_num %> />
+            /
+            <input type="number" id="series_total" name="series_total" size=5 placeholder="num" value=<%= purchase.series_total %> />
+        </div>
+        <div>
             <select class="select" id="maker" name="maker">
                 <option id="option-default" name="default" value="-1">Select Maker</option>
                 <% for ( let maker of makers) { %>

@@ -43,6 +43,7 @@
 
             <div class="card-text">
                 <div>
+                    <a href="/sculpt/<%= purchase.sculpt %>" title="See all '<%= purchase.sculpt %>' caps"><i class="link bi bi-box-arrow-up-left"></i></a>
                     <span id="sculpt-<%= purchase.id%>" class="entity_display font-weight-bold editableField"
                         contenteditable="true" data-id="<%= purchase.id %>" data-type="entity_display">
                         <%= purchase.sculpt %>
@@ -58,6 +59,9 @@
                     <%= purchase.detail %>
                 </div>
             </div>
+            <div class="ms-auto">
+                <div id="series_num"><%= purchase.series_num %></span> / <span id="series_total"><%= purchase.series_total %></div>
+            </div>
             <div class="card-text">
                 <input id="tags" class="tags" data-role="tagsinput" value="<%= purchase.tags %>" >
             </div>
@@ -69,7 +73,7 @@
                             class="card-link ig-link" src="/img/ig.png"></a>
                 </span>
                 <span class="text-left col-md-1">
-                    <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>/<%= purchase.entity.replace(/ /g, '-').replace(/'/g, '').toLowerCase() _%>"
+                    <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>/<%= purchase.entity.replace(/ /g, '-').replace(/'/g, '').replace(/\(/g, '').replace(/\)/g, '').replace(/\./g,'').toLowerCase() _%>"
                         target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
                 </span>
                 <span class="text-left col-md-1">

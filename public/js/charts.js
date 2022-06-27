@@ -41,7 +41,7 @@ $(async function () {
         }
         tableMaker += '</thead><tbody>'
         for (x of topMakerData.data) {
-            tableMaker += `<tr><td>${x.maker_name}</td><td>${x.total}</td></tr>`
+            tableMaker += `<tr><td><a href="/maker/id/${x.maker_id}">${x.maker_name}</a></td><td>${x.total}</td></tr>`
         }
         tableMaker += '</tbody></table>'
         $('#artisan-top-maker').append(tableMaker)
@@ -50,13 +50,17 @@ $(async function () {
     {
         const totalMakerData = await getData("/api/graph/totalMakers")
         const totalSculptData = await getData("/api/graph/totalSculpts")
+        console.log(totalMakerData)
         let totalCounts = `<table class='table border hover'><thead>`
         totalCounts += `<th>Total Makers</th>`
+        totalCounts += `<th>Have Sculpts</th>`
         totalCounts += `<th>Total Sculpts</th>`
+
         totalCounts += '</thead><tbody><tr>'
 
-        totalCounts += `<td>${totalMakerData.data.count.count}</td>`
-        totalCounts += `<td>${totalSculptData.data.count.count}</td>`
+        totalCounts += `<td>${totalMakerData.data.makers.length}</td>`
+        totalCounts += `<td>${totalSculptData.data.sculptCount.length}</td>`
+        totalCounts += `<td>${totalSculptData.data.sculptsNotArrived.length}</td>`
 
         totalCounts += '</tr></tbody></table>'
         $('#artisan-total-counts').append(totalCounts)
@@ -67,7 +71,8 @@ $(async function () {
         console.log(artisanData)
         $('#artisan-count-chart').highcharts({
             chart: {
-                type: 'pie'
+                type: 'pie',
+                backgroundColor: 'transparent'
             },
             title: {
                 text: 'Count By Sculpt'
@@ -91,7 +96,8 @@ $(async function () {
         const makerData = await getData("/api/graph/makerHaveByCount")
         $('#maker-count-chart').highcharts({
             chart: {
-                type: 'pie'
+                type: 'pie',
+                backgroundColor: 'transparent'
             },
             title: {
                 text: 'Count By Maker'
@@ -127,7 +133,8 @@ $(async function () {
         console.log(saleTypeWins)
         $('#artisan-pie-sales').highcharts({
             chart: {
-                type: 'pie'
+                type: 'pie',
+                backgroundColor: 'transparent'
             },
             title: {
                 text: 'Count By Sale Type'

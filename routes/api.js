@@ -521,6 +521,28 @@ router.get('/getTotalSculpts', async (ctx, next) => {
         ctx.status = 400
     }
 })
+
+// api/sculpt
+
+// api/sculpt/<name>
+router.get('/sculpt/:sculpt', async (ctx, next) => {
+    try {
+        let sculpts = await models.getSculptByName(ctx.params.sculpt)
+        ctx.body = {
+            'status': 'OK',
+            'data': sculpts
+        }
+    ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'FAILURE',
+            'error': err
+        }
+    }
+
+})
+
+
 // api/purchase
 router.post('/purchase', async (ctx, next) => {
     // #swagger.tags = ["Purchases"]
@@ -1045,7 +1067,6 @@ router.get('/graph/saleTypeWins', async (ctx, next) => {
     try {
         let sales = await models.getSaleTypeWins()
         headers = ['Sale Type', 'Count']
-
         ctx.body = {
             status: "ok",
             headers: headers,

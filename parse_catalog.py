@@ -5,12 +5,9 @@ from pprint import pprint
 
 def get_catalog(url, conf):
     catalog = {}
-
     res = requests.get(url)
     if res.status_code == 200:
         catalog = json.loads(res.text)
-        
-    
     return catalog
 
 def get_prop(obj, prop):
@@ -18,6 +15,7 @@ def get_prop(obj, prop):
         return obj[prop]
     except:
         return ''
+
 def parse_catalog(catalog, conf):
     makers = {}
     for maker in catalog:
@@ -52,7 +50,6 @@ def main():
         pprint(makers[sys.argv[1]])
     else:
         pprint(makers.keys())
-
     return 0
 
 if __name__ == "__main__":

@@ -1,0 +1,20 @@
+<!-- views/index.html -->
+<div class="container my-5">
+
+    <div class="row">
+        <div class="col-md-11">
+            <h1 class="h1">
+                <%= title %> <span class="small">
+                        <% if (totals> 0) { %> (<%= totals %>) <% } %>
+                    </span>
+            </h1>
+        </div>
+    </div>
+    <div class="container-fluid ">
+        <ul>
+        <% sculpts.forEach((sculpt, index)=> { %>
+            <li><a href="/sculpt/<%= sculpt %>"><%= sculpt %></a></li>
+        <% }) %>
+        </ul>
+    </div>
+</div>

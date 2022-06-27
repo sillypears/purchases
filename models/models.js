@@ -240,7 +240,7 @@ module.exports = {
         let sql = ``
 
         if (source == "id") {
-            sql = `SELECT p.*,m.archivist_name as archivist, m.instagram as instagram FROM ${process.env.DB_SCHEMA}.purchases p LEFT JOIN ${process.env.DB_SCHEMA}.makers m ON m.id = p.maker WHERE m.id = ${id} ORDER BY p.purchaseDate DESC`
+            sql = `SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases ap WHERE ap.maker_id = ${id} ORDER BY ap.purchaseDate DESC`
         }
         if (source == "name") {
             sql = `SELECT p.*,m.archivist_name as archivist, m.instagram as instagram FROM ${process.env.DB_SCHEMA}.purchases p LEFT JOIN ${process.env.DB_SCHEMA}.makers m ON m.id = p.maker WHERE m.name = '${id}' ORDER BY p.purchaseDate DESC`
@@ -275,6 +275,7 @@ module.exports = {
         let updateId = {}
         let tagnames = []
         let newTags = data.tags.split(',')
+        console.log(data)
         updateId['insertId'] = -1
         conn = await db.getConnection()
         const purchdata = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.purchases WHERE id = ${id};`)
@@ -287,6 +288,8 @@ module.exports = {
         if (purch.maker !== data.maker) { update = true }
         if (purch.vendor !== data.vendor) { update = true }
         if (purch.price !== data.price) { update = true }
+        if (purch.series_num !== data.series_num) { update = true }
+        if (purch.series_total !== data.series_total) { update = true }
         if (purch.adjustments !== data.adjustments) { update = true }
         if (purch.saleType !== data.saletype) { update = true }
         if (purch.purchaseDate !== data.purchaseDate) { update = true }
@@ -300,22 +303,24 @@ module.exports = {
             updateId = await conn.query(`
              UPDATE ${process.env.DB_SCHEMA}.purchases SET 
              category=${data.category},
-             detail='${data.detail}',
-             entity='${data.archivist}',
-             entity_display='${data.set}',
-             ka_id='${data.ka_id}',
+             detail=${conn.escape(data.detail)},
+             entity=${conn.escape(data.archivist)},
+             entity_display=${conn.escape(data.set)},
+             ka_id=${conn.escape(data.ka_id)},
              maker=${data.maker},
              vendor=${data.vendor},
              price=${data.price},
              adjustments=${data.adjustments},
              saleType=${data.saletype},
-             purchaseDate='${data.purchaseDate}',
-             receivedDate='${data.expectedDate}',
-             soldDate='${data.soldDate}',
+             purchaseDate=${conn.escape(data.purchaseDate)},
+             receivedDate=${conn.escape(    data.expectedDate)},
+             soldDate=${conn.escape(data.soldDate)},
              salePrice=${data.salePrice},
              orderSet=${data.orderSet},
              image='${data.image}',
-             notes='${data.notes}'
+             notes=${conn.escape(data.notes)},
+             series_num=${data.series_num},
+             series_total=${data.series_total}
              WHERE id=${id}`)
         }
         for (let i = 0; i < tags.length; i++) (
@@ -435,6 +440,12 @@ module.exports = {
         if (conn) conn.release()
         return data
     },
+    getSculptByName: async (name) => {
+        conn = await db.getConnection()
+        let data = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND LOWER(sculpt) = '${name.toLowerCase()}' ORDER BY id;`)
+        if (conn) conn.release()
+        return data
+    },
     getTopSculpts: async () => {
         conn = await db.getConnection()
         let data = await conn.query(`SELECT sculpt, count(sculpt) as total FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 GROUP BY sculpt ORDER BY total DESC LIMIT 5;`)
@@ -443,15 +454,16 @@ module.exports = {
     },
     getTotalSculpts: async () => {
         conn = await db.getConnection()
-        let sculptCount = await conn.query(`SELECT COUNT(DISTINCT(sculpt)) as count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 ORDER BY count DESC;`)
-        let sculptData = await conn.query(`SELECT DISTINCT(p.sculpt) as name FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.isSold = 0 ORDER BY p.sculpt DESC`)
-        let sculpts = []
-        for (sculpt of sculptData) {
-            sculpts.push(sculpt.name)
-        }
+        let sculptCount = await conn.query(`SELECT DISTINCT(sculpt) as sculpt, COUNT(sculpt) as count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND received = 1 GROUP BY sculpt ORDER BY count DESC;`)
+        let sculptCountNotArrived = await conn.query(`SELECT DISTINCT(sculpt) as sculpt, COUNT(sculpt) as count FROM all_purchases WHERE isSold = 0  GROUP BY sculpt ORDER BY count DESC;`)
+        // let sculptData = await conn.query(`SELECT DISTINCT(p.sculpt) as name FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.isSold = 0 ORDER BY p.sculpt DESC`)
+        // let sculpts = []
+        // for (sculpt of sculptData) {
+        //     sculpts.push(sculpt.name)
+        // }
         if (conn) conn.release()
 
-        return { 'count': sculptCount[0], 'sculpts': sculpts.sort() }
+        return {'sculptCount': sculptCount, 'sculptsNotArrived': sculptCountNotArrived }
     },
     getTotalSculptsWithPicture: async () => {
         conn = await db.getConnection()
@@ -470,21 +482,22 @@ module.exports = {
     },
     getTopMakers: async () => {
         conn = await db.getConnection()
-        let data = await conn.query(`SELECT maker_name, count(maker_name) as total FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 GROUP BY maker_name ORDER BY total DESC LIMIT 5;`)
+        let data = await conn.query(`SELECT maker_name, maker_id, count(maker_name) as total FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 GROUP BY maker_name ORDER BY total DESC LIMIT 5;`)
         if (conn) conn.release()
         return data
     },
     getTotalMakers: async () => {
         conn = await db.getConnection()
-        let makerCount = await conn.query(`SELECT COUNT(DISTINCT(maker_name)) as count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0  ORDER BY count DESC; `)
-        let makerData = await conn.query(`SELECT DISTINCT(p.maker_name) as name FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.isSold = 0 ORDER BY p.maker_name DESC`)
-        let makers = []
-        for (maker of makerData) {
-            makers.push(maker.name)
-        }
-        if (conn) conn.release()
+        let makerCount = await conn.query(`SELECT DISTINCT(maker_name) as maker, COUNT(maker_name) as count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0  GROUP BY maker_name ORDER BY count DESC; `)
+        // let makerData = await conn.query(`SELECT DISTINCT(p.maker_name) as name FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.isSold = 0 ORDER BY p.maker_name DESC`)
+        // let makers = []
+        // for (maker of makerData) {
+        //     makers.push(maker.name)
+        // }
+        if (conn) conn.release()    
 
-        return { 'count': makerCount[0], 'sculpts': makers.sort() }
+        return { makers: makerCount }
+            // return { 'count': makerCount[0], 'sculpts': makers.sort() }
     },
     getAllForSale: async () => {
         conn = await db.getConnection()

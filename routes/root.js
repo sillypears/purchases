@@ -14,24 +14,6 @@ const sharp = require('sharp')
 
 const upload = multer();
 
-router.get('/test-upload', async (ctx, next) => {
-
-    return ctx.render('test-upload', {
-        title: "test",
-        nav: "test",
-        totals: 0
-    });
-});
-
-router.post('/test-upload', upload.single('test'), async (ctx, next) => {
-    ;
-    console.log('ctx.request.file', ctx.request.file);
-    console.log('ctx.file', ctx.file);
-    console.log('ctx.request.body', ctx.request.body);
-    
-    return ctx.redirect('/') 
-});
-
 router.get('/', async (ctx, next) => {
     let purchases = await models.getPurchases()
     let haves = await models.getPurchasesIStillHave()
@@ -168,7 +150,6 @@ router.get('/purchase/:id/edit', async (ctx, next) => {
     const s = await models.getSaleTypes();
     const maxSet = await models.getLatestSet();
     const purchase = await models.getPurchase(ctx.params.id)
-    console.log(purchase.purchaseDate, purchase.soldDate)
     return ctx.render('edit-purchase', {
         title: "Edit Purchase",
         nav: "edit-purchase",
@@ -184,6 +165,31 @@ router.get('/purchase/:id/edit', async (ctx, next) => {
     });
 });
 
+router.get('/sculpts', async (ctx, next) => {
+    let sculpts = await models.getTotalSculpts()
+    return ctx.render('sculpts', {
+        title: `Sculpts`,
+        nav: 'sculpts',
+        totals: sculpts.length,
+        ticker: "",
+        sculpts: sculpts.sculpts,
+        moment: moment 
+    })
+})
+
+router.get('/sculpt/:sculpt', async (ctx, next) => {
+    let sculpts = await models.getSculptByName(ctx.params.sculpt)
+    return ctx.render('sculpt', {
+        title: `All '${ctx.params.sculpt}' sculpts`,
+        nav: 'sculpts',
+        totals: 0,
+        ticker: "",
+        sculpt: ctx.params.sculpt,
+        sculpts: sculpts,
+        moment: moment 
+    })
+
+})
 router.get('/search', async (ctx, next) => {
 
     return ctx.render('search', {
