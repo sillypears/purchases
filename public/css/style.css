@@ -3,16 +3,17 @@ body {
     font-family: "Rubik", sans-serif;
 }
 
-.container-fluid {
-    /* margin: 20px 50px; */
-}
-
 .card {
     width: 15rem;
     height: 25rem;
     margin: 0px 0px 10px 10px;
 }
 
+.card-sm {
+    width: 15rem;
+    height: 15rem;
+    margin: 0px 0px 10px 10px;
+}
 .card-big {
     width: 75%;
     margin: 0px 0px 10px 10px;
@@ -67,6 +68,7 @@ body {
     margin-left: auto;
     margin-right: auto;
 }
+
 .bootstrap-tagsinput .tag {
     margin-right: 2px;
     color: white !important;

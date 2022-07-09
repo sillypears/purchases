@@ -6,14 +6,8 @@
                 <% if (totals> 0) { %> (<%= totals %>) <% } %>
             </span>
     </h1>
-    <div class="container">
-        <div class="row">
+        <div class="d-flex flex-wrap">
             <% makers.forEach((maker, index)=> { %>
-                <% if (index % 4==0 && index !=0) { %>
-        </div>
-        <div class="row">
-            <% } %>
-                <div class="col-md-3 d-flex align-items-stretch">
                     <div class="card text-center">
                         <div class="card-body">
 
@@ -33,9 +27,7 @@
                                     class="card-link ig-link" src="/img/ig.png"></a>
                         </div>
 
-                    </div>
                 </div>
                 <% }) %>
-        </div>
     </div>
 </div>

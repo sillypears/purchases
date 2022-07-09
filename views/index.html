@@ -1,5 +1,4 @@
 <!-- views/index.html -->
-
 <div class="container my-5">
     <div class="row no-gutters">
         <div class="col-md-3">
@@ -20,10 +19,9 @@
                 data-off="Missing" data-offstyle="danger">
         </div>
     </div>
-    <div id="all" class="container-fluid ">
-        <div class="row">
+    <div id="all" class="d-flex flex-wrap ">
             <% purchases.forEach((purchase, index)=> { %>
-                <div class="col d-flex" title="<%= purchase.purchaseDate.toDateString() %>">
+                <div class="" title="<%= purchase.purchaseDate.toDateString() %>">
                     <div id="card-<%= purchase.id %>"
                         class="card text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
                         <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"
@@ -152,6 +150,5 @@
                     </div>
                 </div>
                 <% }) %>
-        </div>
     </div>
 </div>
