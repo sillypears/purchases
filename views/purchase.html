@@ -11,7 +11,7 @@
 
 <div class="row no-gutters justify-content-center align-items-center text-center">
     <div id="card-<%= purchase.id %>"
-        class="card-big border-top border-right text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
+        class="card-big border-top border-right text-center <% if (purchase.received) { %> arrived <% } else {%> waiting <%} %>">
         <div class="card-header">
             <div class="row">
                 <div class="col-md-4">
@@ -29,8 +29,9 @@
                 </div>
             </div>
             <span class="row">
-                <span class="toggle-icon col-md-1 clickable text-center" data-id="<%= purchase.id %>" data-type="receive"><span
-                        title="Toggle Status" class="fa fa-times">💌</span></span>
+                <span class="toggle-icon col-md-1 clickable text-center" data-id="<%= purchase.id %>" data-type="receive">
+                    <span title="Toggle Status" class="fa fa-times">💌</span>
+                    </span>
             </span>
 
             <div class="card-body">

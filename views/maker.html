@@ -19,8 +19,8 @@
         <% purchases.forEach((purchase, index)=> { %>
             <div class="" title="<%= purchase.purchaseDate.toDateString() %>">
                 <div id="card-<%= purchase.id %>"
-                    class="card text-center  <% if (purchase.received) { %> green <% } else {%> red <%} %>">
-                    <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"><i title="Toggle Status"
+                    class="card text-center  <% if (purchase.received) { %> arrived <% } else {%> waiting <%} %>">
+                    <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>" data-type="receive"><i title="Toggle Status"
                             class="fa fa-times">&nbsp;o</i></span>
                     <div class="card-body">
                         <div class="card-title">
@@ -34,9 +34,12 @@
                                 <%= purchase.detail %>
                         </div>
                         <div class="card-text mt-auto mx-auto">
-                            <% if (purchase.series_total> 0) { %>
-                                <%= purchase.series_num %> / <%= purchase.series_total %>
-                                        <% } %>
+                            <% if (purchase.series_total > 0) { %>
+                                <% if (purchase.series_num > 0 ) { %>
+                                    <%= purchase.series_num %>
+                                <% } %>
+                                / <%= purchase.series_total %>
+                            <% } %>
                         </div>
                     </div>
                     <div class="card-footer">

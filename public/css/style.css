@@ -34,11 +34,11 @@ body {
     height: 32px;
 }
 
-.green {
+.arrived {
     border-left: 5px solid #73BD07;
 }
 
-.red {
+.waiting {
     border-left: 5px solid #dd0202;
 }
 

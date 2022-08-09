@@ -7,10 +7,10 @@
             <% sculpts.forEach((sculpt, index)=> { %>
 
                 <div class="col d-flex" title="<%= sculpt.purchaseDate.toDateString() %>">
-                    <div id="card-<%= sculpt.id %>"
-                        class="card text-center d-flex <% if (sculpt.received) { %> green <% } else {%> red <%} %>">
-                        <span class="toggle-icon clickable text-left" data-id="<%= sculpt.id %>"><i
-                                title="Toggle Status" class="fa fa-times">&nbsp;o</i></span>
+                    <div id="card-<%= sculpt.id %>" class="card text-center d-flex <% if (sculpt.received) { %> arrived <% } else {%> waiting <%} %>">
+                        <span class="toggle-icon clickable text-left" data-id="<%= sculpt.id %>" data-type="receive">
+                            <i title="Toggle Status" class="fa fa-times">&nbsp;o</i>
+                        </span>
                         <div class="card-body d-flex flex-column">
                             <div class="card-title">
                                 <a href="/purchase/<%= sculpt.id %>"><img class="card-image" loading="lazy"
@@ -26,8 +26,11 @@
                                 <div class="small"><%= sculpt.maker_name %></div>
                             </div>
                             <div class="card-text mt-auto mx-auto" >
-                                <% if (sculpt.series_total > 0) { %>
-                                    <%= sculpt.series_num %> / <%= sculpt.series_total %>
+                                <% if (purchase.series_total > 0) { %>
+                                    <% if (purchase.series_num > 0 ) { %>
+                                        <%= purchase.series_num %>
+                                    <% } %>
+                                    / <%= purchase.series_total %>
                                 <% } %>
                             </div>
                         </div>

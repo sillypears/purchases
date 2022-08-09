@@ -442,7 +442,7 @@ module.exports = {
     },
     getSculptByName: async (name) => {
         conn = await db.getConnection()
-        let data = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND LOWER(sculpt) = '${name.toLowerCase()}' ORDER BY id;`)
+        let data = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE LOWER(sculpt) = '${name.toLowerCase()}' ORDER BY id;`)
         if (conn) conn.release()
         return data
     },
@@ -488,7 +488,7 @@ module.exports = {
     },
     getTotalMakers: async () => {
         conn = await db.getConnection()
-        let makerCount = await conn.query(`SELECT DISTINCT(maker_name) as maker, COUNT(maker_name) as count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0  GROUP BY maker_name ORDER BY count DESC; `)
+        let makerCount = await conn.query(`SELECT DISTINCT(maker_name) as maker, COUNT(maker_name) as count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 and received = 1 GROUP BY maker_name ORDER BY count DESC; `)
         // let makerData = await conn.query(`SELECT DISTINCT(p.maker_name) as name FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.isSold = 0 ORDER BY p.maker_name DESC`)
         // let makers = []
         // for (maker of makerData) {

@@ -23,7 +23,7 @@
             <% purchases.forEach((purchase, index)=> { %>
                 <div class="" title="<%= purchase.purchaseDate.toDateString() %>">
                     <div id="card-<%= purchase.id %>"
-                        class="card text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
+                        class="card text-center <% if (purchase.received) { %> arrived <% } else {%> waiting <%} %>">
                         <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"
                             data-type="receive"><span title="Toggle Status" class="fa fa-times">&nbsp;💌</span></span>
                         <div class="card-body d-flex flex-column">
@@ -47,7 +47,10 @@
                             </div>
                             <div class="card-text mt-auto mx-auto" >
                                 <% if (purchase.series_total > 0) { %>
-                                    <%= purchase.series_num %> / <%= purchase.series_total %>
+                                    <% if (purchase.series_num > 0 ) { %>
+                                        <%= purchase.series_num %>
+                                    <% } %>
+                                    / <%= purchase.series_total %>
                                 <% } %>
                             </div>
                         </div>
@@ -106,7 +109,7 @@
                 <% }) %>
         </div>
     </div>
-    <div id="missing" class="container-fluid">
+    <!-- <div id="missing" class="container-fluid">
         <div class="row  ">
             <% missingPurchases.forEach((purchase, index)=> { %>
 
@@ -142,7 +145,7 @@
                                             src="/img/www.png"></a>
                                 </span>
                                 <span class="text-right col-md-6">
-                                    <!-- $<%= (purchase.price+purchase.adjustments).toFixed(2) %> -->
+                                    $<%= (purchase.price+purchase.adjustments).toFixed(2) %> 
                                 </span>
                             </div>
                         </div>
@@ -150,5 +153,5 @@
                     </div>
                 </div>
                 <% }) %>
-    </div>
+    </div> -->
 </div>

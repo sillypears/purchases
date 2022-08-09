@@ -28,18 +28,18 @@ $(function () {
 
 
     $('.toggle-icon').on('click', function () {
-        console.log(this.dataset.id)
+        // console.log(this.dataset.id, this.dataset.type)
         if (this.dataset.type !== "receive") { return }
         $.ajax({
             'url': `/api/receiveToggle/${this.dataset.id}`,
             'type': 'GET',
             'success': function (result) {
                 if (result.message == 1) {
-                    $(`#card-${result.purchaseId}`).addClass('green')
-                    $(`#card-${result.purchaseId}`).removeClass('red')
+                    $(`#card-${result.purchaseId}`).addClass('arrived')
+                    $(`#card-${result.purchaseId}`).removeClass('waiting')
                 } else {
-                    $(`#card-${result.purchaseId}`).addClass('red')
-                    $(`#card-${result.purchaseId}`).removeClass('green')
+                    $(`#card-${result.purchaseId}`).addClass('waiting')
+                    $(`#card-${result.purchaseId}`).removeClass('arrived')
 
                 }
             }
@@ -134,8 +134,9 @@ $(function () {
             }
         });
     })
-    $('#toggle-box').change(function () {
-        swap()
+    $('#toggle-box').change(function (dir) {
+        // swap()
+        flip()
     })
     $('input.tags')
     .on('change', function (event) {
@@ -182,6 +183,17 @@ function swap() {
     }
 }
 
+function flip() {
+    const trans = 500
+    const allMissing = $('div.card.waiting')
+    const toggleState = $('#toggle-box')
+    $('div#all').html('')
+    if (!$('#toggle-box').is(':checked')) {
+        for (i = 0; i < allMissing.length; i++) {
+            $('div#all').html($('div#all').html() + allMissing[i].outerHTML)
+        }
+    }
+}
 function picRefresh() {
     console.log('refreshing')
     $.ajax({
