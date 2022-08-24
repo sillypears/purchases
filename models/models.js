@@ -299,6 +299,7 @@ module.exports = {
         if (purch.orderSet !== data.orderSet) { update = true }
         if (purch.image !== data.image) { update = true }
         if (purch.notes !== data.notes) { update = true }
+        if (purch.notes !== data.ig_post) { update = true }
         if (update) {
             updateId = await conn.query(`
              UPDATE ${process.env.DB_SCHEMA}.purchases SET 
@@ -320,7 +321,8 @@ module.exports = {
              image='${data.image}',
              notes=${conn.escape(data.notes)},
              series_num=${data.series_num},
-             series_total=${data.series_total}
+             series_total=${data.series_total},
+             ig_post='${data.ig_post}'
              WHERE id=${id}`)
         }
         for (let i = 0; i < tags.length; i++) (

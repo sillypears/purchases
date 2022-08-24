@@ -79,10 +79,13 @@
                                 <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>"
                                     target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
                             </span>
-                            <!-- <span class="text-center col-md-2">
-                                <a href="<%= purchase.link %>" target="_blank"><img class="card-link www-link"
-                                        src="/img/www.png"></a>
-                            </span> -->
+                            <span class="text-center col-md-4">
+                                <% if (purchase.ig_post) { %>
+                                    <a href="<%= purchase.ig_post %>" target="_blank">
+                                        <img class="card-link ig-link" src="/img/camera.png" />
+                                    </a>
+                                <% } %>
+                            </span>
                             <span class="text-right col-md-6">
                                 <!-- $<%= (purchase.price+purchase.adjustments).toFixed(2) %> -->
                             </span>
