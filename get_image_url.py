@@ -64,7 +64,7 @@ def main():
     print(f"Makers: {len(makers)}")
     print(f"Purchases: {len(purchases)}")
     for purchase in purchases:
-        m_id = purchase[8]
+        m_id = purchase[10]
         if m_id in keycap:
             p_id = purchase[0]
             sculpt = purchase[4]

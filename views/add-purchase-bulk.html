@@ -1,0 +1,33 @@
+<!-- views/index.html -->
+<div class="container my-5">
+
+    <h1 class="h1">
+        <%= title %> <span class="small">
+                <% if (totals> 0) { %> (<%= totals %>) <% } %>
+            </span>
+    </h1>
+    <div>
+        Latest set is: <%= maxSet %>
+    </div>
+    <form class="form" action="" method="POST">
+        <div>
+            <textarea type="textarea" name="bulkData" rows=8 cols=140 placeholder="CSV lines go here" ></textarea>
+        </div>
+        <div>
+            <button type="submit" id="submit" class="btn-success">Add Purchase!</button>
+        </div>
+    </form>
+
+    <div id='ticker'>
+        <% if (ticker.insertId) { %>
+            <div class="alert-success">Added id: <%= ticker.insertId %>
+            </div>
+            <% } %>
+                <% if (ticker.error) { %>
+                    <div class="alert-danger">
+                        <%= ticker.error %>
+                    </div>
+                    <% } %>
+    </div>
+
+</div>

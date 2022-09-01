@@ -758,6 +758,18 @@ router.post('/update/:field', async (ctx, next) => {
     }
 });
 
+router.get('/spreadsheetOutput', async (ctx, next) => {
+    let data = await models.getPurchases()
+    let output = ""
+    data.forEach((item) => {
+        let temp = `${item['category_name']},${item['detail']},${item['entity']},${item['maker_name']},${item['vendor_name']},${item['price']},${item['adjustments']},${item['sale_type']},,,${item['purchaseDate']},${item['orderSet']}`
+        output += temp + "\n"
+    })
+
+    ctx.body = output
+    ctx.status = 200
+    
+})
 // api/picRefresh
 router.get('/picRefresh', async (ctx, next) => {
     var dataToSend;
@@ -1082,4 +1094,41 @@ router.get('/graph/saleTypeWins', async (ctx, next) => {
     }
 });
 
+router.get('/graph/monthlyPurchases', async (ctx, next) => {
+
+    try {
+        const purches = await models.getMonthlyPurchaseData()
+        let purchases = []
+        purches.forEach((purch,index)=>{
+            let temp = {}
+            temp.name = toMonthName(purches[index].month)
+            temp.y = purches[index].count
+            purchases.push(temp)
+        })
+        headers = ['Month', 'Count']
+        ctx.body = {
+            status: "ok",
+            data: {
+                headers: headers,
+                purchases: purchases
+            }
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    }
+});
+
+function toMonthName(monthNumber) {
+    const date = new Date();
+    date.setMonth(monthNumber - 1);
+  
+    return date.toLocaleString('en-US', {
+      month: 'long',
+    });
+  }
 module.exports = router;

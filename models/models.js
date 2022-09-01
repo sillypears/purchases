@@ -161,13 +161,17 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
-    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags) => {
+    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, mainColors) => {
         let newTags = tags.split(',')
+        let newColors = mainColors.split(',')
         conn = await db.getConnection();
         let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet});`)
         console.log(purchaseId)
         newTags.forEach(tag => {
             let tagId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES ('${tag}', ${purchaseId.insertId})`)
+        })
+        newColors.forEach(color => {
+            let colorId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.main_colors (color, purchase_id) VALUES ('${color}', ${purchaseId.insertId})`)
         })
         if (conn) conn.release()
         return purchaseId
@@ -270,67 +274,93 @@ module.exports = {
         if (conn) conn.release()
         return tags
     },
-    updatePurchaseById: async (id, data, tags) => {
+    getMainColorsByPurchaseId: async (id) => {
+        conn = await db.getConnection();
+        let mainColors = await conn.query(`SELECT mc.color FROM ${process.env.DB_SCHEMA}.main_colors mc WHERE mc.purchase_id = ${id};`)
+        if (conn) conn.release()
+        return mainColors
+    },
+    updatePurchaseById: async (id, data, tags, colors) => {
         let update = false
         let updateId = {}
         let tagnames = []
+        let colornames = []
         let newTags = data.tags.split(',')
-        console.log(data)
+        const newColors = data.mainColors.split(',')
         updateId['insertId'] = -1
         conn = await db.getConnection()
         const purchdata = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.purchases WHERE id = ${id};`)
         const purch = purchdata[0]
-        if (purch.category !== data.category) { update = true }
-        if (purch.detail !== data.detail) { update = true }
-        if (purch.entity !== data.archivist) { update = true }
-        if (purch.entity_display !== data.set) { update = true }
-        if (purch.ka_id !== data.set) { update = true }
-        if (purch.maker !== data.maker) { update = true }
-        if (purch.vendor !== data.vendor) { update = true }
-        if (purch.price !== data.price) { update = true }
-        if (purch.series_num !== data.series_num) { update = true }
-        if (purch.series_total !== data.series_total) { update = true }
-        if (purch.adjustments !== data.adjustments) { update = true }
-        if (purch.saleType !== data.saletype) { update = true }
-        if (purch.purchaseDate !== data.purchaseDate) { update = true }
-        if (purch.expectedDate !== data.expectedDate) { update = true }
-        if (purch.soldDate !== data.soldDate) { update = true }
-        if (purch.salePrice !== data.salePrice) { update = true }
-        if (purch.orderSet !== data.orderSet) { update = true }
-        if (purch.image !== data.image) { update = true }
-        if (purch.notes !== data.notes) { update = true }
-        if (purch.notes !== data.ig_post) { update = true }
-        if (update) {
-            updateId = await conn.query(`
-             UPDATE ${process.env.DB_SCHEMA}.purchases SET 
-             category=${data.category},
-             detail=${conn.escape(data.detail)},
-             entity=${conn.escape(data.archivist)},
-             entity_display=${conn.escape(data.set)},
-             ka_id=${conn.escape(data.ka_id)},
-             maker=${data.maker},
-             vendor=${data.vendor},
-             price=${data.price},
-             adjustments=${data.adjustments},
-             saleType=${data.saletype},
-             purchaseDate=${conn.escape(data.purchaseDate)},
-             receivedDate=${conn.escape(    data.expectedDate)},
-             soldDate=${conn.escape(data.soldDate)},
-             salePrice=${data.salePrice},
-             orderSet=${data.orderSet},
-             image='${data.image}',
-             notes=${conn.escape(data.notes)},
-             series_num=${data.series_num},
-             series_total=${data.series_total},
-             ig_post='${data.ig_post}'
-             WHERE id=${id}`)
+        let sql = `UPDATE ${process.env.DB_SCHEMA}.purchases SET\n`
+        if (purch.category !== parseInt(data.category)) { update = true; sql += `category=${data.category},\n` }
+        if (purch.detail !== data.detail) { update = true; sql+= `detail=${conn.escape(data.detail)},\n` }
+        if (purch.entity !== data.archivist) { update = true; sql+=`entity=${conn.escape(data.archivist)},\n` }
+        if (purch.entity_display !== data.set) { update = true; sql+=`entity_display=${conn.escape(data.set)},\n` }
+        if (purch.ka_id !== data.ka_id) { update = true; sql+=`ka_id=${conn.escape(data.ka_id)},\n` }
+        if (purch.maker !== parseInt(data.maker)) { update = true; sql+=`maker=${data.maker},\n` }
+        if (purch.vendor !== parseInt(data.vendor)) { update = true; sql+=`vendor=${data.vendor},\n` }
+        if (purch.price !== parseInt(data.price)) { update = true; sql+=`price=${data.price},\n` }
+        if (purch.series_num !== parseInt(data.series_num)) { update = true; sql+=`series_num=${data.series_num},\n` }
+        if (purch.series_total !== parseInt(data.series_total)) { update = true; sql+=`series_total=${data.series_total},\n` }
+        if (purch.adjustments !== parseInt(data.adjustments)) { update = true; sql+=`adjustments=${data.adjustments},\n` }
+        if (purch.saleType !== parseInt(data.saletype)) { update = true; sql+=`saleType=${data.saletype},\n` }
+        if (new Date(purch.purchaseDate).toISOString().substring(0, 10) !== data.purchaseDate) { update = true; sql+=`purchaseDate=${conn.escape(data.purchaseDate)},\n` }
+        if (new Date(purch.receivedDate).toISOString().substring(0, 10) !== data.expectedDate) { update = true; sql+=`receivedDate=${conn.escape(data.expectedDate)},\n` }
+        if (new Date(purch.soldDate).toISOString().substring(0, 10) !== data.soldDate) { update = true; sql+=`soldDate=${conn.escape(data.soldDate)},\n` }
+        if (purch.salePrice !== parseInt(data.salePrice)) { update = true; sql+=`salePrice=${data.salePrice},\n` }
+        if (purch.orderSet !== parseInt(data.orderSet)) { update = true; sql+=`orderSet=${data.orderSet},\n` }
+        if (purch.image != data.image) { update = true; sql+=`image='${data.image}',\n` }
+        if (purch.notes != data.notes) { update = true; sql+=`notes=${conn.escape(data.notes)},\n` }
+        if (purch.ig_post != data.ig_post) { update = true; sql+=`ig_post='${data.ig_post}'\n` }
+        const test = sql.charAt(sql.length - 2)
+        if (test == ",") { 
+            sql = sql.slice(0,-2)
         }
+        sql += `\nWHERE id=${id}`
+        if (update) { console.log(sql)}
+        if (update) { updateId = await conn.query(sql) }
+        // if (update) {
+        //     updateId = await conn.query(`
+        //      UPDATE ${process.env.DB_SCHEMA}.purchases SET 
+        //      category=${data.category},
+        //      detail=${conn.escape(data.detail)},
+        //      entity=${conn.escape(data.archivist)},
+        //      entity_display=${conn.escape(data.set)},
+        //      ka_id=${conn.escape(data.ka_id)},
+        //      maker=${data.maker},
+        //      vendor=${data.vendor},
+        //      price=${data.price},
+        //      adjustments=${data.adjustments},
+        //      saleType=${data.saletype},
+        //      purchaseDate=${conn.escape(data.purchaseDate)},
+        //      receivedDate=${conn.escape(    data.expectedDate)},
+        //      soldDate=${conn.escape(data.soldDate)},
+        //      salePrice=${data.salePrice},
+        //      orderSet=${data.orderSet},
+        //      image='${data.image}',
+        //      notes=${conn.escape(data.notes)},
+        //      series_num=${data.series_num},
+        //      series_total=${data.series_total},
+        //      ig_post='${data.ig_post}'
+        //      WHERE id=${id}`)
+        // }
         for (let i = 0; i < tags.length; i++) (
             tagnames.push(tags[i].tagname)
         ) 
         newTags.forEach(tag => {
             if (!tagnames.includes(tag)) {
                 let tagId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES ('${tag}', ${id})`)
+            }
+        })
+
+        for(let i=0;i<colors.length;i++) {
+
+            colornames.push(colors[i].color)
+        }
+        newColors.forEach(color => {
+            if (!colornames.includes(color)) {
+                console.log(`did not find ${color.color} in ${colornames} `)
+                let colorId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.main_colors (color, purchase_id) VALUES ('${color}', ${id})`)
             }
         })
         // Object.keys(newTags).forEach(function(tag) {
@@ -525,6 +555,36 @@ module.exports = {
         console.log(delId)
         if (conn) conn.release()
         return delId
+    },
+    getCategoryFromName: async (name) => {
+        conn = await db.getConnection()
+        let categoryId = await conn.query(`SELECT c.id FROM ${process.env.DB_SCHEMA}.categories c WHERE c.display_name = ${conn.escape(name)} OR c.name = ${conn.escape(name)}`)
+        if (conn) conn.release()
+        return categoryId
+    },
+    getMakerFromName: async (name) => {
+        conn = await db.getConnection()
+        let makerId = await conn.query(`SELECT m.id FROM ${process.env.DB_SCHEMA}.makers m WHERE m.display_name = ${conn.escape(name)} OR m.name = ${conn.escape(name)}`)
+        if (conn) conn.release()
+        return makerId
+    },
+    getVendorFromName: async (name) => {
+        conn = await db.getConnection()
+        let vendorId = await conn.query(`SELECT v.id FROM ${process.env.DB_SCHEMA}.vendors v WHERE v.display_name = ${conn.escape(name)} OR v.name = ${conn.escape(name)}`)
+        if (conn) conn.release()
+        return vendorId
+    },
+    getSaleTypeFromName: async (name) => {
+        conn = await db.getConnection()
+        let saleTypeId = await conn.query(`SELECT st.id FROM ${process.env.DB_SCHEMA}.sale_types st WHERE st.display_name = ${conn.escape(name)} OR st.name = ${conn.escape(name)}`)
+        if (conn) conn.release()
+        return saleTypeId
+    },
+    getMonthlyPurchaseData: async () => {
+        conn = await db.getConnection()
+        let monthlyPurch = await conn.query(`SELECT MONTH(p.purchaseDate) as month,COUNT(MONTH(p.purchaseDate)) as count FROM ${process.env.DB_SCHEMA}.purchases p GROUP BY MONTH(p.purchaseDate)`)
+        if (conn) conn.release()
+        return monthlyPurch
     }
 }
 

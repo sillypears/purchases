@@ -28,6 +28,9 @@
             <input type="text" id="ka_id" name="ka_id" size=40 placeholder="Archivist ID" value="<%= purchase.ka_id %>" />
         </div>
         <div>
+            <input type="text" id="mainColors" name="mainColors" class="tags" size=40 placeholder="Main Colors" data-role="tagsinput" value="<%= purchase.mainColors %>" />
+        </div>
+        <div>
             <input type="text" id="tags" name="tags" class="tags" size=40 placeholder="Tags" data-role="tagsinput" value="<%= purchase.tags %>" />
         </div>
         <div>
@@ -63,7 +66,8 @@
             <select class="select" id="saletype" name="saletype">
                 <option id="option-default" name="default" value="-1">Select Sale Type</option>
                 <% for ( let saleType of saleTypes) { %>
-                <option id="option-<%= saleType.name %>" name="saleType" value=<%=saleType.id %><% if (saleType.id==purchase.sale_id) { %> selected <% } %>><%= saleType.display_name %></option>
+
+                <option id="option-<%= saleType.name %>" name="saleType" value=<%=saleType.id %>  <% if (saleType.id==purchase.sale_id) { %> selected <% } %>><%= saleType.display_name %></option>
                 <% }; %>
             </select>
         </div>
@@ -103,7 +107,6 @@
             <button type="submit" id="submit" class="btn-success">Update Purchase!</button>
         </div>
     </form>
-
 
     <div id='ticker'>
         <% if (ticker.insertId) { %>

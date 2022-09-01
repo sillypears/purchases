@@ -153,6 +153,32 @@ $(async function () {
             }]
         })
     }
+    //purchasesByMonthCount
+    {
+        const monthPurch = await getData("/api/graph/monthlyPurchases")
+        
+        $('#monthy-purchase-chart').highcharts({
+            chart: {
+                type: 'pie',
+                backgroundColor: 'transparent'
+            },
+            title: {
+                text: 'Count By Month Purchased'
+            },
+
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            legend: {
+                enabled: true
+            },
+            series: [{
+                name: "Montly Purchase Count",
+                colorByPoint: true,
+                data: monthPurch.data.purchases
+            }]
+        })
+    }
 });
 
 async function getData(url) {

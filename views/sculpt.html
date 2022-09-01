@@ -6,7 +6,7 @@
         <div class="row ">
             <% sculpts.forEach((sculpt, index)=> { %>
 
-                <div class="col d-flex" title="<%= sculpt.purchaseDate.toDateString() %>">
+                <div class="col d-flex" >
                     <div id="card-<%= sculpt.id %>" class="card text-center d-flex <% if (sculpt.received) { %> arrived <% } else {%> waiting <%} %>">
                         <span class="toggle-icon clickable text-left" data-id="<%= sculpt.id %>" data-type="receive">
                             <i title="Toggle Status" class="fa fa-times">&nbsp;o</i>

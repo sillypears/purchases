@@ -138,27 +138,30 @@ $(function () {
         // swap()
         flip()
     })
+
     $('input.tags')
-    .on('change', function (event) {
-      var $element = $(event.target);
-      var $container = $element.closest('.example');
+        .on('change', function (event) {
+            var $element = $(event.target);
+            var $container = $element.closest('.example');
+            console.log($element)
 
-      if (!$element.data('tagsinput')) return;
+            if (!$element.data('tagsinput')  ) return;
 
-      var val = $element.val();
-      if (val === null) val = 'null';
-      var items = $element.tagsinput('items');
+            var val = $element.val();
+            if (val === null) val = 'null';
+            var items = $element.tagsinput('items');
 
-      $('code', $('pre.val', $container)).html(
-        $.isArray(val)
-          ? JSON.stringify(val)
-          : '"' + val.replace('"', '\\"') + '"'
-      );
-      $('code', $('pre.items', $container)).html(
-        JSON.stringify($element.tagsinput('items'))
-      );
-    })
-    .trigger('change');
+            $('code', $('pre.val', $container)).html(
+                $.isArray(val)
+                ? JSON.stringify(val)
+                : '"' + val.replace('"', '\\"') + '"'
+            );
+            $('code', $('pre.items', $container)).html(
+                JSON.stringify($element.tagsinput('items'))
+            );
+            })
+        .trigger('change');
+
 })
 
 function swap() {
