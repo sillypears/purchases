@@ -91,8 +91,10 @@
                                             class="card-link ig-link" src="/img/ig.png"></a>
                                 </span>
                                 <span class="text-center col-md-4">
-                                    <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>"
+                                    <% if (purchase.archivist) { %>
+                                    <a href="https://keycap-archivist.com/maker/<%= purchase.archivist.replace('.','') %>"
                                         target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
+                                    <% } %>
                                 </span>
                                 <span class="text-center col-md-4">
                                     <% if (purchase.ig_post) { %>

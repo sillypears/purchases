@@ -25,12 +25,14 @@ def get_data(maker):
     try:
         if ' ' in maker:
             maker = maker.replace(' ', '-')
+        if '.' in maker:
+            maker = maker.replace('.', '-')
         url = f"https://raw.githubusercontent.com/keycap-archivist/database/master/db/{maker}.json"
         res = requests.get(url=url)
         if res.status_code == 200:
             return json.loads(res.text)
         else:
-            print(f"Couldn't get ${maker}")
+            print(f"Couldn't get {maker}")
     except Exception as e:
         print(f"{e}")
         return None

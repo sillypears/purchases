@@ -103,8 +103,13 @@
         <div>
             <input type="textarea" id="notes" name="notes" size=80 placeholder="Notes!" value="<%= purchase.notes %>" />
         </div>
-        <div>
-            <button type="submit" id="submit" class="btn-success">Update Purchase!</button>
+        <div class="row">
+            <div class="col-6">
+                <button type="submit" id="submit" class="btn-success">Update Purchase!</button>
+            </div>
+            <div class="col-6">
+                <button type="button" id="pls-delet" class="btn-danger pls-delet" data-id=<%= purchase.id %> >Delete Purchase!</button>
+            </div>
         </div>
     </form>
 

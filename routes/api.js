@@ -405,6 +405,25 @@ router.get('/purchase/:id', async (ctx, next) => {
     }
 });
 
+// api/purchase/:id/delete
+router.post('/purchase/:id/delete', async (ctx, next) => {
+    // #swagger.tags = ["Purchases"]
+    // #swagger.description = "Purchase endpoints"
+    // #swagger.parameters['id'] = { description: 'Purchase ID' }
+    console.log(ctx.params)
+    try {
+        let purchase = await models.deletePurchaseById(ctx.params.id);
+        ctx.body = purchase
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    }
+});
+
 router.get('/willSell', async (ctx, next) => {
     // #swagger.tags = ["Purchases"]
     // #swagger.description = "Purchase endpoints"

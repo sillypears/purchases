@@ -315,12 +315,35 @@ router.get('/totalSculpts', async (ctx, next) => {
     })
 });
 
+router.get('/export/csv', async (ctx, next) => {
+    let purchases = await models.getPurchases();
+    let data = `id,category_name,detail,entity,sculpt,maker_name,instagram,archivist,vendor_name,price,adjustments,total,sale_type,salePrice,purchaseDate,retail_price,mainColors,tags\n`
+    for (let purch of purchases) {
+        data += `${purch.id},${purch.category_name},${purch.detail},${purch.entity},${purch.sculpt},${purch.maker_name},${purch.instagram},${purch.archivist},${purch.vendor_name},${purch.price},${purch.adjustments},${purch.total},${purch.sale_type},${purch.salePrice},${purch.purchaseDate},${purch.retail_price},${purch.mainColors},${purch.tags}\n`
+    }
+    filename = 'allPurchases'
+    ctx.response.set('Content-disposition', `attachment; filename=${filename}.csv`)
+    ctx.response.set('Content-Type', 'text/csv')
+    ctx.statusCode = 200;
+    ctx.body = data
+});
+
+router.get('/export/json', async (ctx, next) => {
+    let purchases = await models.getPurchases();
+    const data = purchases
+    filename = 'allPurchases'
+    ctx.response.set('Content-disposition', `attachment; filename=${filename}.json`)
+    ctx.response.set('Content-Type', 'application/json')
+    ctx.statusCode = 200;
+    ctx.body = JSON.stringify(data)
+});
+
 router.post('/add-purchase', async (ctx, next) => {
     let a = ctx.request.body
     if (a.adjustments < 0) {
         a.adjustments = 0
     }
-    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags, a.mainColors);
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags, a.ig_post, a.mainColors);
     let meta = { 'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name }
     let m = await models.getMakers();
     let v = await models.getVendors();
@@ -437,34 +460,34 @@ async function parseBulk(data) {
         temp['categoryName'] = item[0]
         try {
             temp['categoryId'] = (await models.getCategoryFromName(item[0]))[0].id
-        } catch (err) { 
+        } catch (err) {
             temp['categoryId']
-            console.log(err) 
+            console.log(err)
         }
         temp['colorway'] = item[1]
         temp['sculpt'] = item[2]
         temp['makerName'] = item[3]
         try {
-            temp['makerId'] =  (await models.getMakerFromName(item[3]))[0].id
-        } catch (err) { 
+            temp['makerId'] = (await models.getMakerFromName(item[3]))[0].id
+        } catch (err) {
             temp['makerId'] = -2
-            console.log(err) 
+            console.log(err)
         }
         temp['vendorName'] = item[4]
         try {
             temp['vendorId'] = (await models.getVendorFromName(item[4]))[0].id
-        } catch (err) { 
+        } catch (err) {
             temp['vendorId'] = -2
-            console.log(err) 
+            console.log(err)
         }
         temp['price'] = item[5]
         temp['adjustments'] = item[6]
         temp['saleTypeName'] = item[8]
         try {
             temp['saleTypeId'] = (await models.getSaleTypeFromName(item[8]))[0].id
-        } catch (err) { 
+        } catch (err) {
             temp['saleTypeId'] = -2
-            console.log(err) 
+            console.log(err)
         }
         temp['received'] = (item[9] == 'Yes') ? true : false
         temp['purchaseDate'] = new Date(Date.parse(item[10]))
@@ -472,7 +495,7 @@ async function parseBulk(data) {
         temp['orderSet'] = item[12]
         parsed.push(temp)
         console.log(parsed)
-    })  
+    })
     console.log('b', parsed)
     return parsed
 }

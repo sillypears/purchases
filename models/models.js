@@ -161,11 +161,11 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
-    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, mainColors) => {
+    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, ig_post, mainColors) => {
         let newTags = tags.split(',')
         let newColors = mainColors.split(',')
         conn = await db.getConnection();
-        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet});`)
+        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)});`)
         console.log(purchaseId)
         newTags.forEach(tag => {
             let tagId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES ('${tag}', ${purchaseId.insertId})`)
@@ -319,31 +319,7 @@ module.exports = {
         sql += `\nWHERE id=${id}`
         if (update) { console.log(sql)}
         if (update) { updateId = await conn.query(sql) }
-        // if (update) {
-        //     updateId = await conn.query(`
-        //      UPDATE ${process.env.DB_SCHEMA}.purchases SET 
-        //      category=${data.category},
-        //      detail=${conn.escape(data.detail)},
-        //      entity=${conn.escape(data.archivist)},
-        //      entity_display=${conn.escape(data.set)},
-        //      ka_id=${conn.escape(data.ka_id)},
-        //      maker=${data.maker},
-        //      vendor=${data.vendor},
-        //      price=${data.price},
-        //      adjustments=${data.adjustments},
-        //      saleType=${data.saletype},
-        //      purchaseDate=${conn.escape(data.purchaseDate)},
-        //      receivedDate=${conn.escape(    data.expectedDate)},
-        //      soldDate=${conn.escape(data.soldDate)},
-        //      salePrice=${data.salePrice},
-        //      orderSet=${data.orderSet},
-        //      image='${data.image}',
-        //      notes=${conn.escape(data.notes)},
-        //      series_num=${data.series_num},
-        //      series_total=${data.series_total},
-        //      ig_post='${data.ig_post}'
-        //      WHERE id=${id}`)
-        // }
+
         for (let i = 0; i < tags.length; i++) (
             tagnames.push(tags[i].tagname)
         ) 
@@ -371,6 +347,13 @@ module.exports = {
         // })
         if (conn) conn.release()
         return updateId
+    },
+    deletePurchaseById: async (id) => {
+        conn = await db.getConnection()
+        const delId = await conn.query(`DELETE FROM ${process.env.DB_SCHEMA}.purchases WHERE id = ${id} `)
+        // const delId = 1
+        if (conn) conn.release()
+        return delId
     },
     updateMakerById: async (id, data) => {
         let update = false
@@ -480,7 +463,7 @@ module.exports = {
     },
     getTopSculpts: async () => {
         conn = await db.getConnection()
-        let data = await conn.query(`SELECT sculpt, count(sculpt) as total FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 GROUP BY sculpt ORDER BY total DESC LIMIT 5;`)
+        let data = await conn.query(`SELECT sculpt, count(sculpt) as total FROM ${process.env.DB_SCHEMA}.all_purchases GROUP BY sculpt ORDER BY total DESC LIMIT 5;`)
         if (conn) conn.release()
         return data
     },
@@ -514,7 +497,7 @@ module.exports = {
     },
     getTopMakers: async () => {
         conn = await db.getConnection()
-        let data = await conn.query(`SELECT maker_name, maker_id, count(maker_name) as total FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 GROUP BY maker_name ORDER BY total DESC LIMIT 5;`)
+        let data = await conn.query(`SELECT maker_name, maker_id, count(maker_name) as total FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND received = 1 GROUP BY maker_name ORDER BY total DESC LIMIT 5;`)
         if (conn) conn.release()
         return data
     },
