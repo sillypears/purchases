@@ -390,9 +390,12 @@ module.exports = {
         return updateId
     },
     toggleReceivedStatus: async (id) => {
+        let d = new Date().toLocaleString({ timeZone: "America/New_York" });
+        let dt = new Date(d);
+        let dtt = `${dt.getFullYear()}-${("0" + (dt.getMonth() + 1)).slice(-2)}-${("0" + (dt.getDate())).slice(-2)}`;
         conn = await db.getConnection();
         let r = await conn.query(`SELECT received FROM ${process.env.DB_SCHEMA}.purchases WHERE id = ${id}`)
-        let updatedReceived = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.purchases SET received = ${r[0].received == 0 ? 1 : 0} WHERE id = ${id}`)
+        let updatedReceived = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.purchases SET received = ${r[0].received == 0 ? 1 : 0}, receivedDate = '${dtt}' WHERE id = ${id}`)
         if (conn) conn.release()
         return r[0].received == 0 ? 1 : 0
 
@@ -469,8 +472,8 @@ module.exports = {
     },
     getTotalSculpts: async () => {
         conn = await db.getConnection()
-        let sculptCount = await conn.query(`SELECT DISTINCT(sculpt) as sculpt, COUNT(sculpt) as count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND received = 1 GROUP BY sculpt ORDER BY count DESC;`)
-        let sculptCountNotArrived = await conn.query(`SELECT DISTINCT(sculpt) as sculpt, COUNT(sculpt) as count FROM all_purchases WHERE isSold = 0  GROUP BY sculpt ORDER BY count DESC;`)
+        let sculptCount = await conn.query(`SELECT DISTINCT(sculpt) as sculpt, COUNT(sculpt) as count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND received = 1 AND includeInCount = 1 GROUP BY sculpt ORDER BY count DESC;`)
+        let sculptCountNotArrived = await conn.query(`SELECT DISTINCT(sculpt) as sculpt, COUNT(sculpt) as count FROM all_purchases WHERE isSold = 0  AND includeInCount = 1 GROUP BY sculpt ORDER BY count DESC;`)
         // let sculptData = await conn.query(`SELECT DISTINCT(p.sculpt) as name FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.isSold = 0 ORDER BY p.sculpt DESC`)
         // let sculpts = []
         // for (sculpt of sculptData) {
@@ -503,7 +506,7 @@ module.exports = {
     },
     getTotalMakers: async () => {
         conn = await db.getConnection()
-        let makerCount = await conn.query(`SELECT DISTINCT(maker_name) as maker, COUNT(maker_name) as count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 and received = 1 GROUP BY maker_name ORDER BY count DESC; `)
+        let makerCount = await conn.query(`SELECT DISTINCT(maker_name) as maker, COUNT(maker_name) as count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 and received = 1 AND includeInCount = 1 GROUP BY maker_name ORDER BY count DESC; `)
         // let makerData = await conn.query(`SELECT DISTINCT(p.maker_name) as name FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.isSold = 0 ORDER BY p.maker_name DESC`)
         // let makers = []
         // for (maker of makerData) {
@@ -568,9 +571,20 @@ module.exports = {
         let monthlyPurch = await conn.query(`SELECT MONTH(p.purchaseDate) as month,COUNT(MONTH(p.purchaseDate)) as count FROM ${process.env.DB_SCHEMA}.purchases p GROUP BY MONTH(p.purchaseDate)`)
         if (conn) conn.release()
         return monthlyPurch
+    },
+    getWinCountByYear: async () => {
+        conn = await db.getConnection()
+        let monthCount = await conn.query(`SELECT p.maker, SUBSTRING(purchaseDate, 1, 4) as year, COUNT(SUBSTRING(purchaseDate, 1, 4)) as count FROM ${process.env.DB_SCHEMA}.purchases p GROUP BY p.maker, year`)    
+        if (conn) conn.release()
+        return monthCount
+    },
+    getWinCountByYearByMaker: async (maker_id) => {
+        conn = await db.getConnection()
+        let monthCount = await conn.query(`SELECT YEAR(p.purchaseDate) as year, COUNT(YEAR(purchaseDate)) as count FROM ${process.env.DB_SCHEMA}.purchases p WHERE p.maker = ${maker_id} GROUP BY year`)
+        if (conn) conn.release()
+        return monthCount
     }
 }
-
 // Pricing table
 // SELECT MAX(price) as max_price, MIN(price) as min_price, AVG(price) as avg_price FROM keyboard.all_purchases WHERE isSold = 0 AND price > 0;
 

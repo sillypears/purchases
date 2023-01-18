@@ -97,13 +97,19 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.js"
             integrity="sha512-VvWznBcyBJK71YKEKDMpZ0pCVxjNuKwApp4zLF3ul+CiflQi6aIJR+aZCP/qWsoFBA28avL5T5HA+RE+zrGQYg=="
             crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <% if (nav=="artisan-count" ) { %>
+
+        <% if (nav == "artisan-count" || nav == "maker") {%>
             <script src="https://code.highcharts.com/highcharts.js"></script>
             <script src="https://code.highcharts.com/modules/exporting.js"></script>
             <script src="https://code.highcharts.com/modules/export-data.js"></script>
             <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+        <% } %>
+        <% if (nav=="artisan-count" ) { %>
             <script src="/js/charts.js"></script>
-            <% } %>
+        <% } %>
+        <% if (nav=="maker" ) { %>
+            <script src="/js/maker-charts.js"></script>
+        <% } %>
             <script src="/js/index.js"></script>
                 <% if (nav=="edit-purchase" ) { %>
                     <script src="/js/edit-purchase.js"></script>

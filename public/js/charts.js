@@ -179,6 +179,26 @@ $(async function () {
             }]
         })
     }
+    //yearlyWinCountByMaker
+    {
+        const maker_id = window.location.pathname.split('/').at(-1)
+        const yearWins = await getData(`/api/graph/getYearlyWinsByMaker/${maker_id}`)
+        $('yearWinsChart').highcharts({
+            chart: {
+                type: 'bar',
+                backgroundColor: 'transparent'
+            },
+            title: {
+                text: "Yes"
+            },
+            legend: {
+                enabled: true
+            },
+            series:[{
+                data: yearWins.data
+            }]
+        })
+    }
 });
 
 async function getData(url) {

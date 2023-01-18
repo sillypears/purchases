@@ -611,7 +611,6 @@ router.post('/mass-purchase', async (ctx, next) => {
         for (i in purchases) {
             let purchase = purchases[i]
             let category = await models.getCategoryIdByDisplayName(purchase.category)
-            console.log(category)
             let detail = purchase.detail
             let entity = purchase.entity
             let maker = await models.getMakerIdByDisplayName(purchase.maker)
@@ -1139,6 +1138,35 @@ router.get('/graph/monthlyPurchases', async (ctx, next) => {
             'error': err
         }
         ctx.status = 400
+    }
+});
+
+router.get('/graph/getYearlyWinsByMaker/:maker_id', async (ctx, next) => {
+    try {
+        const montlyWins = await models.getWinCountByYearByMaker(ctx.params.maker_id)
+        const makerName = await models.getMakerById(ctx.params.maker_id)
+        let wins = []
+        montlyWins.forEach((month, index) => {
+            let temp = {}
+            temp.name = month.year
+            temp.y = month.count
+            wins.push(temp)
+        })
+        const headers = ['Year', 'Count']
+        ctx.body = {
+            'status': 'OK',
+            'data': {
+                'maker': makerName,
+                'headers': headers,
+                'yearly': wins
+            }
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
     }
 });
 

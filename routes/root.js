@@ -53,12 +53,13 @@ router.get('/makers', async (ctx, next) => {
 router.get('/maker/:type/:id', async (ctx, next) => {
     let maker = await models.getMakerTotal(ctx.params.type, ctx.params.id)
     let purchases = await models.getMakerPurchases(ctx.params.type, ctx.params.id)
-
+    let monthlyPurchases = await models.getWinCountByYearByMaker(ctx.params.id)
     return ctx.render('maker', {
         title: `Maker - ${maker.display_name} -$${maker.total}`,
         nav: "maker",
         maker: maker,
         purchases: purchases,
+        monthly: monthlyPurchases,
         totals: purchases.length
     });
 });
