@@ -50,17 +50,20 @@ $(async function () {
     {
         const totalMakerData = await getData("/api/graph/totalMakers")
         const totalSculptData = await getData("/api/graph/totalSculpts")
+        const totalArtisansIHaveCount = await getData("/api/graph/artisansIHaveCount")
         console.log(totalMakerData)
         let totalCounts = `<table class='table border hover'><thead>`
         totalCounts += `<th>Total Makers</th>`
         totalCounts += `<th>Have Sculpts</th>`
         totalCounts += `<th>Total Sculpts</th>`
+        totalCounts += `<th>Total Have</th>`
 
         totalCounts += '</thead><tbody><tr>'
 
         totalCounts += `<td>${totalMakerData.data.makers.length}</td>`
         totalCounts += `<td>${totalSculptData.data.sculptCount.length}</td>`
         totalCounts += `<td>${totalSculptData.data.sculptsNotArrived.length}</td>`
+        totalCounts += `<td>${totalArtisansIHaveCount.data.length}</td>`
 
         totalCounts += '</tr></tbody></table>'
         $('#artisan-total-counts').append(totalCounts)

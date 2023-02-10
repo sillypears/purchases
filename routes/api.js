@@ -851,6 +851,24 @@ router.get('/graph/artisansByCount', async (ctx, next) => {
         }
     }
 });
+// api/graph/artisansIHaveCount
+router.get('/graph/artisansIHaveCount', async (ctx, next) => {
+    try {
+        let artisansIHaveCount = await models.getPurchasesIStillHave()
+        headers = ['Total Artisans']
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: artisansIHaveCount,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = { 
+        status: 'Failure',
+        error: err
+        }
+    }
+});
 
 // api/graph/haveArtisansByCount
 router.get('/graph/haveArtisansByCount', async (ctx, next) => {

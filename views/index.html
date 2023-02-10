@@ -1,5 +1,5 @@
 <!-- views/index.html -->
-<div class="container my-5">
+<div class="container my-5" width="100%">
     <div class="row no-gutters">
         <div class="col-md-3">
             <h1 class="h1">
@@ -19,9 +19,9 @@
                 data-off="Missing" data-offstyle="danger">
         </div>
     </div>
-    <div id="all" class="d-flex flex-wrap ">
+    <div id="all" class="d-flex all ">
             <% purchases.forEach((purchase, index)=> { %>
-                <div class="" title="<%= purchase.purchaseDate.toDateString() %>">
+                <div class="card-box" title="<%= purchase.purchaseDate.toDateString() %>">
                     <div id="card-<%= purchase.id %>"
                         class="card text-center <% if (purchase.received) { %> arrived <% } else {%> waiting <%} %>">
                         <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"

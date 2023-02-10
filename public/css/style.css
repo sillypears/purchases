@@ -1,16 +1,22 @@
 body {
     background-color: lightgrey;
     font-family: "Rubik", sans-serif;
+    min-width: fit-content;
 }
 
 .card {
     width: 15rem;
     height: 25rem;
     margin: 0px 0px 10px 10px;
+
+}
+.all {
+    display: flex;
+    flex-wrap: wrap;
 }
 
 .card-sm {
-    width: 15rem;
+    width: 10rem;
     height: 15rem;
     margin: 0px 0px 10px 10px;
 }
@@ -74,4 +80,16 @@ body {
     color: white !important;
     background-color: #0d6efd;
     padding: 0.2rem;
+  }
+
+  @media screen and (max-width:900px) {
+    .container {
+      flex-wrap: nowrap;
+      width: 100%;
+    }
+    .card {
+        width: 8rem;
+        height: 15rem;
+        margin: 0px 0px 10px 10px;
+    }
   }
