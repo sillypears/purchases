@@ -776,6 +776,22 @@ router.post('/update/:field', async (ctx, next) => {
     }
 });
 
+router.get('/whatIHave', async (ctx, next) => {
+    let data = await models.getUniqueMakerAndSculpt()
+    let temp = {}
+    data.forEach((item) => {
+        if (temp[item['maker']]) {
+            temp[item['maker']].push(item['sculpt'])
+        }
+        else {
+            temp[item['maker']] = [item['sculpt']]
+        }
+    })
+
+    ctx.body = temp
+    ctx.status = 200
+})
+
 router.get('/spreadsheetOutput', async (ctx, next) => {
     let data = await models.getPurchases()
     let output = ""

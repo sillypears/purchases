@@ -583,6 +583,12 @@ module.exports = {
         let monthCount = await conn.query(`SELECT YEAR(p.purchaseDate) as year, COUNT(YEAR(purchaseDate)) as count FROM ${process.env.DB_SCHEMA}.purchases p WHERE p.maker = ${maker_id} GROUP BY year`)
         if (conn) conn.release()
         return monthCount
+    },
+    getUniqueMakerAndSculpt: async () => {
+        conn = await db.getConnection()
+        let stuff = await conn.query(`select distinct(p.entity) as sculpt, m.display_name as maker from ${process.env.DB_SCHEMA}.purchases p left join makers m on m.id = p.maker order by m.display_name asc`)
+        if (conn) conn.release()
+        return stuff
     }
 }
 // Pricing table
