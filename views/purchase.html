@@ -11,7 +11,7 @@
 
     <div class="row no-gutters justify-content-center align-items-center text-center">
         <div id="card-<%= purchase.id %>"
-            class="card-big border-top border-right text-center <% if (purchase.received) { %> arrived <% } else {%> waiting <%} %>">
+            class="card-big border-top border-right text-center <% if (purchase.received) { %> arrived <% } else {%> waiting <%} %>" data-status="<% if (purchase.received) {%>received<%}else { %>waiting<%}%>">            >
             <div class="card-header">
                 <div class="row">
                     <div class="col-md-4">
