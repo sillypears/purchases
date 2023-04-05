@@ -193,6 +193,7 @@ router.get('/sculpts', async (ctx, next) => {
 
 router.get('/sculpt/:sculpt', async (ctx, next) => {
     let sculpts = await models.getSculptByName(ctx.params.sculpt)
+    console.log(sculpts)
     return ctx.render('sculpt', {
         title: `All '${ctx.params.sculpt}' sculpts`,
         nav: 'sculpts',
