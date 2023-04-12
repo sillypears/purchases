@@ -41,6 +41,12 @@ module.exports = {
         if (conn) conn.release()
         return makers
     },
+    getMakersThatIHave: async () => {
+        conn = await db.getConnection();
+        let makers = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases p WHERE p.received = 1 AND p.isSold = 0 ORDER BY p.maker_name ASC;`)
+        if (conn) conn.release()
+        return makers
+    },
     getMaker: async () => {
         conn = await db.getConnection();
         let maker = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.makers ORDER BY id DESC LIMIT 1;`)

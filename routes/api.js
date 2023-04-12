@@ -40,6 +40,25 @@ router.get('/makers', async (ctx, next) => {
 });
 
 // api/makers
+router.get('/makers/have', async (ctx, next) => {
+    // #swagger.tags = ["Makers"]
+    // #swagger.description = "Maker endpoints"
+
+    try {
+        let makers = await models.getMakersThatIHave();
+        let haveMakers = []
+        makers.forEach((e) => {
+            haveMakers.indexOf(e.maker_name) === -1 ? haveMakers.push(e.maker_name) : ""
+        })
+        ctx.body = haveMakers
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = { 'status': 'Failure', 'error': err }
+        ctx.status = 500
+    }
+});
+
+// api/makersprice
 router.get('/makersprice', async (ctx, next) => {
     // #swagger.tags = ["Makers"]
     // #swagger.description = "Maker endpoints"
@@ -85,7 +104,32 @@ router.get('/maker/id/:id', async (ctx, next) => {
     try {
         let maker = await models.getMakerById(ctx.params.id);
         if (maker) {
-            ctx.body = maker[0]
+            ctx.body = maker
+            ctx.status = 200
+        } else {
+            throw err;
+        }
+    } catch (err) {
+        ctx.body = { 'status': 'Failure', 'error': err }
+        ctx.status = 422
+    }
+
+});
+
+// api/purchases/:id
+router.get('/maker/purchases/:id/:source?', async (ctx, next) => {
+    // #swagger.tags = ["Makers"]
+    // #swagger.description = "Maker endpoints"
+    // #swagger.parameters['id'] = { description: 'Maker\'s ID' }
+    /* #swagger.responses[200] = { 
+        schema: { $ref: "#/definitions/Maker" },
+        description: 'A Maker!' 
+    } */
+    let source = ctx.params.source ? ctx.params.source : 'id'
+    try {
+        let maker = await models.getMakerPurchases(source, ctx.params.id);
+        if (maker) {
+            ctx.body = maker
             ctx.status = 200
         } else {
             throw err;
