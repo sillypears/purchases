@@ -168,6 +168,31 @@ router.get('/maker/name/:name', async (ctx, next) => {
 
 });
 
+// api/maker/sculpt/count/:id
+router.get('/maker/sculpt/count/:id', async (ctx, next) => {
+    // #swagger.tags = ["Makers"]
+    // #swagger.description = "Maker endpoints"
+    // #swagger.parameters['name'] = { description: 'Maker\'s short-name' }
+    /* #swagger.responses[200] = { 
+        schema: { $ref: "#/definitions/Maker" },
+        description: 'A Maker!' 
+    } */
+    try {
+        let sculptCount = await models.getSculptCountByMaker(ctx.params.id);
+        if (sculptCount) {
+            ctx.body = sculptCount
+            ctx.status = 200
+        } else {
+            throw err;
+        }
+    } catch (err) {
+        ctx.body = { 'status': 'Failure', 'error': err }
+        ctx.status = 422
+    } finally {
+        if (conn) return conn.release();
+    }
+});
+
 // api/pricebyname/:name
 router.get('/maker/name-money/:name', async (ctx, next) => {
     // #swagger.tags = ["Makers"]

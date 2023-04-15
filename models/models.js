@@ -83,6 +83,12 @@ module.exports = {
         if (conn) conn.release()
         return makers[0].id
     },
+    getSculptCountByMaker: async(id) => {
+        conn = await db.getConnection();
+        let sculpt_counts = await conn.query(`SELECT sculpt as sculpt,count(sculpt) as count from ${process.env.DB_SCHEMA}.all_purchases WHERE maker_id = ${id} AND received = 1 AND isSold = 0 GROUP BY sculpt ORDER BY count(sculpt) desc`)
+        if (conn) conn.release()
+        return sculpt_counts
+    },
     getCategories: async () => {
         conn = await db.getConnection();
         let categories = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.categories ORDER BY display_name ASC;`)

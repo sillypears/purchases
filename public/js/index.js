@@ -189,12 +189,17 @@ function swap() {
 function flip() {
     const trans = 500
     const allMissing = $('div.card.waiting')
+    const allReceived = $('div.card.arrived')
     const toggleState = $('#toggle-box')
-    $('div#all').html('')
     if (!$('#toggle-box').is(':checked')) {
-        for (i = 0; i < allMissing.length; i++) {
-            $('div#all').html($('div#all').html() + allMissing[i].outerHTML)
-        }
+        allReceived.each(function(e) {
+            allReceived[e].style.display = 'none'
+            
+        })
+    } else {
+        allReceived.each(function(e){
+            allReceived[e].style.display = 'block'
+        })
     }
 }
 function picRefresh() {
