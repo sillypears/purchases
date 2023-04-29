@@ -40,7 +40,44 @@ $(async function () {
             }]
         })
     }
+    {
+        const maker_id = window.location.pathname.split('/').at(-1)
+        const monthlyPurch = await getData(`/api/graph/monthlyPurchases/${maker_id}`)
+        let data = monthlyPurch.data
+        let seriesData = []
+        data.purchases.forEach(function(s) {
+            seriesData.push({ data: [s.y], name: s.name})    
+        })
+        Highcharts.chart('monthlyPurch', {
+            chart: {
+                type: 'column'
+            },
+            title: {
+                text: 'Purchases By Month'
+            },
 
+            xAxis: {
+                categories: data.headers,
+                crosshair: false
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '# of Purchases'
+                }
+            },
+            tooltip: {
+                headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f} mm</b></td></tr>',
+                footerFormat: '</table>',
+                shared: false,
+                useHTML: true
+            },
+  
+            series: seriesData
+        })
+    }
     //yearlyWinCountByMaker
     {
         const maker_id = window.location.pathname.split('/').at(-1)
@@ -49,7 +86,6 @@ $(async function () {
         sculptCounts.forEach(function(s) {
             data.push({ value: s.count, name: s.sculpt})    
         })
-        console.log(data)
         $('#sculptBubble').highcharts({
             chart: {
                 type: 'packedbubble',

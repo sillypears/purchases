@@ -45,24 +45,11 @@ $(function () {
             }
         });
     })
-    $.ajax({
-        'url': '/api/picRefreshStatus',
-        'type': 'GET',
-        'success': function (result) {
-            console.log(result.message)
-            if (result.message) {
-                $('#picRefresh').addClass('disabled');
-            } else {
-                $('#picRefresh').removeClass('disabled');
-            }
-        }
-    })
     setInterval(function () {
         $.ajax({
             'url': '/api/picRefreshStatus',
             'type': 'GET',
             'success': function (result) {
-                console.log(result.message)
                 if (result.message) {
                     $('#picRefresh').addClass('disabled');
                 } else {

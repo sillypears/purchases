@@ -55,6 +55,9 @@
             <input type="number" id="adjustments" name="adjustments" step="0.01" placeholder="Adjustments $" />
         </div>
         <div>
+            <input type="number" id="retailPrice" name="retailPrice" placeholder="Retail Price" onfocus="this.value=document.getElementById('price').value"/><br />
+        </div>
+        <div>
             <select class="select" id="saletype" name="saletype">
                 <option id="option-default" name="default" value="-1">Select Sale Type</option>
                 <% for ( let saleType of saleTypes) { %>

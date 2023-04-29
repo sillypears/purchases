@@ -63,6 +63,10 @@
                 value="<%= purchase.adjustments %>" />
         </div>
         <div>
+            <input type="number" id="retailPrice" name="retailPrice" size=40 step="0.01" placeholder="Retail Price $"
+                value="<%= purchase.retail_price %>" />
+        </div>
+        <div>
             <select class="select" id="saletype" name="saletype">
                 <option id="option-default" name="default" value="-1">Select Sale Type</option>
                 <% for ( let saleType of saleTypes) { %>

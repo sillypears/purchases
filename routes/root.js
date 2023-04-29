@@ -114,7 +114,6 @@ router.get('/add-purchase', async (ctx, next) => {
     let c = await models.getCategories();
     let s = await models.getSaleTypes();
     let maxSet = await models.getLatestSet();
-    console.log(maxSet)
     return ctx.render('add-purchase', {
         title: "Add Purchase",
         nav: "add-purchase",
@@ -345,7 +344,7 @@ router.post('/add-purchase', async (ctx, next) => {
     if (a.adjustments < 0) {
         a.adjustments = 0
     }
-    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags, a.ig_post, a.mainColors);
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags, a.ig_post, a.mainColors, a.retailPrice);
     let meta = { 'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name }
     let m = await models.getMakers();
     let v = await models.getVendors();

@@ -62,10 +62,8 @@ router.get('/makers/have', async (ctx, next) => {
 router.get('/makersprice', async (ctx, next) => {
     // #swagger.tags = ["Makers"]
     // #swagger.description = "Maker endpoints"
-
     try {
         let makers = await models.getMakerTotals(makers);
-        console.log(makers)
         ctx.body = makers
         ctx.status = 200
     } catch (err) {
@@ -1219,6 +1217,35 @@ router.get('/graph/monthlyPurchases', async (ctx, next) => {
 
     try {
         const purches = await models.getMonthlyPurchaseData()
+        let purchases = []
+        purches.forEach((purch,index)=>{
+            let temp = {}
+            temp.name = toMonthName(purches[index].month)
+            temp.y = purches[index].count
+            purchases.push(temp)
+        })
+        headers = ['Month', 'Count']
+        ctx.body = {
+            status: "ok",
+            data: {
+                headers: headers,
+                purchases: purchases
+            }
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+        ctx.status = 400
+    }
+});
+
+router.get('/graph/monthlyPurchases/:id', async (ctx, next) => {
+
+    try {
+        const purches = await models.getMonthlyPurchaseDataByMaker(ctx.params.id)
         let purchases = []
         purches.forEach((purch,index)=>{
             let temp = {}

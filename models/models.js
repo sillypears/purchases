@@ -173,11 +173,11 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
-    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, ig_post, mainColors) => {
+    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, ig_post, mainColors, retail) => {
         let newTags = tags.split(',')
         let newColors = mainColors.split(',')
         conn = await db.getConnection();
-        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)});`)
+        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail});`)
         console.log(purchaseId)
         newTags.forEach(tag => {
             let tagId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES ('${tag}', ${purchaseId.insertId})`)
@@ -324,6 +324,7 @@ module.exports = {
         if (purch.image != data.image) { update = true; sql+=`image='${data.image}',\n` }
         if (purch.notes != data.notes) { update = true; sql+=`notes=${conn.escape(data.notes)},\n` }
         if (purch.ig_post != data.ig_post) { update = true; sql+=`ig_post='${data.ig_post}'\n` }
+        if (purch.retail_price != data.retailPrice) { update = true; sql+=`retail_price='${data.retailPrice}'\n` }
         const test = sql.charAt(sql.length - 2)
         if (test == ",") { 
             sql = sql.slice(0,-2)
@@ -581,6 +582,15 @@ module.exports = {
     getMonthlyPurchaseData: async () => {
         conn = await db.getConnection()
         let monthlyPurch = await conn.query(`SELECT MONTH(p.purchaseDate) as month,COUNT(MONTH(p.purchaseDate)) as count FROM ${process.env.DB_SCHEMA}.purchases p GROUP BY MONTH(p.purchaseDate)`)
+        console.log(monthlyPurch)
+        if (conn) conn.release()    
+        return monthlyPurch
+    },
+    getMonthlyPurchaseDataByMaker: async (id) => {
+        conn = await db.getConnection()
+        console.log(id)
+        let monthlyPurch = await conn.query(`SELECT MONTH(p.purchaseDate) as month,COUNT(MONTH(p.purchaseDate)) as count FROM ${process.env.DB_SCHEMA}.purchases p WHERE p.maker = ${id} GROUP BY MONTH(p.purchaseDate)`)
+        console.log(monthlyPurch)
         if (conn) conn.release()
         return monthlyPurch
     },
