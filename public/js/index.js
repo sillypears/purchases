@@ -125,7 +125,7 @@ $(function () {
         // swap()
         flip()
     })
-
+    $('[data-toggle="tooltip"]').tooltip()
     $('input.tags')
         .on('change', function (event) {
             var $element = $(event.target);

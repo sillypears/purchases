@@ -11,7 +11,7 @@
 
     <div class="row no-gutters justify-content-center align-items-center text-center">
         <div id="card-<%= purchase.id %>"
-            class="card-big border-top border-right text-center <% if (purchase.received) { %> arrived <% } else {%> waiting <%} %>" data-status="<% if (purchase.received) {%>received<%}else { %>waiting<%}%>">            >
+            class="card-big border-top border-right text-center <% if (purchase.received) { %> arrived <% } else {%> waiting <%} %>" data-status="<% if (purchase.received) {%>received<%}else { %>waiting<%}%>">           
             <div class="card-header">
                 <div class="row">
                     <div class="col-md-4">
@@ -149,17 +149,17 @@
 
         <div class="row no-gutters justify-content-center align-items-center text-center">
             <div class="col-md-2">
+                <% if (next) { %>
+                    <span class="font-weight-bold "><a class="" href="/purchase/<%= next.id %>">NEXT</a></span>
+                    <% } %>
+            </div>
+            <div class="col-md-8">&nbsp;</div>
+            <div class="col-md-2">
                 <% if (prev) { %>
                     <div class="font-weight-bold">
                         <a class="align-bottom" href="/purchase/<%= prev.id %>">PREV
                         </a>
                     </div>
-                    <% } %>
-            </div>
-            <div class="col-md-8">&nbsp;</div>
-            <div class="col-md-2">
-                <% if (next) { %>
-                    <span class="font-weight-bold "><a class="" href="/purchase/<%= next.id %>">NEXT</a></span>
                     <% } %>
             </div>
         </div>

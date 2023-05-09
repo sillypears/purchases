@@ -54,13 +54,16 @@ router.get('/maker/:type/:id', async (ctx, next) => {
     let maker = await models.getMakerTotal(ctx.params.type, ctx.params.id)
     let purchases = await models.getMakerPurchases(ctx.params.type, ctx.params.id)
     let monthlyPurchases = await models.getWinCountByYearByMaker(ctx.params.id)
+    let avgPriceByMaker = await models.getAvgPriceByMaker(ctx.params.id)
+    console.log(avgPriceByMaker[0])
     return ctx.render('maker', {
         title: `Maker - ${maker.display_name} -$${maker.total}`,
         nav: "maker",
         maker: maker,
         purchases: purchases,
         monthly: monthlyPurchases,
-        totals: purchases.length
+        totals: purchases.length,
+        avg: avgPriceByMaker
     });
 });
 
@@ -129,7 +132,6 @@ router.get('/add-purchase', async (ctx, next) => {
 
 router.get('/add-purchase-bulk', async (ctx, next) => {
     let maxSet = await models.getLatestSet();
-    console.log(maxSet)
     return ctx.render('add-purchase-bulk', {
         title: "Bulk Add Purchase",
         nav: "add-purchase-bulk",
@@ -192,7 +194,6 @@ router.get('/sculpts', async (ctx, next) => {
 
 router.get('/sculpt/:sculpt', async (ctx, next) => {
     let sculpts = await models.getSculptByName(ctx.params.sculpt)
-    console.log(sculpts)
     return ctx.render('sculpt', {
         title: `All '${ctx.params.sculpt}' sculpts`,
         nav: 'sculpts',
@@ -495,7 +496,6 @@ async function parseBulk(data) {
         temp['receivedDate'] = new Date(new Date(Date.parse(item[10])).setDate(new Date(Date.parse(item[10])).getDate() + 7)) //+7
         temp['orderSet'] = item[12]
         parsed.push(temp)
-        console.log(parsed)
     })
     console.log('b', parsed)
     return parsed

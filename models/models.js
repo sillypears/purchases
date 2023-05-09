@@ -266,6 +266,13 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
+    getAvgPriceByMaker: async(maker_id) => {
+        let sql = `SELECT round(AVG(price),2) as avg_price ,count(price) as purchases FROM all_purchases WHERE sale_type not in ("Trade", "Charity", "Auction", "Giveaway", "Free/Give") AND maker_id=${maker_id}`
+        conn = await db.getConnection()
+        let data = await conn.query(sql)
+        if (conn) conn.release()
+        return data
+    },
     getVendorPurchases: async (source, id) => {
         let sql = ``
 
@@ -323,8 +330,8 @@ module.exports = {
         if (purch.orderSet !== parseInt(data.orderSet)) { update = true; sql+=`orderSet=${data.orderSet},\n` }
         if (purch.image != data.image) { update = true; sql+=`image='${data.image}',\n` }
         if (purch.notes != data.notes) { update = true; sql+=`notes=${conn.escape(data.notes)},\n` }
-        if (purch.ig_post != data.ig_post) { update = true; sql+=`ig_post='${data.ig_post}'\n` }
-        if (purch.retail_price != data.retailPrice) { update = true; sql+=`retail_price='${data.retailPrice}'\n` }
+        if (purch.ig_post != data.ig_post) { update = true; sql+=`ig_post='${data.ig_post}',\n` }
+        if (purch.retail_price != data.retailPrice) { update = true; sql+=`retail_price='${data.retailPrice}',\n` }
         const test = sql.charAt(sql.length - 2)
         if (test == ",") { 
             sql = sql.slice(0,-2)

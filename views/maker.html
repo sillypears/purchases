@@ -1,15 +1,18 @@
 <!-- views/index.html -->
 <div class="container my-5">
     <div class="row">
-        <div class="col-md-11">
+        <div class="col-10">
             <h1 class="h1">
                 <%= title %> <a href="https://instagram.com/<%= maker.instagram %>" target="_blank"><img class="ig-link" src="/img/ig.png"></a>
                 <span class="small">
                         <% if (totals> 0) { %> (<%= totals %>) <% } %>
                     </span>
             </h1>
+        </div >
+        <div class="col-1">
+            Avg Price: $<span id="avgPrice"><%= avg[0].avg_price %></span> (<span id="avgPricePurchaseCount"><%= avg[0].purchases %></span>)
         </div>
-        <div class="col-md-1">
+        <div class="col-1">
             <a href="/maker/id/<%= maker.id %>/edit" class="btn btn-primary">Edit Maker</a>
         </div>
     </div>

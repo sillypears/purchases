@@ -1072,6 +1072,29 @@ router.get('/graph/makerByPrice', async (ctx, next) => {
         }
     }
 });
+// api/graph/avgPriceByMaker/:id
+router.get('/graph/avgPriceByMaker/:id', async (ctx, next) => {
+    try {
+        let avgPriceByMaker = await models.getAvgPriceByMaker(id)
+        headers = ['Price', 'Count']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: avgPriceByMaker,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
 
 // api/graph/getPricingTable
 router.get('/graph/getPricingTable', async (ctx, next) => {
