@@ -95,6 +95,15 @@
             <input type="number" id="orderSet" name="orderSet" size=40 placeholder="Set Number"
                 value="<%= purchase.orderSet %>" />
         </div>
+        <div>
+            <select id="stemType" name="stemType" size=1>
+                <option disabled value="none">Stem</option>
+                <option value="mx" <% if (purchase.stem == "mx") { %> selected <% } %> >MX</option>
+                <option value="topre" <% if (purchase.stem == "topre") { %> selected <% } %> >Topre</option>
+                <option value="bs" <% if (purchase.stem == "bs") { %> selected <% } %> >BS</option>
+                <option value="alps" <% if (purchase.stem == "alps") { %> selected <% } %> >Alps</option>
+            </select>
+        </div>
         <div id="img-container">
             <input type="text" id="image" name="image" size=80 placeholder="Link to image" value="<%= purchase.image %>" />
             <%if (purchase.image) { %>

@@ -331,6 +331,7 @@ module.exports = {
         if (purch.image != data.image) { update = true; sql+=`image='${data.image}',\n` }
         if (purch.notes != data.notes) { update = true; sql+=`notes=${conn.escape(data.notes)},\n` }
         if (purch.ig_post != data.ig_post) { update = true; sql+=`ig_post='${data.ig_post}',\n` }
+        if (purch.stem != data.stemType) { update = true; sql+=`stem='${data.stemType}',\n` }
         if (purch.retail_price != data.retailPrice) { update = true; sql+=`retail_price='${data.retailPrice}',\n` }
         const test = sql.charAt(sql.length - 2)
         if (test == ",") { 
