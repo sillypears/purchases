@@ -16,7 +16,7 @@
                 <div class="row">
                     <div class="col-md-4">
                         Maker: <a class="link-primary" href="/maker/id/<%= purchase.maker_id %>">
-                            <%= purchase.maker_name %>
+                            <%= purchase.maker_name %> <% if (purchase.maker_country) { %> <img title="<%= purchase.maker_country.toString().toUpperCase() %>" src="https://flagsapi.com/<%= purchase.maker_country.toString().toUpperCase() %>/shiny/16.png"> <% } %>
                         </a>
                     </div>
                     <div class="col-md-4">

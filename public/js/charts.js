@@ -159,7 +159,7 @@ $(async function () {
     //purchasesByMonthCount
     {
         const monthPurch = await getData("/api/graph/monthlyPurchases")
-        
+
         $('#monthy-purchase-chart').highcharts({
             chart: {
                 type: 'pie',
@@ -197,10 +197,35 @@ $(async function () {
             legend: {
                 enabled: true
             },
-            series:[{
+            series: [{
                 data: yearWins.data
             }]
         })
+    }
+    {
+        const countries = await getData(`/api/graph/getAllMakerCountries`)
+        $('#maker-countries').highcharts({
+            chart: {
+                type: 'pie',
+                backgroundColor: 'transparent'
+            },
+            title: {
+                text: "Count of Maker's Country"
+            },
+
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            legend: {
+                enabled: true
+            },
+            series: [{
+                name: "Maker Country",
+                colorByPoint: true,
+                data: countries.data2
+            }]
+        })
+
     }
 });
 

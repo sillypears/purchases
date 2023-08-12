@@ -195,7 +195,7 @@ module.exports = {
         if (conn) conn.release();
         return purchaseId
     },
-    insertMaker: async (name, display_name, ka_name, ka_id, ig) => {
+    insertMaker: async (name, display_name, ka_name, ka_id, city, state, country, ig) => {
         conn = await db.getConnection();
         let makerId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.makers (name, display_name, instagram, archivist_name, archivist_id) VALUES ('${name}', ${conn.escape(display_name)}, '${ig}', '${ka_name}', '${ka_id}');`)
         if (conn) conn.release()
@@ -388,8 +388,12 @@ module.exports = {
         if (maker.instagram !== data.instagram) { update = true }
         if (maker.archivist_name !== data.ka_name) { update = true }
         if (maker.archivist_id !== data.ka_id) { update = true }
+        if (maker.shipping_city !== data.city) { update = true }
+        if (maker.shipping_state !== data.state) { update = true }
+        if (maker.shipping_country !== data.country) { update = true }
+
         if (update) {
-            updateId = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.makers SET name='${data.name}', display_name='${data.displayName}', archivist_name='${data.ka_name}', archivist_id='${data.ka_id}', instagram='${data.instagram}' WHERE id=${id}`)
+            updateId = await conn.query(`UPDATE ${process.env.DB_SCHEMA}.makers SET name='${data.name}', display_name='${data.displayName}', archivist_name='${data.ka_name}', archivist_id='${data.ka_id}', instagram='${data.instagram}', shipping_city='${data.city}', shipping_state='${data.state}', shipping_country='${data.country}' WHERE id=${id}`)
         }
         if (conn) conn.release()
         return updateId
@@ -619,6 +623,12 @@ module.exports = {
         let stuff = await conn.query(`select distinct(p.entity) as sculpt, m.display_name as maker from ${process.env.DB_SCHEMA}.purchases p left join makers m on m.id = p.maker order by m.display_name asc`)
         if (conn) conn.release()
         return stuff
+    },
+    getAllMakerCountries: async () => {
+        conn = await db.getConnection()
+        let countries = await conn.query(`select count(m.shipping_country) as count, m.shipping_country as country from makers m WHERE m.shipping_country is not null group by m.shipping_country order by count(m.shipping_country) desc`)
+        if (conn) conn.release()
+        return countries
     }
 }
 // Pricing table

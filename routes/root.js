@@ -386,7 +386,7 @@ router.post('/add-purchase-bulk', async (ctx, next) => {
 
 router.post('/add-maker', async (ctx, next) => {
     let ticker;
-    let makerId = await models.insertMaker(ctx.request.body.name, ctx.request.body.displayName, ctx.request.body.ka_name, ctx.request.body.ka_id, ctx.request.body.instagram)
+    let makerId = await models.insertMaker(ctx.request.body.name, ctx.request.body.displayName, ctx.request.body.ka_name, ctx.request.body.ka_id, ctx.request.body.city, ctx.request.body.state, ctx.request.body.country, ctx.request.body.instagram)
     if (makerId.insertId > 0) {
         ticker = { makerId: makerId.insertId }
     } else {

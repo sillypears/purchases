@@ -11,23 +11,232 @@ const myEmitter = new events.EventEmitter();
 
 const db = require('../db');
 const models = require('../models/models');
+const { version } = require('os');
 
 var router = new Router({
     prefix: '/api'
 });
 
+/**
+* @openapi
+* components:
+*   schemas:
+*     ErrorMsg:
+*       type: object
+*       properties:
+*         status:
+*           type: string
+*         error:
+*           type: object
+*     Maker:
+*       type: object
+*       properties:
+*         id:
+*           type: integer
+*         name:
+*           type: string
+*         display_name:
+*           type: string
+*         instagram:
+*           type: string
+*         archivist_name:
+*           type: string
+*         archivist_id:
+*           type: string
+*         shipping_city:
+*           type: string
+*         shipping_state:
+*           type: string
+*         shipping_country:
+*           type: string
+*     MakerMap:
+*       type: array
+*       items:
+*         $ref: "#/components/schemas/Maker"
+*     Vendor:
+*       type: object
+*       properties:
+*         id:
+*           type: integer
+*         name:
+*           type: string
+*         display_name:
+*           type: string
+*         link:
+*           type: string
+*     VendorMap:
+*       type: array
+*       items:
+*         $ref: "#/components/schemas/Vendor"
+*     Purchase:
+*       type: object
+*       properties:
+*         id:
+*           type: integer
+*         category_id:
+*           type: integer
+*         category_name:
+*           type: string
+*         detail:
+*           type: string
+*         entity:
+*           type: string
+*         sculpt:
+*           type: string
+*         sculpt_id:
+*           type: integer
+*         sculpt_style:
+*           type: integer
+*         ka_id:
+*           type: string
+*         maker_name:
+*           type: string
+*         maker_id:
+*           type: integer
+*         instagram:
+*           type: string
+*         archivist:
+*           type: string
+*         vendor_name:
+*           type: string
+*         vendor_id:
+*           type: integer
+*         link:
+*           type: string
+*         price:
+*           type: integer
+*         adjustments:
+*           type: integer
+*         total:
+*           type: integer
+*         series_num:
+*           type: integer
+*         series_total:
+*           type: integer
+*         sale_id:
+*           type: integer
+*         sale_type:
+*           type: string
+*         soldDate:
+*           type: string
+*         salePrice:
+*           type: integer
+*         isSold:
+*           type: integer
+*         willSell:
+*           type: integer
+*         received:
+*           type: integer
+*         purchaseDate:
+*           type: string
+*         receivedDate:
+*           type: string
+*         orderSet:
+*           type: integer
+*         notes:
+*           type: string
+*         image:
+*           type: string
+*         ig_post:
+*           type: integer
+*         retail_price:
+*           type: integer
+*         includeInCount:
+*           type: boolean
+*         mainColors:
+*           type: string
+*         tags:
+*           type: string
+*         stem:
+*           type: string
+*         keycap_size:
+*           type: integer
+*         maker_city:
+*           type: string
+*         maker_state:
+*           type: string
+*         maker_country:
+*           type: string
+*     PurchaseMap:
+*       type: array
+*       items:
+*         $ref: "#/components/schemas/Purchase"
+*/
+
+/**
+   * @openapi
+   * tags:
+   *   name: Base
+   *   description: All base API related things
+ */
+
+/**
+   * @openapi
+   * tags:
+   *   name: Maker
+   *   description: All maker related things
+ */
+/**
+   * @openapi
+   * tags:
+   *   name: Purchase
+   *   description: All purchase related things
+ */
+/**
+   * @openapi
+   * tags:
+   *   name: Vendor
+   *   description: All vendors related things
+ */
+
 // api
+/** 
+ * @openapi
+ * /:
+ *   get:
+ *     description: Get API version
+ *     operationId: getBaseApi
+ *     tags: [Base]
+ *     responses:
+ *       200:
+ *         description: Returns the current API version
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+*/
 router.get('/', async (ctx, next) => {
-    // #swagger.ignore = true
     ctx.body = {
         'version': process.env.VERSION
     }
 });
 
 // api/makers
+/**
+ * @openapi
+ * /makers:
+ *   get:
+ *     description: Get API version
+ *     operationId: getAllMakers
+ *     tags: [Maker]
+ *     responses:
+ *       200:
+ *         description: Returns Maker objects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MakerMap'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *
+*/
 router.get('/makers', async (ctx, next) => {
-    // #swagger.tags = ["Makers"]
-    // #swagger.description = "Maker endpoints"
 
     try {
         let makers = await models.getMakers();
@@ -73,13 +282,29 @@ router.get('/makersprice', async (ctx, next) => {
 });
 
 // api/maker
+/**
+ * @openapi
+ * /maker:
+ *   get:
+ *     description: Get the latest Maker 
+ *     operationId: getLatestMaker
+ *     tags: [Maker]
+ *     responses:
+ *       200:
+ *         description: Returns Maker object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Maker'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *
+*/
 router.get('/maker', async (ctx, next) => {
-    // #swagger.tags = ["Makers"]
-    // #swagger.description = "Maker endpoints"
-    /* #swagger.responses[200] = { 
-        schema: { $ref: "#/definitions/Maker" },
-        description: 'A Maker!' 
-    } */
     try {
         let maker = await models.getMaker()
         ctx.body = maker[0]
@@ -90,15 +315,38 @@ router.get('/maker', async (ctx, next) => {
     }
 });
 
-// api/id/:id
+// api/maker/id/:id
+/**
+ * @openapi
+ * /maker/id/{id}:
+ *   get:
+ *     description: Get Maker object by ID
+ *     operationId: getMakerById
+ *     tags: [Maker]
+ *     responses:
+ *       200:
+ *         description: Returns Maker object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Maker'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *   parameters:
+ *     - name: id
+ *       in: path
+ *       example: 1
+ *       description: ID of maker to get
+ *       required: true
+ *       schema:
+ *         type: integer
+ *
+*/
 router.get('/maker/id/:id', async (ctx, next) => {
-    // #swagger.tags = ["Makers"]
-    // #swagger.description = "Maker endpoints"
-    // #swagger.parameters['id'] = { description: 'Maker\'s ID' }
-    /* #swagger.responses[200] = { 
-        schema: { $ref: "#/definitions/Maker" },
-        description: 'A Maker!' 
-    } */
     try {
         let maker = await models.getMakerById(ctx.params.id);
         if (maker) {
@@ -114,40 +362,10 @@ router.get('/maker/id/:id', async (ctx, next) => {
 
 });
 
-// api/purchases/:id
-router.get('/maker/purchases/:id/:source?', async (ctx, next) => {
-    // #swagger.tags = ["Makers"]
-    // #swagger.description = "Maker endpoints"
-    // #swagger.parameters['id'] = { description: 'Maker\'s ID' }
-    /* #swagger.responses[200] = { 
-        schema: { $ref: "#/definitions/Maker" },
-        description: 'A Maker!' 
-    } */
-    let source = ctx.params.source ? ctx.params.source : 'id'
-    try {
-        let maker = await models.getMakerPurchases(source, ctx.params.id);
-        if (maker) {
-            ctx.body = maker
-            ctx.status = 200
-        } else {
-            throw err;
-        }
-    } catch (err) {
-        ctx.body = { 'status': 'Failure', 'error': err }
-        ctx.status = 422
-    }
 
-});
-
-// api/name/:name
+// api/maker/name/:name
 router.get('/maker/name/:name', async (ctx, next) => {
-    // #swagger.tags = ["Makers"]
-    // #swagger.description = "Maker endpoints"
-    // #swagger.parameters['name'] = { description: 'Maker\'s short-name' }
-    /* #swagger.responses[200] = { 
-        schema: { $ref: "#/definitions/Maker" },
-        description: 'A Maker!' 
-    } */
+
     try {
 
         let maker = await models.getMakerSculptsByName(ctx.params.name);
@@ -168,13 +386,7 @@ router.get('/maker/name/:name', async (ctx, next) => {
 
 // api/maker/sculpt/count/:id
 router.get('/maker/sculpt/count/:id', async (ctx, next) => {
-    // #swagger.tags = ["Makers"]
-    // #swagger.description = "Maker endpoints"
-    // #swagger.parameters['name'] = { description: 'Maker\'s short-name' }
-    /* #swagger.responses[200] = { 
-        schema: { $ref: "#/definitions/Maker" },
-        description: 'A Maker!' 
-    } */
+
     try {
         let sculptCount = await models.getSculptCountByMaker(ctx.params.id);
         if (sculptCount) {
@@ -193,13 +405,7 @@ router.get('/maker/sculpt/count/:id', async (ctx, next) => {
 
 // api/pricebyname/:name
 router.get('/maker/name-money/:name', async (ctx, next) => {
-    // #swagger.tags = ["Makers"]
-    // #swagger.description = "Maker endpoints"
-    // #swagger.parameters['name'] = { description: 'Maker\'s short-name' }
-    /* #swagger.responses[200] = { 
-        schema: { $ref: "#/definitions/Maker" },
-        description: 'A Maker!' 
-    } */
+
     try {
 
         let maker = await models.getMakerMoneyByName(ctx.params.name);
@@ -221,12 +427,6 @@ router.get('/maker/name-money/:name', async (ctx, next) => {
 
 // api/maker
 router.post('/maker', async (ctx, next) => {
-    // #swagger.tags = ["Makers"]
-    // #swagger.description = "Maker endpoints"
-    /* #swagger.responses[201] = { 
-        schema: { $ref: "#/definitions/MakerAdd" },
-        description: 'A Maker!' 
-    } */
     try {
         let name = ctx.request.body.name;
         let displayName = ctx.request.body.displayName;
@@ -267,6 +467,24 @@ router.post('/maker', async (ctx, next) => {
 });
 
 // api/vendors
+/**
+ * @openapi
+ * /vendors:
+ *   get:
+ *     description: Get all vendors
+ *     operationId: getAllVendors
+ *     tags: [Vendor]
+ *     responses:
+ *       200:
+ *         description: Returns Vendor objects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/VendorMap'
+ *       500:
+ *         description: Returns error
+ *
+*/
 router.get('/vendors', async (ctx, next) => {
     // #swagger.tags = ["Vendors"]
     // #swagger.description = "Vendor endpoints"
@@ -281,7 +499,7 @@ router.get('/vendors', async (ctx, next) => {
     }
 });
 
-// api/makers
+// api/vednorsprice
 router.get('/vendorsprice', async (ctx, next) => {
     // #swagger.tags = ["Vendors"]
     // #swagger.description = "Vendor endpoints"
@@ -295,6 +513,24 @@ router.get('/vendorsprice', async (ctx, next) => {
     }
 });
 // api/vendor
+/**
+* @openapi
+* /vendor:
+*   get:
+*     description: Get latest vendor
+*     operationId: getLatestVendor
+*     tags: [Vendor]
+*     responses:
+*       200:
+*         description: Returns Vendor object
+*         content:
+*           application/json:
+*             schema:
+*               $ref: '#/components/schemas/Vendor'
+*       500:
+*         description: Returns error
+*
+*/
 router.get('/vendor', async (ctx, next) => {
     // #swagger.tags = ["Vendors"]
     // #swagger.description = "Vendor endpoints"
@@ -414,6 +650,28 @@ router.get('/saletypes', async (ctx, next) => {
 });
 
 // api/purchases
+/**
+ * @openapi
+ * /purchases:
+ *   get:
+ *     description: Get all Purchases
+ *     operationId: getAllPurchases
+ *     tags: [Purchase]
+ *     responses:
+ *       200:
+ *         description: Returns Purchase objects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PurchaseMap'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *
+*/
 router.get('/purchases', async (ctx, next) => {
     // #swagger.tags = ["Purchases"]
     // #swagger.description = "Purchase endpoints"
@@ -433,9 +691,30 @@ router.get('/purchases', async (ctx, next) => {
 });
 
 // api/purchase
+/**
+ * @openapi
+ * /purchase:
+ *   get:
+ *     description: Get latest Purchases
+ *     operationId: getLatestPurchases
+ *     tags: [Purchase]
+ *     responses:
+ *       200:
+ *         description: Returns Purchase object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Purchase'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *
+*/
 router.get('/purchase', async (ctx, next) => {
-    // #swagger.tags = ["Purchases"]
-    // #swagger.description = "Purchase endpoints"
+
     try {
         let maxId = await models.getLatestId()
         let purchase = await models.getPurchase(maxId)
@@ -452,12 +731,38 @@ router.get('/purchase', async (ctx, next) => {
     }
 
 });
-
 // api/purchase/:id
+/**
+ * @openapi
+ * /purchase/{id}:
+ *   get:
+ *     description: Get Purchase object by ID
+ *     operationId: getPurchaseById
+ *     tags: [Purchase]
+ *     responses:
+ *       200:
+ *         description: Returns Purchase object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Purchase'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *   parameters:
+ *     - name: id
+ *       in: path
+ *       example: 74
+ *       description: ID of purchase to get
+ *       required: true
+ *       schema:
+ *         type: integer
+ *
+*/
 router.get('/purchase/:id', async (ctx, next) => {
-    // #swagger.tags = ["Purchases"]
-    // #swagger.description = "Purchase endpoints"
-    // #swagger.parameters['id'] = { description: 'Purchase ID' }
 
     try {
         let purchase = await models.getPurchase(ctx.params.id);
@@ -470,6 +775,25 @@ router.get('/purchase/:id', async (ctx, next) => {
         }
         ctx.status = 400
     }
+});
+
+// api/purchases/:id
+router.get('/maker/purchases/:id/:source?', async (ctx, next) => {
+
+    let source = ctx.params.source ? ctx.params.source : 'id'
+    try {
+        let maker = await models.getMakerPurchases(source, ctx.params.id);
+        if (maker) {
+            ctx.body = maker
+            ctx.status = 200
+        } else {
+            throw err;
+        }
+    } catch (err) {
+        ctx.body = { 'status': 'Failure', 'error': err }
+        ctx.status = 422
+    }
+
 });
 
 // api/purchase/:id/delete
@@ -618,7 +942,7 @@ router.get('/sculpt/:sculpt', async (ctx, next) => {
             'status': 'OK',
             'data': sculpts
         }
-    ctx.status = 200
+        ctx.status = 200
     } catch (err) {
         ctx.body = {
             'status': 'FAILURE',
@@ -869,7 +1193,7 @@ router.get('/spreadsheetOutput', async (ctx, next) => {
 
     ctx.body = output
     ctx.status = 200
-    
+
 })
 // api/picRefresh
 router.get('/picRefresh', async (ctx, next) => {
@@ -946,9 +1270,9 @@ router.get('/graph/artisansIHaveCount', async (ctx, next) => {
         }
         ctx.status = 200
     } catch (err) {
-        ctx.body = { 
-        status: 'Failure',
-        error: err
+        ctx.body = {
+            status: 'Failure',
+            error: err
         }
     }
 });
@@ -1241,7 +1565,7 @@ router.get('/graph/monthlyPurchases', async (ctx, next) => {
     try {
         const purches = await models.getMonthlyPurchaseData()
         let purchases = []
-        purches.forEach((purch,index)=>{
+        purches.forEach((purch, index) => {
             let temp = {}
             temp.name = toMonthName(purches[index].month)
             temp.y = purches[index].count
@@ -1270,7 +1594,7 @@ router.get('/graph/monthlyPurchases/:id', async (ctx, next) => {
     try {
         const purches = await models.getMonthlyPurchaseDataByMaker(ctx.params.id)
         let purchases = []
-        purches.forEach((purch,index)=>{
+        purches.forEach((purch, index) => {
             let temp = {}
             temp.name = toMonthName(purches[index].month)
             temp.y = purches[index].count
@@ -1323,12 +1647,50 @@ router.get('/graph/getYearlyWinsByMaker/:maker_id', async (ctx, next) => {
     }
 });
 
+router.get('/graph/getAllMakerCountries', async (ctx, next) => {
+    try {
+        let regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+        const c = await models.getAllMakerCountries()
+        countries = []
+        countriesChart = []
+        c.forEach((count, index) => {
+            let temp = {}
+            let temp2 = {}
+            temp.country = count.country
+            temp.display = temp.country.toUpperCase()
+            temp.fullName = regionNames.of(temp.display)
+            temp.count = count.count
+            temp2.name = temp.fullName
+            temp2.y = temp.count
+            countries.push(temp)
+            countriesChart.push(temp2)
+
+        })
+        const headers = ['Country', 'Count']
+        ctx.body = {
+            'status': 'OK',
+            'data': {
+                'countryData': countries,
+                'headers': headers
+            },
+            'data2': countriesChart
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
 function toMonthName(monthNumber) {
     const date = new Date();
     date.setMonth(monthNumber - 1);
-  
+
     return date.toLocaleString('en-US', {
-      month: 'long',
+        month: 'long',
     });
-  }
+}
+
 module.exports = router;
