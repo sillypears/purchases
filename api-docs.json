@@ -84,12 +84,13 @@
         "responses": {
           "200": {
             "description": "Returns array of Makers that I have",
-            "content": null,
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "type": "string"
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
                 }
               }
             }
@@ -632,7 +633,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CategoriesMap"
+                  "$ref": "#/components/schemas/CategoryMap"
                 }
               }
             }
