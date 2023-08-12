@@ -42,7 +42,11 @@ const options = {
             contact: {
                 name: "yes"
             },
-            description: "Stuff!"
+            description: "Stuff!",
+            license: {
+                name: "The Unlicense",
+                url: "https://unlicense.org/"
+              },
         },
         servers: [
             {
@@ -55,7 +59,7 @@ const options = {
 };
 
 const openapiSpecification = swaggerJsdoc(options);
-console.log(openapiSpecification)
+
 const router = new Router()
 router.get("/api/api-docs.json", async function (ctx) {
     ctx.set("Content-Type", "application/json");
@@ -85,3 +89,10 @@ app.use(koaSwagger({
 );
 
 app.listen(process.env.PORT, process.env.HOSTNAME, () => console.log(`running on ${process.env.HOSTNAME}:${process.env.PORT}`))
+
+module.exports = {
+    info: options.definition.info,
+    host: `http://${process.env.IP}:${process.env.PORT}`,
+    basePath: '/api',
+    openapiSpecification
+}
