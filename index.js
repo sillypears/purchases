@@ -82,8 +82,7 @@ app.use(koaSwagger({
     supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
     routePrefix: '/api/api-docs',
     swaggerOptions: {
-        url: `http://${process.env.HOSTNAME}:${process.env.PORT}/api/api-docs.json`,
-        validatorUrl: null,
+        url: 'https://raw.githubusercontent.com/sillypears/purchases/swagger/api-docs.json', //url: `http://${process.env.HOSTNAME}:${process.env.PORT}/api/api-docs.json`,
         docExpansion: 'none',
     },
     hideTopbar: true,
