@@ -1,539 +1,1149 @@
 {
-    "openapi": "3.0.0",
-    "info": {
-      "title": "Keyboard Purchases",
-      "version": "1.0.1",
-      "contact": {
-        "name": "yes"
-      },
-      "description": "Stuff!",
-      "license": {
-        "name": "The Unlicense",
-        "url": "https://unlicense.org/"
-      }
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Keyboard Purchases",
+    "version": "1.0.1",
+    "contact": {
+      "name": "yes"
     },
-    "servers": [
-      {
-        "url": "http://192.168.1.20:80/api",
-        "description": "main"
-      }
-    ],
-    "paths": {
-      "/": {
-        "get": {
-          "description": "Get API version",
-          "operationId": "getBaseApi",
-          "tags": [
-            "Base"
-          ],
-          "responses": {
-            "200": {
-              "description": "Returns the current API version"
-            },
-            "500": {
-              "description": "Returns error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ErrorMsg"
-                  }
+    "description": "Stuff!",
+    "license": {
+      "name": "The Unlicense",
+      "url": "https://unlicense.org/"
+    }
+  },
+  "servers": [
+    {
+      "url": "http://192.168.1.20:80/api",
+      "description": "main"
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "description": "Get API version",
+        "operationId": "getBaseApi",
+        "tags": [
+          "Base"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the current API version"
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
                 }
               }
             }
-          }
-        }
-      },
-      "/makers": {
-        "get": {
-          "description": "Get API version",
-          "operationId": "getAllMakers",
-          "tags": [
-            "Maker"
-          ],
-          "responses": {
-            "200": {
-              "description": "Returns Maker objects",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/MakerMap"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Returns error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ErrorMsg"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/maker": {
-        "get": {
-          "description": "Get the latest Maker",
-          "operationId": "getLatestMaker",
-          "tags": [
-            "Maker"
-          ],
-          "responses": {
-            "200": {
-              "description": "Returns Maker object",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Maker"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Returns error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ErrorMsg"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/maker/id/{id}": {
-        "get": {
-          "description": "Get Maker object by ID",
-          "operationId": "getMakerById",
-          "tags": [
-            "Maker"
-          ],
-          "responses": {
-            "200": {
-              "description": "Returns Maker object",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Maker"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Returns error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ErrorMsg"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "example": 1,
-            "description": "ID of maker to get",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ]
-      },
-      "/vendors": {
-        "get": {
-          "description": "Get all vendors",
-          "operationId": "getAllVendors",
-          "tags": [
-            "Vendor"
-          ],
-          "responses": {
-            "200": {
-              "description": "Returns Vendor objects",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/VendorMap"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Returns error"
-            }
-          }
-        }
-      },
-      "/vendor": {
-        "get": {
-          "description": "Get latest vendor",
-          "operationId": "getLatestVendor",
-          "tags": [
-            "Vendor"
-          ],
-          "responses": {
-            "200": {
-              "description": "Returns Vendor object",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Vendor"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Returns error"
-            }
-          }
-        }
-      },
-      "/purchases": {
-        "get": {
-          "description": "Get all Purchases",
-          "operationId": "getAllPurchases",
-          "tags": [
-            "Purchase"
-          ],
-          "responses": {
-            "200": {
-              "description": "Returns Purchase objects",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/PurchaseMap"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Returns error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ErrorMsg"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/purchase": {
-        "get": {
-          "description": "Get latest Purchases",
-          "operationId": "getLatestPurchases",
-          "tags": [
-            "Purchase"
-          ],
-          "responses": {
-            "200": {
-              "description": "Returns Purchase object",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Purchase"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Returns error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ErrorMsg"
-                  }
-                }
-              }
-            }
-          }
-        }
-      },
-      "/purchase/{id}": {
-        "get": {
-          "description": "Get Purchase object by ID",
-          "operationId": "getPurchaseById",
-          "tags": [
-            "Purchase"
-          ],
-          "responses": {
-            "200": {
-              "description": "Returns Purchase object",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/Purchase"
-                  }
-                }
-              }
-            },
-            "500": {
-              "description": "Returns error",
-              "content": {
-                "application/json": {
-                  "schema": {
-                    "$ref": "#/components/schemas/ErrorMsg"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "example": 74,
-            "description": "ID of purchase to get",
-            "required": true,
-            "schema": {
-              "type": "integer"
-            }
-          }
-        ]
-      }
-    },
-    "components": {
-      "schemas": {
-        "ErrorMsg": {
-          "type": "object",
-          "properties": {
-            "status": {
-              "type": "string"
-            },
-            "error": {
-              "type": "object"
-            }
-          }
-        },
-        "Maker": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer"
-            },
-            "name": {
-              "type": "string"
-            },
-            "display_name": {
-              "type": "string"
-            },
-            "instagram": {
-              "type": "string"
-            },
-            "archivist_name": {
-              "type": "string"
-            },
-            "archivist_id": {
-              "type": "string"
-            },
-            "shipping_city": {
-              "type": "string"
-            },
-            "shipping_state": {
-              "type": "string"
-            },
-            "shipping_country": {
-              "type": "string"
-            }
-          }
-        },
-        "MakerMap": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/Maker"
-          }
-        },
-        "Vendor": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer"
-            },
-            "name": {
-              "type": "string"
-            },
-            "display_name": {
-              "type": "string"
-            },
-            "link": {
-              "type": "string"
-            }
-          }
-        },
-        "VendorMap": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/Vendor"
-          }
-        },
-        "Purchase": {
-          "type": "object",
-          "properties": {
-            "id": {
-              "type": "integer"
-            },
-            "category_id": {
-              "type": "integer"
-            },
-            "category_name": {
-              "type": "string"
-            },
-            "detail": {
-              "type": "string"
-            },
-            "entity": {
-              "type": "string"
-            },
-            "sculpt": {
-              "type": "string"
-            },
-            "sculpt_id": {
-              "type": "integer"
-            },
-            "sculpt_style": {
-              "type": "integer"
-            },
-            "ka_id": {
-              "type": "string"
-            },
-            "maker_name": {
-              "type": "string"
-            },
-            "maker_id": {
-              "type": "integer"
-            },
-            "instagram": {
-              "type": "string"
-            },
-            "archivist": {
-              "type": "string"
-            },
-            "vendor_name": {
-              "type": "string"
-            },
-            "vendor_id": {
-              "type": "integer"
-            },
-            "link": {
-              "type": "string"
-            },
-            "price": {
-              "type": "integer"
-            },
-            "adjustments": {
-              "type": "integer"
-            },
-            "total": {
-              "type": "integer"
-            },
-            "series_num": {
-              "type": "integer"
-            },
-            "series_total": {
-              "type": "integer"
-            },
-            "sale_id": {
-              "type": "integer"
-            },
-            "sale_type": {
-              "type": "string"
-            },
-            "soldDate": {
-              "type": "string"
-            },
-            "salePrice": {
-              "type": "integer"
-            },
-            "isSold": {
-              "type": "integer"
-            },
-            "willSell": {
-              "type": "integer"
-            },
-            "received": {
-              "type": "integer"
-            },
-            "purchaseDate": {
-              "type": "string"
-            },
-            "receivedDate": {
-              "type": "string"
-            },
-            "orderSet": {
-              "type": "integer"
-            },
-            "notes": {
-              "type": "string"
-            },
-            "image": {
-              "type": "string"
-            },
-            "ig_post": {
-              "type": "integer"
-            },
-            "retail_price": {
-              "type": "integer"
-            },
-            "includeInCount": {
-              "type": "boolean"
-            },
-            "mainColors": {
-              "type": "string"
-            },
-            "tags": {
-              "type": "string"
-            },
-            "stem": {
-              "type": "string"
-            },
-            "keycap_size": {
-              "type": "integer"
-            },
-            "maker_city": {
-              "type": "string"
-            },
-            "maker_state": {
-              "type": "string"
-            },
-            "maker_country": {
-              "type": "string"
-            }
-          }
-        },
-        "PurchaseMap": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/Purchase"
           }
         }
       }
     },
-    "tags": [
-      {
-        "name": "Base",
-        "description": "All base API related things"
-      },
-      {
-        "name": "Maker",
-        "description": "All maker related things"
-      },
-      {
-        "name": "Purchase",
-        "description": "All purchase related things"
-      },
-      {
-        "name": "Vendor",
-        "description": "All vendors related things"
+    "/makers": {
+      "get": {
+        "description": "Get API version",
+        "operationId": "getAllMakers",
+        "tags": [
+          "Maker"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Maker objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MakerMap"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
       }
-    ]
-  }
+    },
+    "/makers/have": {
+      "get": {
+        "description": "Get all Makers that I have",
+        "operationId": "getAllMakersThatIHave",
+        "tags": [
+          "Maker"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns array of Makers that I have",
+            "content": null,
+            "application/json": {
+              "schema": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/makersprice": {
+      "get": {
+        "description": "Get PriceTotal for Makers",
+        "operationId": "getAllMakersPrice",
+        "tags": [
+          "Maker"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns MakerPrice objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MakerPriceMap"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/maker": {
+      "get": {
+        "description": "Get the latest Maker",
+        "operationId": "getLatestMaker",
+        "tags": [
+          "Maker"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Maker object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Maker"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "description": "Create new Maker",
+        "operationId": "createNewMaker",
+        "tags": [
+          "Maker"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Maker"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Created"
+          },
+          "209": {
+            "description": "Duplicate Entry"
+          },
+          "422": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/maker/id/{id}": {
+      "get": {
+        "description": "Get Maker object by ID",
+        "operationId": "getMakerById",
+        "tags": [
+          "Maker"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Maker object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Maker"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "example": 1,
+          "description": "ID of maker to get",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ]
+    },
+    "/maker/name/{name}": {
+      "get": {
+        "description": "Get Maker  object by Name",
+        "operationId": "getMakerByName",
+        "tags": [
+          "Maker"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Maker object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Maker"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "example": "8o8keys",
+          "description": "ID of maker to get",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/maker/sculpts/name/{name}": {
+      "get": {
+        "description": "Get Maker sculpts object by Name",
+        "operationId": "getMakerSculptsByName",
+        "tags": [
+          "Maker"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Maker object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Maker"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "example": "8o8keys",
+          "description": "ID of maker to get",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/maker/sculpt/count/{id}": {
+      "get": {
+        "description": "Get sculpt counts by maker id",
+        "operationId": "getSculptCountsByMakerId",
+        "tags": [
+          "Maker"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns SculptCount objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SculptCountMap"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "example": 1,
+          "description": "ID of maker to get",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ]
+    },
+    "/maker/name-money/{name}": {
+      "get": {
+        "description": "Get total for Maker by Name",
+        "operationId": "getTotalForMakerByName",
+        "tags": [
+          "Maker"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns object with total",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MakerTotalPrice"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "example": "8o8keys",
+          "description": "Name of maker to get",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/vendors": {
+      "get": {
+        "description": "Get all vendors",
+        "operationId": "getAllVendors",
+        "tags": [
+          "Vendor"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Vendor objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendorMap"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error"
+          }
+        }
+      }
+    },
+    "/vendorsprice": {
+      "get": {
+        "description": "Get PriceTotal for Vendors",
+        "operationId": "getAllVendorPrice",
+        "tags": [
+          "Vendor"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns VendorPrice objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendorPriceMap"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vendor": {
+      "get": {
+        "description": "Get latest vendor",
+        "operationId": "getLatestVendor",
+        "tags": [
+          "Vendor"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Vendor object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vendor"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error"
+          }
+        }
+      },
+      "post": {
+        "description": "Create new Vendor",
+        "operationId": "createNewVendor",
+        "tags": [
+          "Vendor"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Vendor"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Created"
+          },
+          "209": {
+            "description": "Duplicate Entry"
+          },
+          "422": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/vendor/id/{id}": {
+      "get": {
+        "description": "Get Vendor object by ID",
+        "operationId": "getVendorById",
+        "tags": [
+          "Vendor"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Vendor object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VendorMap"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "example": 1,
+          "description": "ID of vendor to get",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ]
+    },
+    "/vendor/name/{name}": {
+      "get": {
+        "description": "Get Vendor object by Name",
+        "operationId": "getVendorByName",
+        "tags": [
+          "Vendor"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Vendor object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Vendor"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "example": "8o8keys",
+          "description": "ID of vendor to get",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ]
+    },
+    "/categories": {
+      "get": {
+        "description": "Get all categories",
+        "operationId": "getAllCategories",
+        "tags": [
+          "Base"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Categories objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoriesMap"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error"
+          }
+        }
+      }
+    },
+    "/saletypes": {
+      "get": {
+        "description": "Get all saletypes",
+        "operationId": "getAllSaleTypes",
+        "tags": [
+          "Base"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns SaleType objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaleTypeMap"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error"
+          }
+        }
+      }
+    },
+    "/purchases": {
+      "get": {
+        "description": "Get all Purchases",
+        "operationId": "getAllPurchases",
+        "tags": [
+          "Purchase"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Purchase objects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PurchaseMap"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase": {
+      "get": {
+        "description": "Get latest Purchases",
+        "operationId": "getLatestPurchases",
+        "tags": [
+          "Purchase"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Purchase object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Purchase"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/purchase/{id}": {
+      "get": {
+        "description": "Get Purchase object by ID",
+        "operationId": "getPurchaseById",
+        "tags": [
+          "Purchase"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Purchase object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Purchase"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Returns error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorMsg"
+                }
+              }
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "example": 74,
+          "description": "ID of purchase to get",
+          "required": true,
+          "schema": {
+            "type": "integer"
+          }
+        }
+      ]
+    }
+  },
+  "components": {
+    "schemas": {
+      "ErrorMsg": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          },
+          "error": {
+            "type": "object"
+          }
+        }
+      },
+      "Maker": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "instagram": {
+            "type": "string"
+          },
+          "archivist_name": {
+            "type": "string"
+          },
+          "archivist_id": {
+            "type": "string"
+          },
+          "shipping_city": {
+            "type": "string"
+          },
+          "shipping_state": {
+            "type": "string"
+          },
+          "shipping_country": {
+            "type": "string"
+          }
+        }
+      },
+      "MakerMap": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Maker"
+        }
+      },
+      "MakerPrice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "instagram": {
+            "type": "string"
+          },
+          "archivist_name": {
+            "type": "string"
+          },
+          "archivist_id": {
+            "type": "string"
+          },
+          "shipping_city": {
+            "type": "string"
+          },
+          "shipping_state": {
+            "type": "string"
+          },
+          "shipping_country": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          }
+        }
+      },
+      "MakerPriceMap": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/MakerPrice"
+        }
+      },
+      "MakerTotalPrice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        }
+      },
+      "SculptCount": {
+        "type": "object",
+        "properties": {
+          "sculpt": {
+            "type": "string"
+          },
+          "count": {
+            "type": "integer"
+          }
+        }
+      },
+      "SculptCountMap": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SculptCount"
+        }
+      },
+      "Vendor": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          }
+        }
+      },
+      "VendorMap": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Vendor"
+        }
+      },
+      "Purchase": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "category_id": {
+            "type": "integer"
+          },
+          "category_name": {
+            "type": "string"
+          },
+          "detail": {
+            "type": "string"
+          },
+          "entity": {
+            "type": "string"
+          },
+          "sculpt": {
+            "type": "string"
+          },
+          "sculpt_id": {
+            "type": "integer"
+          },
+          "sculpt_style": {
+            "type": "integer"
+          },
+          "ka_id": {
+            "type": "string"
+          },
+          "maker_name": {
+            "type": "string"
+          },
+          "maker_id": {
+            "type": "integer"
+          },
+          "instagram": {
+            "type": "string"
+          },
+          "archivist": {
+            "type": "string"
+          },
+          "vendor_name": {
+            "type": "string"
+          },
+          "vendor_id": {
+            "type": "integer"
+          },
+          "link": {
+            "type": "string"
+          },
+          "price": {
+            "type": "integer"
+          },
+          "adjustments": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          },
+          "series_num": {
+            "type": "integer"
+          },
+          "series_total": {
+            "type": "integer"
+          },
+          "sale_id": {
+            "type": "integer"
+          },
+          "sale_type": {
+            "type": "string"
+          },
+          "soldDate": {
+            "type": "string"
+          },
+          "salePrice": {
+            "type": "integer"
+          },
+          "isSold": {
+            "type": "integer"
+          },
+          "willSell": {
+            "type": "integer"
+          },
+          "received": {
+            "type": "integer"
+          },
+          "purchaseDate": {
+            "type": "string"
+          },
+          "receivedDate": {
+            "type": "string"
+          },
+          "orderSet": {
+            "type": "integer"
+          },
+          "notes": {
+            "type": "string"
+          },
+          "image": {
+            "type": "string"
+          },
+          "ig_post": {
+            "type": "integer"
+          },
+          "retail_price": {
+            "type": "integer"
+          },
+          "includeInCount": {
+            "type": "boolean"
+          },
+          "mainColors": {
+            "type": "string"
+          },
+          "tags": {
+            "type": "string"
+          },
+          "stem": {
+            "type": "string"
+          },
+          "keycap_size": {
+            "type": "integer"
+          },
+          "maker_city": {
+            "type": "string"
+          },
+          "maker_state": {
+            "type": "string"
+          },
+          "maker_country": {
+            "type": "string"
+          }
+        }
+      },
+      "PurchaseMap": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Purchase"
+        }
+      },
+      "VendorPrice": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          },
+          "total": {
+            "type": "integer"
+          }
+        }
+      },
+      "VendorPriceMap": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/VendorPrice"
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          }
+        }
+      },
+      "CategoryMap": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/Category"
+        }
+      },
+      "SaleType": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          }
+        }
+      },
+      "SaleTypeMap": {
+        "type": "array",
+        "items": {
+          "$ref": "#/components/schemas/SaleType"
+        }
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Base",
+      "description": "All base API related things"
+    },
+    {
+      "name": "Maker",
+      "description": "All maker related things"
+    },
+    {
+      "name": "Purchase",
+      "description": "All purchase related things"
+    },
+    {
+      "name": "Vendor",
+      "description": "All vendors related things"
+    },
+    {
+      "name": "Graph",
+      "description": "All vendors related things"
+    }
+  ]
+}

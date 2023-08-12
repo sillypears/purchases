@@ -73,7 +73,7 @@ module.exports = {
     },
     getMakerMoneyByName: async (name) => {
         conn = await db.getConnection();
-        let maker = await conn.query(`SELECT m.id, SUM(p.price) FROM ${process.env.DB_SCHEMA}.makers m LEFT JOIN ${process.env.DB_SCHEMA}.purchases p ON p.maker = m.id WHERE name = '${name}';`)
+        let maker = await conn.query(`SELECT m.id, SUM(p.price) as total FROM ${process.env.DB_SCHEMA}.makers m LEFT JOIN ${process.env.DB_SCHEMA}.purchases p ON p.maker = m.id WHERE name = '${name}';`)
         if (conn) conn.release()
         return maker
     },

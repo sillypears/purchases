@@ -28,6 +28,7 @@ var router = new Router({
 *           type: string
 *         error:
 *           type: object
+*
 *     Maker:
 *       type: object
 *       properties:
@@ -53,6 +54,55 @@ var router = new Router({
 *       type: array
 *       items:
 *         $ref: "#/components/schemas/Maker"
+*
+*     MakerPrice:
+*       type: object
+*       properties:
+*         id:
+*           type: integer
+*         name:
+*           type: string
+*         display_name:
+*           type: string
+*         instagram:
+*           type: string
+*         archivist_name:
+*           type: string
+*         archivist_id:
+*           type: string
+*         shipping_city:
+*           type: string
+*         shipping_state:
+*           type: string
+*         shipping_country:
+*           type: string
+*         total:
+*           type: integer
+*     MakerPriceMap:
+*       type: array
+*       items:
+*         $ref: "#/components/schemas/MakerPrice"
+*
+*     MakerTotalPrice:
+*       type: object
+*       properties:
+*         id:
+*           type: integer
+*         total:
+*           type: integer
+*
+*     SculptCount:
+*       type: object
+*       properties:
+*         sculpt:
+*           type: string
+*         count:
+*           type: integer
+*     SculptCountMap:
+*       type: array
+*       items:
+*         $ref: "#/components/schemas/SculptCount"
+*
 *     Vendor:
 *       type: object
 *       properties:
@@ -68,6 +118,7 @@ var router = new Router({
 *       type: array
 *       items:
 *         $ref: "#/components/schemas/Vendor"
+*
 *     Purchase:
 *       type: object
 *       properties:
@@ -161,32 +212,67 @@ var router = new Router({
 *       type: array
 *       items:
 *         $ref: "#/components/schemas/Purchase"
+*
+*     VendorPrice:
+*       type: object
+*       properties:
+*         id:
+*           type: integer
+*         name:
+*           type: string
+*         display_name:
+*           type: string
+*         link:
+*           type: string
+*         total:
+*           type: integer
+*     VendorPriceMap:
+*       type: array
+*       items:
+*         $ref: "#/components/schemas/VendorPrice"
+*
+*     Category:
+*       type: object
+*       properties:
+*         id:
+*           type: integer
+*         name:
+*           type: string
+*         display_name:
+*           type: string
+*     CategoryMap:
+*       type: array
+*       items:
+*         $ref: "#/components/schemas/Category"
+*
+*     SaleType:
+*       type: object
+*       properties:
+*         id:
+*           type: integer
+*         name:
+*           type: string
+*         display_name:
+*           type: string
+*     SaleTypeMap:
+*       type: array
+*       items:
+*         $ref: "#/components/schemas/SaleType"
 */
 
-/**
-   * @openapi
-   * tags:
-   *   name: Base
-   *   description: All base API related things
- */
-
-/**
-   * @openapi
-   * tags:
-   *   name: Maker
-   *   description: All maker related things
- */
-/**
-   * @openapi
-   * tags:
-   *   name: Purchase
-   *   description: All purchase related things
- */
-/**
-   * @openapi
-   * tags:
-   *   name: Vendor
-   *   description: All vendors related things
+ /**
+ * @openapi
+ * tags:
+ *   - name: Base
+ *     description: All base API related things
+ *   - name: Maker
+ *     description: All maker related things
+ *   - name: Purchase
+ *     description: All purchase related things
+ *   - name: Vendor
+ *     description: All vendors related things
+ *   - name: Graph
+ *     description: All vendors related things
  */
 
 // api
@@ -237,7 +323,6 @@ router.get('/', async (ctx, next) => {
  *
 */
 router.get('/makers', async (ctx, next) => {
-
     try {
         let makers = await models.getMakers();
         ctx.body = makers
@@ -249,10 +334,31 @@ router.get('/makers', async (ctx, next) => {
 });
 
 // api/makers
+/**
+ * @openapi
+ * /makers/have:
+ *   get:
+ *     description: Get all Makers that I have
+ *     operationId: getAllMakersThatIHave
+ *     tags: [Maker]
+ *     responses:
+ *       200:
+ *         description: Returns array of Makers that I have
+ *         content:
+ *           application/json:
+ *             schema: 
+ *               type: array
+ *               items:
+ *                 type: string 
+ *       500:
+ *         description: Returns error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *
+*/
 router.get('/makers/have', async (ctx, next) => {
-    // #swagger.tags = ["Makers"]
-    // #swagger.description = "Maker endpoints"
-
     try {
         let makers = await models.getMakersThatIHave();
         let haveMakers = []
@@ -268,11 +374,31 @@ router.get('/makers/have', async (ctx, next) => {
 });
 
 // api/makersprice
+/**
+ * @openapi
+ * /makersprice:
+ *   get:
+ *     description: Get PriceTotal for Makers
+ *     operationId: getAllMakersPrice
+ *     tags: [Maker]
+ *     responses:
+ *       200:
+ *         description: Returns MakerPrice objects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MakerPriceMap'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *
+*/
 router.get('/makersprice', async (ctx, next) => {
-    // #swagger.tags = ["Makers"]
-    // #swagger.description = "Maker endpoints"
     try {
-        let makers = await models.getMakerTotals(makers);
+        let makers = await models.getMakerTotals();
         ctx.body = makers
         ctx.status = 200
     } catch (err) {
@@ -362,10 +488,87 @@ router.get('/maker/id/:id', async (ctx, next) => {
 
 });
 
-
 // api/maker/name/:name
+/**
+ * @openapi
+ * /maker/name/{name}:
+ *   get:
+ *     description: Get Maker  object by Name
+ *     operationId: getMakerByName
+ *     tags: [Maker]
+ *     responses:
+ *       200:
+ *         description: Returns Maker object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Maker'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *   parameters:
+ *     - name: name
+ *       in: path
+ *       example: 8o8keys
+ *       description: ID of maker to get
+ *       required: true
+ *       schema:
+ *         type: string
+ *
+*/
 router.get('/maker/name/:name', async (ctx, next) => {
+    try {
+        let maker = await models.getMakerByName(ctx.params.name);
+        if (maker) {
+            ctx.body = maker
+            ctx.status = 200
+        } else {
+            throw err;
+        }
+    } catch (err) {
+        ctx.body = { 'status': 'Failure', 'error': err }
+        ctx.status = 422
+    } finally {
+        if (conn) return conn.release();
+    }
 
+});
+
+// api/maker/sculpts/name/:name
+/**
+ * @openapi
+ * /maker/sculpts/name/{name}:
+ *   get:
+ *     description: Get Maker sculpts object by Name
+ *     operationId: getMakerSculptsByName
+ *     tags: [Maker]
+ *     responses:
+ *       200:
+ *         description: Returns Maker object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Maker'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *   parameters:
+ *     - name: name
+ *       in: path
+ *       example: 8o8keys
+ *       description: ID of maker to get
+ *       required: true
+ *       schema:
+ *         type: string
+ *
+*/
+router.get('/maker/sculpts/name/:name', async (ctx, next) => {
     try {
 
         let maker = await models.getMakerSculptsByName(ctx.params.name);
@@ -385,8 +588,37 @@ router.get('/maker/name/:name', async (ctx, next) => {
 });
 
 // api/maker/sculpt/count/:id
+/**
+ * @openapi
+ * /maker/sculpt/count/{id}:
+ *   get:
+ *     description: Get sculpt counts by maker id
+ *     operationId: getSculptCountsByMakerId
+ *     tags: [Maker]
+ *     responses:
+ *       200:
+ *         description: Returns SculptCount objects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SculptCountMap'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *   parameters:
+ *     - name: id
+ *       in: path
+ *       example: 1
+ *       description: ID of maker to get
+ *       required: true
+ *       schema:
+ *         type: integer
+ *
+*/
 router.get('/maker/sculpt/count/:id', async (ctx, next) => {
-
     try {
         let sculptCount = await models.getSculptCountByMaker(ctx.params.id);
         if (sculptCount) {
@@ -403,9 +635,38 @@ router.get('/maker/sculpt/count/:id', async (ctx, next) => {
     }
 });
 
-// api/pricebyname/:name
+// api/maker/name-money/:name
+/**
+ * @openapi
+ * /maker/name-money/{name}:
+ *   get:
+ *     description: Get total for Maker by Name
+ *     operationId: getTotalForMakerByName
+ *     tags: [Maker]
+ *     responses:
+ *       200:
+ *         description: Returns object with total
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/MakerTotalPrice'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *   parameters:
+ *     - name: name
+ *       in: path
+ *       example: 8o8keys
+ *       description: Name of maker to get
+ *       required: true
+ *       schema:
+ *         type: string
+ *
+*/
 router.get('/maker/name-money/:name', async (ctx, next) => {
-
     try {
 
         let maker = await models.getMakerMoneyByName(ctx.params.name);
@@ -426,6 +687,32 @@ router.get('/maker/name-money/:name', async (ctx, next) => {
 
 
 // api/maker
+/**
+ * @openapi
+ * /maker:
+ *   post:
+ *     description: Create new Maker
+ *     operationId: createNewMaker
+ *     tags: [Maker]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Maker'
+ *     responses:
+ *       204:
+ *         description: Created
+ *       209:
+ *         description: Duplicate Entry
+ *       422:
+ *         description: Returns error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *
+*/
 router.post('/maker', async (ctx, next) => {
     try {
         let name = ctx.request.body.name;
@@ -447,7 +734,7 @@ router.post('/maker', async (ctx, next) => {
             }
 
         } else {
-            ctx.body = {}
+            ctx.body = 'Created'
             ctx.status = 204
         }
     } catch (err) {
@@ -486,8 +773,6 @@ router.post('/maker', async (ctx, next) => {
  *
 */
 router.get('/vendors', async (ctx, next) => {
-    // #swagger.tags = ["Vendors"]
-    // #swagger.description = "Vendor endpoints"
     try {
         let vendors = await models.getVendors();
         ctx.body = vendors
@@ -500,9 +785,29 @@ router.get('/vendors', async (ctx, next) => {
 });
 
 // api/vednorsprice
+/**
+ * @openapi
+ * /vendorsprice:
+ *   get:
+ *     description: Get PriceTotal for Vendors
+ *     operationId: getAllVendorPrice
+ *     tags: [Vendor]
+ *     responses:
+ *       200:
+ *         description: Returns VendorPrice objects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/VendorPriceMap'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *
+*/
 router.get('/vendorsprice', async (ctx, next) => {
-    // #swagger.tags = ["Vendors"]
-    // #swagger.description = "Vendor endpoints"
     try {
         let vendors = await models.getVendorTotals();
         ctx.body = vendors
@@ -532,8 +837,6 @@ router.get('/vendorsprice', async (ctx, next) => {
 *
 */
 router.get('/vendor', async (ctx, next) => {
-    // #swagger.tags = ["Vendors"]
-    // #swagger.description = "Vendor endpoints"
     try {
         let vendor = await models.getVendor();
         ctx.body = vendor
@@ -546,11 +849,37 @@ router.get('/vendor', async (ctx, next) => {
 });
 
 // api/vendor/id/:id
+/**
+ * @openapi
+ * /vendor/id/{id}:
+ *   get:
+ *     description: Get Vendor object by ID
+ *     operationId: getVendorById
+ *     tags: [Vendor]
+ *     responses:
+ *       200:
+ *         description: Returns Vendor object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/VendorMap'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *   parameters:
+ *     - name: id
+ *       in: path
+ *       example: 1
+ *       description: ID of vendor to get
+ *       required: true
+ *       schema:
+ *         type: integer
+ *
+*/
 router.get('/vendor/id/:id', async (ctx, next) => {
-    // #swagger.tags = ["Vendors"]
-    // #swagger.description = "Vendor endpoints"
-    // #swagger.parameters['id'] = { description: 'Vendor\'s ID' }
-
     try {
         let vendor = await models.getVendorById(ctx.params.id);
         return ctx.body = vendor
@@ -562,11 +891,37 @@ router.get('/vendor/id/:id', async (ctx, next) => {
 });
 
 // api/vendor/name/:name
+/**
+ * @openapi
+ * /vendor/name/{name}:
+ *   get:
+ *     description: Get Vendor object by Name
+ *     operationId: getVendorByName
+ *     tags: [Vendor]
+ *     responses:
+ *       200:
+ *         description: Returns Vendor object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Vendor'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *   parameters:
+ *     - name: name
+ *       in: path
+ *       example: 8o8keys
+ *       description: ID of vendor to get
+ *       required: true
+ *       schema:
+ *         type: string
+ *
+*/
 router.get('/vendor/name/:name', async (ctx, next) => {
-    // #swagger.tags = ["Vendors"]
-    // #swagger.description = "Vendor endpoints"
-    // #swagger.parameters['name'] = { description: 'Vendor\'s short-name' }
-
     try {
         let vendor = await models.getVendorByName(ctx.params.name);
         return ctx.body = vendor
@@ -576,10 +931,34 @@ router.get('/vendor/name/:name', async (ctx, next) => {
         ctx.body = { 'status': 'Failure', 'error': err }
     }
 });
-
+// /api/vendor
+/**
+ * @openapi
+ * /vendor:
+ *   post:
+ *     description: Create new Vendor
+ *     operationId: createNewVendor
+ *     tags: [Vendor]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/Vendor'
+ *     responses:
+ *       204:
+ *         description: Created
+ *       209:
+ *         description: Duplicate Entry
+ *       422:
+ *         description: Returns error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *
+*/
 router.post('/vendor', async (ctx, next) => {
-    // #swagger.tags = ["Vendors"]
-    // #swagger.description = "Vendor endpoints"
     console.log(ctx.request.body)
     try {
         let name = ctx.request.body.name;
@@ -587,7 +966,6 @@ router.post('/vendor', async (ctx, next) => {
         let link = ctx.request.body.site;
         if ((name) && (displayName)) {
             let vendorId = await models.insertVendor(name, displayName, link)
-            // let vendorId = await conn.query(`INSERT INTO keyboard.vendors (name, display_name, link) VALUES ('${name}', ${conn.escape(displayName)}, '${link}');`)
             if (vendorId) {
                 console.log(vendorId)
                 ctx.body = {
@@ -619,9 +997,25 @@ router.post('/vendor', async (ctx, next) => {
 });
 
 // api/categories
+/**
+ * @openapi
+ * /categories:
+ *   get:
+ *     description: Get all categories
+ *     operationId: getAllCategories
+ *     tags: [Base]
+ *     responses:
+ *       200:
+ *         description: Returns Categories objects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/CategoryMap'
+ *       500:
+ *         description: Returns error
+ *
+*/
 router.get('/categories', async (ctx, next) => {
-    // #swagger.tags = ["Categories"]
-    // #swagger.description = "Category endpoints"
     try {
         let categories = await models.getCategories();
         console.log(categories)
@@ -635,9 +1029,25 @@ router.get('/categories', async (ctx, next) => {
 });
 
 // api/saletypes
+/**
+ * @openapi
+ * /saletypes:
+ *   get:
+ *     description: Get all saletypes
+ *     operationId: getAllSaleTypes
+ *     tags: [Base]
+ *     responses:
+ *       200:
+ *         description: Returns SaleType objects
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/SaleTypeMap'
+ *       500:
+ *         description: Returns error
+ *
+*/
 router.get('/saletypes', async (ctx, next) => {
-    // #swagger.tags = ["Sales"]
-    // #swagger.description = "Sale endpoints"
     try {
         let saleTypes = await models.getSaleTypes();
         ctx.body = saleTypes

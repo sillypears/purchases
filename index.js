@@ -80,11 +80,13 @@ app.use(Logger())
 app.use(koaSwagger({
     title: 'lol hi', // page title
     supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
-    routePrefix: '/api/api-docs', // host at /swagger instead of default /docs
+    routePrefix: '/api/api-docs',
     swaggerOptions: {
-        url: `http://${process.env.HOSTNAME}:${process.env.PORT}/api/api-docs.json` // example path to json
+        url: `http://${process.env.HOSTNAME}:${process.env.PORT}/api/api-docs.json`,
+        validatorUrl: null,
+        docExpansion: 'none',
     },
-    hideTopbar: true, // hide swagger top bar
+    hideTopbar: true,
 }),
 );
 
