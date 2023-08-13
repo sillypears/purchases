@@ -1,0 +1,21 @@
+_id: req_a35b1a17503e40b9b91710209f75a7ea
+type: Request
+parentId: fld_74b1301c3d7b43cead273fafb6e6333c
+modified: 1691923856954
+created: 1691923856954
+url: "{{ _.base_url }}/purchase"
+name: /purchase
+description: ""
+method: GET
+body: {}
+parameters: []
+headers: []
+authentication: {}
+metaSortKey: -1691923726116
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

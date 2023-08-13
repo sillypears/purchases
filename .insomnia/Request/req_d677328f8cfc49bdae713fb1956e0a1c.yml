@@ -1,0 +1,21 @@
+_id: req_d677328f8cfc49bdae713fb1956e0a1c
+type: Request
+parentId: fld_7446faae2f1a4754b134ef6b87cfd098
+modified: 1691923856928
+created: 1691923856928
+url: "{{ _.base_url }}/"
+name: /
+description: ""
+method: GET
+body: {}
+parameters: []
+headers: []
+authentication: {}
+metaSortKey: -1691923726105
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

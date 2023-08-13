@@ -1,0 +1,20 @@
+_id: env_f532963ea27c439cbff262dff63f8661
+type: Environment
+parentId: wrk_25bd3a6403744eb595c716be9e1fe0ce
+modified: 1691924218986
+created: 1691923856921
+name: Base Environment
+data:
+  base_host: 192.168.1.20
+  base_port: "80"
+  base_path: api
+  base_url: http://{{ _.base_host }}:{{ _.base_port }}/{{ _.base_path }}
+dataPropertyOrder:
+  "&":
+    - base_host
+    - base_port
+    - base_path
+    - base_url
+color: null
+isPrivate: false
+metaSortKey: 1691795945075

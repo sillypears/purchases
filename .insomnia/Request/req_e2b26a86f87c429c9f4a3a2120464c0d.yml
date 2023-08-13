@@ -1,0 +1,32 @@
+_id: req_e2b26a86f87c429c9f4a3a2120464c0d
+type: Request
+parentId: fld_ab36301d46b249d2ad192f5b2ccb9a03
+modified: 1691923856968
+created: 1691923856968
+url: "{{ _.base_url }}/vendor"
+name: /vendor
+description: ""
+method: POST
+body:
+  mimeType: application/json
+  text: |-
+    {
+      "id": 0,
+      "name": "string",
+      "display_name": "string",
+      "link": "string"
+    }
+parameters: []
+headers:
+  - name: Content-Type
+    disabled: false
+    value: application/json
+authentication: {}
+metaSortKey: -1691923726112
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

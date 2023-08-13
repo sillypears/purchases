@@ -1,0 +1,37 @@
+_id: req_80bbe0c057f04dacb2c4a38115de9456
+type: Request
+parentId: fld_52ba57ec50ec4cc0b63b037c80ed9f77
+modified: 1691923856943
+created: 1691923856943
+url: "{{ _.base_url }}/maker"
+name: /maker
+description: ""
+method: POST
+body:
+  mimeType: application/json
+  text: |-
+    {
+      "id": 0,
+      "name": "string",
+      "display_name": "string",
+      "instagram": "string",
+      "archivist_name": "string",
+      "archivist_id": "string",
+      "shipping_city": "string",
+      "shipping_state": "string",
+      "shipping_country": "string"
+    }
+parameters: []
+headers:
+  - name: Content-Type
+    disabled: false
+    value: application/json
+authentication: {}
+metaSortKey: -1691923726108
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

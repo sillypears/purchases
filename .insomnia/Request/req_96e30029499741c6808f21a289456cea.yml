@@ -1,0 +1,21 @@
+_id: req_96e30029499741c6808f21a289456cea
+type: Request
+parentId: fld_ab36301d46b249d2ad192f5b2ccb9a03
+modified: 1691923856969
+created: 1691923856969
+url: "{{ _.base_url }}/vendor/id/{{ _.id }}"
+name: /vendor/id/{id}
+description: ""
+method: GET
+body: {}
+parameters: []
+headers: []
+authentication: {}
+metaSortKey: -1691923726113
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

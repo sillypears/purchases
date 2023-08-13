@@ -1,0 +1,21 @@
+_id: req_9de78df015bc40489467bed42fb27af3
+type: Request
+parentId: fld_52ba57ec50ec4cc0b63b037c80ed9f77
+modified: 1691923856938
+created: 1691923856938
+url: "{{ _.base_url }}/makersprice"
+name: /makersprice
+description: ""
+method: GET
+body: {}
+parameters: []
+headers: []
+authentication: {}
+metaSortKey: -1691923726106
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

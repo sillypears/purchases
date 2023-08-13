@@ -1,0 +1,21 @@
+_id: req_46ede7a06c0148679012797ed8e99d42
+type: Request
+parentId: fld_7446faae2f1a4754b134ef6b87cfd098
+modified: 1691923856932
+created: 1691923856932
+url: "{{ _.base_url }}/saletypes"
+name: /saletypes
+description: ""
+method: GET
+body: {}
+parameters: []
+headers: []
+authentication: {}
+metaSortKey: -1691923726115
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

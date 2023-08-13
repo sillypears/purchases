@@ -1,0 +1,21 @@
+_id: req_86542ce026cb43e989413a0f5fc71ec0
+type: Request
+parentId: fld_52ba57ec50ec4cc0b63b037c80ed9f77
+modified: 1691923856937
+created: 1691923856937
+url: "{{ _.base_url }}/makers/have"
+name: /makers/have
+description: ""
+method: GET
+body: {}
+parameters: []
+headers: []
+authentication: {}
+metaSortKey: -1691923726106
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

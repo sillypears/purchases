@@ -1,0 +1,21 @@
+_id: req_85aebf9f4a3143c684bc10a9f12c9d23
+type: Request
+parentId: fld_52ba57ec50ec4cc0b63b037c80ed9f77
+modified: 1691923856947
+created: 1691923856947
+url: "{{ _.base_url }}/maker/sculpts/name/{{ _.name }}"
+name: /maker/sculpts/name/{name}
+description: ""
+method: GET
+body: {}
+parameters: []
+headers: []
+authentication: {}
+metaSortKey: -1691923726109
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

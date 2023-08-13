@@ -1,0 +1,21 @@
+_id: req_acfa890c472543179c518ef4f486a43b
+type: Request
+parentId: fld_52ba57ec50ec4cc0b63b037c80ed9f77
+modified: 1691923856949
+created: 1691923856949
+url: "{{ _.base_url }}/maker/sculpt/count/{{ _.id }}"
+name: /maker/sculpt/count/{id}
+description: ""
+method: GET
+body: {}
+parameters: []
+headers: []
+authentication: {}
+metaSortKey: -1691923726110
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

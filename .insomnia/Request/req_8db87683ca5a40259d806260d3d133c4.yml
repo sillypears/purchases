@@ -1,0 +1,21 @@
+_id: req_8db87683ca5a40259d806260d3d133c4
+type: Request
+parentId: fld_52ba57ec50ec4cc0b63b037c80ed9f77
+modified: 1691923856951
+created: 1691923856951
+url: "{{ _.base_url }}/maker/name-money/{{ _.name }}"
+name: /maker/name-money/{name}
+description: ""
+method: GET
+body: {}
+parameters: []
+headers: []
+authentication: {}
+metaSortKey: -1691923726110
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global

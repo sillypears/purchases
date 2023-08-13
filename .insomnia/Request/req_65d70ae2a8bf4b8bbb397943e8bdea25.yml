@@ -1,0 +1,21 @@
+_id: req_65d70ae2a8bf4b8bbb397943e8bdea25
+type: Request
+parentId: fld_52ba57ec50ec4cc0b63b037c80ed9f77
+modified: 1691923856945
+created: 1691923856945
+url: "{{ _.base_url }}/maker/name/{{ _.name }}"
+name: /maker/name/{name}
+description: ""
+method: GET
+body: {}
+parameters: []
+headers: []
+authentication: {}
+metaSortKey: -1691923726109
+isPrivate: false
+settingStoreCookies: true
+settingSendCookies: true
+settingDisableRenderRequestBody: false
+settingEncodeUrl: true
+settingRebuildPath: true
+settingFollowRedirects: global
