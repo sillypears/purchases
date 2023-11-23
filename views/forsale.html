@@ -8,7 +8,7 @@
 <table class="table hover border">
 <% sale.forEach((item, index) => { %>
     <tr>
-        <td><%= item.detail %></td>
+        <td><a href="/purchase/<%= item.id %>"><%= item.detail %></a></td>
         <td><%= item.sculpt %></td>
         <td>
             <a class="link-success" href="/maker/id/<%= item.maker_id %>">

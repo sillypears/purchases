@@ -60,12 +60,15 @@ def get_catalog():
         print(f"{e}")
         return None
 
-def parse_src(data, maker, sculpt, cw):
+def parse_src(data, maker, sculpt, cw, cw_id):
     img = ''
     for x in data['sculpts']:
         if x['name'].lower() == sculpt.lower():
             for color in x['colorways']:
-                if color['name'].lower().strip() == cw.lower().strip():
+                if cw == 'Poltergeist': print(x)
+                if color['id'].lower().strip() == cw_id.lower().strip():
+                    img = color['img']
+                elif color['name'].lower().strip() == cw.lower().strip():
                     img = color['img']
     return img
 
@@ -109,17 +112,22 @@ def main():
             p_id = purchase[0]
             sculpt = purchase[4]
             cw = purchase[3]
+            cw_id = purchase[8]
             maker = keycap[m_id]
             pic = purchase[32]
+            self_hosted = purchase[41]
             # d = get_data(maker)
 
             try:
                 lookup = catalog[maker_lookup[str(m_id)][5]]
-                i = parse_src(lookup, maker.strip(), sculpt.strip(), cw.strip())
-                if i != pic:
-                    print(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}; {maker}, {sculpt}, {cw}, {pic}")
-                    # print(maker, sculpt, cw, i)
-                    cur.execute(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}")
+                # print(p_id, self_hosted)
+                if not self_hosted:
+                    # print(cw)
+                    i = parse_src(lookup, maker.strip(), sculpt.strip(), cw.strip(), cw_id.strip())
+                    if i != pic:
+                        print(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}; {maker}, {sculpt}, {cw}, {pic}")
+                        # print(maker, sculpt, cw, i)
+                        cur.execute(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}")
             except:
                 pass
                 # print(f"Couldn't parse catalog for {maker}, {sculpt}, {cw}")

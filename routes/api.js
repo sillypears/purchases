@@ -1083,8 +1083,6 @@ router.get('/saletypes', async (ctx, next) => {
  *
 */
 router.get('/purchases', async (ctx, next) => {
-    // #swagger.tags = ["Purchases"]
-    // #swagger.description = "Purchase endpoints"
     try {
 
         let purchases = await models.getPurchases()
@@ -1124,7 +1122,6 @@ router.get('/purchases', async (ctx, next) => {
  *
 */
 router.get('/purchase', async (ctx, next) => {
-
     try {
         let maxId = await models.getLatestId()
         let purchase = await models.getPurchase(maxId)
@@ -1173,7 +1170,6 @@ router.get('/purchase', async (ctx, next) => {
  *
 */
 router.get('/purchase/:id', async (ctx, next) => {
-
     try {
         let purchase = await models.getPurchase(ctx.params.id);
         ctx.body = purchase
@@ -1187,9 +1183,8 @@ router.get('/purchase/:id', async (ctx, next) => {
     }
 });
 
-// api/purchases/:id
+// api/maker/purchases/:id/:source?
 router.get('/maker/purchases/:id/:source?', async (ctx, next) => {
-
     let source = ctx.params.source ? ctx.params.source : 'id'
     try {
         let maker = await models.getMakerPurchases(source, ctx.params.id);
@@ -1208,9 +1203,6 @@ router.get('/maker/purchases/:id/:source?', async (ctx, next) => {
 
 // api/purchase/:id/delete
 router.post('/purchase/:id/delete', async (ctx, next) => {
-    // #swagger.tags = ["Purchases"]
-    // #swagger.description = "Purchase endpoints"
-    // #swagger.parameters['id'] = { description: 'Purchase ID' }
     console.log(ctx.params)
     try {
         let purchase = await models.deletePurchaseById(ctx.params.id);
@@ -1226,10 +1218,6 @@ router.post('/purchase/:id/delete', async (ctx, next) => {
 });
 
 router.get('/willSell', async (ctx, next) => {
-    // #swagger.tags = ["Purchases"]
-    // #swagger.description = "Purchase endpoints"
-    // #swagger.parameters['id'] = { description: 'OrderSet ID' }
-
     try {
         let sells = await models.getAllForSale()
 
@@ -1248,10 +1236,6 @@ router.get('/willSell', async (ctx, next) => {
 });
 
 router.get('/willNotSell', async (ctx, next) => {
-    // #swagger.tags = ["Purchases"]
-    // #swagger.description = "Purchase endpoints"
-    // #swagger.parameters['id'] = { description: 'OrderSet ID' }
-
     try {
         let sells = await models.getAllNotForSale()
 
@@ -1362,6 +1346,29 @@ router.get('/sculpt/:sculpt', async (ctx, next) => {
 
 })
 
+// api/graph/topSculpts
+router.get('/getRaffleWinsForMaker/:makerId', async (ctx, next) => {
+    try {
+        let sculptTable = await models.getRaffleWinsForMaker(ctx.params.makerId)
+        headers = ['Maker', 'Count']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: sculptTable,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
 
 // api/purchase
 router.post('/purchase', async (ctx, next) => {
@@ -1854,6 +1861,30 @@ router.get('/graph/getPricingTable', async (ctx, next) => {
     }
 });
 
+// api/graph/getAvgYearlyPrice
+router.get('/graph/getAvgYearlyPrice', async (ctx, next) => {
+    try {
+        let pricingTable = await models.getAvgPurchasePriceByYear()
+        headers = ['avg_cost', 'year', 'purchase_count']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: pricingTable,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
 // api/graph/topSculpts
 router.get('/graph/topSculpts', async (ctx, next) => {
     try {
@@ -2084,6 +2115,104 @@ router.get('/graph/getAllMakerCountries', async (ctx, next) => {
                 'headers': headers
             },
             'data2': countriesChart
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+// api/graph/topSculpts
+router.get('/graph/allRaffleWinsByMaker', async (ctx, next) => {
+    try {
+        let sculptTable = await models.getAllRaffleWinsByMaker()
+        headers = ['Maker', 'Count']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: sculptTable,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+// api/graph/retailPurchasePricesByYears
+router.get('/graph/retailPurchasePricesByYears', async (ctx, next) => {
+    try {
+        let priceTable = await models.getRetailPurchasePricesByYears()
+        headers = ['Year', 'Price', 'Count']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: priceTable,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+// api/graph/avgPurchasePricesByYears
+router.get('/graph/avgPurchasePricesByYears', async (ctx, next) => {
+    try {
+        let priceTable = await models.getAvgPurchasesByYears()
+        headers = ['Year', 'Price']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: priceTable,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+// api/graph/avgPurchasePricesByYear/:year
+router.get('/graph/avgPurchasePricesByYear/:year?', async (ctx, next) => {
+    let year = (new Date()).getFullYear()
+    if (ctx.params.year) year = ctx.params.year
+    try {
+        let priceTable = await models.getAvgPurchasesByYear(year)
+        headers = ['Year', 'Price']
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: priceTable,
         }
         ctx.status = 200
     } catch (err) {

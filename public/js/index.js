@@ -148,6 +148,16 @@ $(function () {
             );
             })
         .trigger('change');
+    $('.purchaseDate').each((i, time) => {
+
+        let t = moment(time.textContent)
+        let now = moment()
+        let p = $(time.parentElement)
+        if ($(p).hasClass('waiting')) {
+            $(p.find('.timeSince')).text(`${now.diff(t, 'days')} days since invoice`)
+        }
+        
+    })
 
 })
 

@@ -21,6 +21,9 @@ $(async function () {
     {
         const topSculptData = await getData("/api/graph/topSculpts")
         let tableSculpt = `<table class='table border hover'><thead>`
+        console.log('a')
+        console.log(topSculptData)
+        console.log('b')
         for (h of topSculptData.headers) {
             console.log(h)
             tableSculpt += `<th>${h}</th>`

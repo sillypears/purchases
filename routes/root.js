@@ -19,9 +19,11 @@ router.get('/', async (ctx, next) => {
     let purchases = await models.getPurchases()
     let haves = await models.getPurchasesIStillHave()
     let missingPurchases = await models.getPurchasesThatAreMissing()
+    let tDate = new Date()
     return ctx.render('index', {
         title: "Purchases",
         nav: "index",
+        tDate: tDate,
         purchases: purchases,
         missingPurchases: missingPurchases,
         allHaveTotals: haves.length,
@@ -309,11 +311,12 @@ router.get('/notforsale', async (ctx, next) => {
 
 router.get('/totalSculpts', async (ctx, next) => {
     let sculpts = await models.getTotalSculpts();
+    console.log(sculpts.sculpts)
     return ctx.render('totalsculpts', {
         title: "All The Sculpts",
         nav: "totalsculpts",
-        sculpts: sculpts.sculpts,
-        totals: sculpts.count
+        sculpts: sculpts.sculptCount,
+        totals: sculpts.sculptsNotArrived
     })
 });
 
@@ -345,7 +348,7 @@ router.post('/add-purchase', async (ctx, next) => {
     if (a.adjustments < 0) {
         a.adjustments = 0
     }
-    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags, a.ig_post, a.mainColors, a.retailPrice);
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags, a.ig_post, a.mainColors, a.retailPrice, a.selfHostedImage);
     let meta = { 'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name }
     let m = await models.getMakers();
     let v = await models.getVendors();

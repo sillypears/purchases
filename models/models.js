@@ -173,11 +173,12 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
-    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, ig_post, mainColors, retail) => {
+    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, ig_post, mainColors, retail, self_host_image) => {
         let newTags = tags.split(',')
         let newColors = mainColors.split(',')
         conn = await db.getConnection();
-        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail});`)
+        console.log((self_host_image == 'on') ? true : false)
+        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false});`)
         console.log(purchaseId)
         newTags.forEach(tag => {
             let tagId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES ('${tag}', ${purchaseId.insertId})`)
@@ -267,7 +268,7 @@ module.exports = {
         return purchases
     },
     getAvgPriceByMaker: async(maker_id) => {
-        let sql = `SELECT round(AVG(price),2) as avg_price ,count(price) as purchases FROM all_purchases WHERE sale_type not in ("Trade", "Charity", "Auction", "Giveaway", "Free/Give") AND maker_id=${maker_id}`
+        let sql = `SELECT round(AVG(price),2) as avg_price ,count(price) as purchases FROM all_purchases WHERE sale_type not in ("Trade", "Charity", "Giveaway", "Free/Give") AND maker_id=${maker_id}`
         conn = await db.getConnection()
         let data = await conn.query(sql)
         if (conn) conn.release()
@@ -310,6 +311,7 @@ module.exports = {
         conn = await db.getConnection()
         const purchdata = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.purchases WHERE id = ${id};`)
         const purch = purchdata[0]
+        data.selfHostedImage = (data.selfHostedImage == 'on') ? 1 : 0
         let sql = `UPDATE ${process.env.DB_SCHEMA}.purchases SET\n`
         if (purch.category !== parseInt(data.category)) { update = true; sql += `category=${data.category},\n` }
         if (purch.detail !== data.detail) { update = true; sql+= `detail=${conn.escape(data.detail)},\n` }
@@ -332,7 +334,10 @@ module.exports = {
         if (purch.notes != data.notes) { update = true; sql+=`notes=${conn.escape(data.notes)},\n` }
         if (purch.ig_post != data.ig_post) { update = true; sql+=`ig_post='${data.ig_post}',\n` }
         if (purch.stem != data.stemType) { update = true; sql+=`stem='${data.stemType}',\n` }
+        if (purch.released_month != data.releasedMonth) { update = true; sql+=`released_month=${data.releasedMonth},\n` }
+        if (purch.released_year != data.releasedYear) { update = true; sql+=`released_year=${data.releasedYear},\n` }
         if (purch.retail_price != data.retailPrice) { update = true; sql+=`retail_price='${data.retailPrice}',\n` }
+        if (purch.selfHostedImage != data.selfHostedImage) { update = true; sql+=`selfHostedImage=${(data.selfHostedImage) ? true: false},\n` }
         const test = sql.charAt(sql.length - 2)
         if (test == ",") { 
             sql = sql.slice(0,-2)
@@ -479,7 +484,7 @@ module.exports = {
     },
     getPricingTable: async () => {
         conn = await db.getConnection()
-        let data = await conn.query(`SELECT MAX(price) as max_price, MIN(price) as min_price, AVG(price) as avg_price FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND price > 0 AND sale_type != 'charity'`)
+        let data = await conn.query(`SELECT MAX(price) as max_price, MIN(price) as min_price, AVG(price) as avg_price FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 AND price > 0 AND sale_type NOT IN ("Free/Gift", "Trade", "Charity", "Giveaway")`)
         if (conn) conn.release()
         return data
     },
@@ -489,9 +494,21 @@ module.exports = {
         if (conn) conn.release()
         return data
     },
+    getAllRaffleWinsByMaker: async () => {
+        conn = await db.getConnection()
+        let data = await conn.query(`SELECT maker_name, count(maker_name) as raffle_wins FROM all_purchases WHERE sale_type = "Raffle"  GROUP BY maker_name HAVING count(maker_name) > 0 ORDER BY count(maker_name) DESC, maker_name ASC`)
+        if (conn) conn.release()
+        return data
+    },
+    getRaffleWinsForMaker: async (maker_id) => {
+        conn = await db.getConnection()
+        let data = await conn.query(`SELECT maker_name, count(maker_name) as raffle_wins FROM all_purchases WHERE sale_type = "Raffle" AND maker_id = ${maker_id} GROUP BY maker_name HAVING count(maker_name) > 0 ORDER BY count(maker_name) DESC, maker_name ASC`)
+        if (conn) conn.release()
+        return data
+    },
     getTopSculpts: async () => {
         conn = await db.getConnection()
-        let data = await conn.query(`SELECT sculpt, count(sculpt) as total FROM ${process.env.DB_SCHEMA}.all_purchases GROUP BY sculpt ORDER BY total DESC LIMIT 5;`)
+        let data = await conn.query(`SELECT sculpt, count(sculpt) as total FROM ${process.env.DB_SCHEMA}.all_purchases WHERE isSold = 0 GROUP BY sculpt ORDER BY total DESC LIMIT 5;`)
         if (conn) conn.release()
         return data
     },
@@ -544,7 +561,7 @@ module.exports = {
     },
     getAllForSale: async () => {
         conn = await db.getConnection()
-        let data = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE willSell = 1 AND isSold = 0 ORDER BY id DESC;`)
+        let data = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.all_purchases WHERE willSell = 1 AND isSold = 0 ORDER BY maker_name ASC, entity ASC;`)
         if (conn) conn.release()
         return data
     },
@@ -629,6 +646,30 @@ module.exports = {
         let countries = await conn.query(`select count(m.shipping_country) as count, m.shipping_country as country from makers m WHERE m.shipping_country is not null group by m.shipping_country order by count(m.shipping_country) desc`)
         if (conn) conn.release()
         return countries
+    },
+    getAvgPurchasePriceByYear: async () => {
+        conn = await db.getConnection()
+        let price = await conn.query(`SELECT ROUND(SUM(price)/COUNT(id), 2) as avg_cost, YEAR(purchaseDate) as year, COUNT(id) as purchase_count FROM ${process.env.DB_SCHEMA}.all_purchases WHERE sale_type NOT IN ("Free/Gift", "Trade", "Charity", "Giveaway") AND includeInPriceCount = 1 GROUP BY YEAR(purchaseDate) DESC`);
+        if (conn) conn.release()
+        return price
+    },
+    getRetailPurchasePricesByYears: async() => {
+        conn = await db.getConnection()
+        let prices = await conn.query(`SELECT YEAR(p.purchaseDate) as year, p.price as price, COUNT(p.id) as counts FROM all_purchases p WHERE p.sale_type IN ("Raffle", "FCFS", "Group Buys", "Aftermarket", "Extras", "Fullfilment") GROUP BY YEAR(p.purchaseDate),p.price ORDER BY YEAR(p.purchaseDate) DESC, p.price DESC`)
+        if (conn) conn.release()
+        return prices
+    },
+    getAvgPurchasesByYears: async() => {
+        conn = await db.getConnection()
+        let prices = await conn.query(`SELECT YEAR(p.purchaseDate) as year, (SUM(p.price)/COUNT(p.id)) as avg_price FROM all_purchases p WHERE p.sale_type IN ("Raffle", "FCFS", "Group Buys", "Aftermarket", "Extras", "Fullfilment") GROUP BY YEAR(p.purchaseDate)`)
+        if (conn) conn.release()
+        return prices
+    },
+    getAvgPurchasesByYear: async(year) => {
+        conn = await db.getConnection()
+        let prices = await conn.query(`SELECT YEAR(p.purchaseDate) as year, (SUM(p.price)/COUNT(p.id)) as avg_price FROM all_purchases p WHERE YEAR(p.purchaseDate) = ${year} AND p.sale_type IN ("Raffle", "FCFS", "Group Buys", "Aftermarket", "Extras", "Fullfilment") GROUP BY YEAR(p.purchaseDate)`)
+        if (conn) conn.release()
+        return prices
     }
 }
 // Pricing table

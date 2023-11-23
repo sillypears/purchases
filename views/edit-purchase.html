@@ -92,6 +92,10 @@
                 value="<%= purchase.salePrice %>" />
         </div>
         <div>
+            <input type="text" id="releasedMonth" class="number" name="releasedMonth" placeholder="Month Released" size=9 value="<%= purchase.released_month %>" />
+            <input type="text" id="releasedYear" class="number" name="releasedYear" placeholder="Year Released" size=9 value="<%= purchase.released_year %>" />
+        </div>
+        <div>
             <input type="number" id="orderSet" name="orderSet" size=40 placeholder="Set Number"
                 value="<%= purchase.orderSet %>" />
         </div>
@@ -109,6 +113,8 @@
             <%if (purchase.image) { %>
             <img class="clickable biggify" src="<%= purchase.image %>" width="32px" height="32px" />
             <% } %>
+            <input type="checkbox" id="selfHostedImage" name="selfHostedImage" <% if (purchase.selfHostedImage) { %> checked <% } %> >
+            <label for="selfHostedImage">Self Hosted</label>
         </div>
         <div>
             <input type="text" id="ig_post" name="ig_post" size=80 placeholder="Instagram Post" value="<%= purchase.ig_post %>"/>

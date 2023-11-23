@@ -43,6 +43,9 @@
                             <% } %>
                         </div>
                     </div>
+                    <div class="card-text mt-auto mx-auto timeSince spoiler-text" id="timeSince-<%= purchase.id %>">
+
+                    </div>
                     <div class="card-footer">
                         <div class="row">
                             <div class="will-sell toggle-icon col-md-6 clickable" data-id="<%= purchase.id %>"
@@ -91,7 +94,14 @@
                                 <!-- $<%= (purchase.price+purchase.adjustments).toFixed(2) %> -->
                             </span>
                         </div>
+    
                     </div>
+                    <hidden class="purchaseDate d-none" id="purchaseDate-<%= purchase.id %>">
+                        <%= purchase.purchaseDate %>
+                    </hidden>
+                    <hidden class="purchaseId d-none" id="purchaseId-<%= purchase.id %>">
+                        <%= purchase.id %>
+                    </hidden>
                 </div>
             </div>
             <% }) %>
