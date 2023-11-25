@@ -21,7 +21,7 @@
     </div>
     <div id="all" class="d-flex all ">
             <% purchases.forEach((purchase, index)=> { %>
-                <div class="card-box" title="<%= purchase.purchaseDate.toDateString() %>">
+                <div class="card-box" title="<%= purchase.purchaseDate.toDateString() %><% if (purchase.received) { %>&#013<%= purchase.receivedDate.toDateString() %><% } %>">
                     <div id="card-<%= purchase.id %>"
                         class="card text-center <% if (purchase.received) { %> arrived <% } else {%> waiting <%} %>" data-status="<% if (purchase.received) {%>received<%}else { %>waiting<%}%>">
                         <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"

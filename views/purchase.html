@@ -25,7 +25,8 @@
                         </a>
                     </div>
                     <div class="col-md-4" title="<% if (purchase.received) { %> <%= moment(purchase.receivedDate).format('DD MMM YYYY') %> <% } %>">
-                        <%= moment(purchase.purchaseDate).format('DD MMM YYYY') %> 
+                        <div><%= moment(purchase.purchaseDate).format('DD MMM YYYY') %></div> <% if (purchase.received) { %><div><%= moment(purchase.receivedDate).format('DD MMM YYYY') %> </div><% } %>
+
                     </div>
                 </div>
                 <span class="row">

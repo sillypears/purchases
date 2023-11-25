@@ -213,6 +213,16 @@ var router = new Router({
 *       items:
 *         $ref: "#/components/schemas/Purchase"
 *
+*     PurchaseDelete:
+*       type: object
+*       properties:
+*           affectedRows:
+*               type: integer
+*           insertId: 
+*               type: integer
+*           warningStatus:
+*               type: integer
+*
 *     VendorPrice:
 *       type: object
 *       properties:
@@ -1184,6 +1194,43 @@ router.get('/purchase/:id', async (ctx, next) => {
 });
 
 // api/maker/purchases/:id/:source?
+/**
+ * @openapi
+ * /maker/purchases/{id}/{source}:
+ *   get:
+ *     description: Get Purchase object by maker ID or name
+ *     operationId: getPurchaseByMakerIdorName
+ *     tags: [Purchase]
+ *     responses:
+ *       200:
+ *         description: Returns Purchase object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Purchase'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *   parameters:
+ *     - name: id
+ *       in: path
+ *       example: 74
+ *       description: ID of purchase to get
+ *       required: true
+ *       schema:
+ *         type: integer
+*     - name: source
+ *       in: path
+ *       example: id, name
+ *       description: Whether to use maker id or name
+ *       required: false
+ *       schema:
+ *         type: string
+ *
+*/
 router.get('/maker/purchases/:id/:source?', async (ctx, next) => {
     let source = ctx.params.source ? ctx.params.source : 'id'
     try {
@@ -1201,13 +1248,44 @@ router.get('/maker/purchases/:id/:source?', async (ctx, next) => {
 
 });
 
-// api/purchase/:id/delete
-router.post('/purchase/:id/delete', async (ctx, next) => {
+// api/purchase/:id
+
+/**
+ * @openapi
+ * /purchase/{id}:
+ *   delete:
+ *     description: Delete Purchase object by ID
+ *     operationId: deletePurchaseById
+ *     tags: [Purchase]
+ *     responses:
+ *       204:
+ *         description: Returns deleted Purchase object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/PurchaseDelete'
+ *       500:
+ *         description: Returns error
+  *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorMsg'
+ *   parameters:
+ *     - name: id
+ *       in: path
+ *       example: 74
+ *       description: ID of purchase to get
+ *       required: true
+ *       schema:
+ *         type: integer
+ *
+*/
+router.delete('/purchase/:id', async (ctx, next) => {
     console.log(ctx.params)
     try {
         let purchase = await models.deletePurchaseById(ctx.params.id);
         ctx.body = purchase
-        ctx.status = 200
+        ctx.status = 204
     } catch (err) {
         ctx.body = {
             'status': 'Failure',

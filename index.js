@@ -50,7 +50,7 @@ const options = {
         },
         servers: [
             {
-                url: `http://${process.env.HOSTNAME}:${process.env.PORT}/api`,
+                url: `https://${process.env.HOSTNAME}/api`,
                 description: "main"
             }
         ]
@@ -82,7 +82,8 @@ app.use(koaSwagger({
     supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
     routePrefix: '/api/api-docs',
     swaggerOptions: {
-        url: 'https://raw.githubusercontent.com/sillypears/purchases/swagger/api-docs.json', //url: `http://${process.env.HOSTNAME}:${process.env.PORT}/api/api-docs.json`,
+        // url: 'https://raw.githubusercontent.com/sillypears/purchases/swagger/api-docs.json', 
+        url: `https://${process.env.HOSTNAME}/api/api-docs.json`,
         docExpansion: 'none',
     },
     hideTopbar: true,
