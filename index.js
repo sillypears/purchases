@@ -94,7 +94,7 @@ app.listen(process.env.PORT, process.env.HOSTNAME, () => console.log(`running on
 
 module.exports = {
     info: options.definition.info,
-    host: `http://${process.env.IP}:${process.env.PORT}`,
+    host: `http://${process.env.HOSTNAME}:${process.env.PORT}`,
     basePath: '/api',
     openapiSpecification
 }

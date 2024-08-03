@@ -24,7 +24,7 @@
                     <div class="card-body">
                         <div class="card-title">
                             <a href="/purchase/<%= purchase.id %>"><img class="card-image" loading="lazy"
-                                    src="<% if (purchase.image) {%> <%= purchase.image %> <%} else { %>/img/missing.png<% } %>"
+                                    src="<% if (purchase.image_250) {%> <%= purchase.image_250 %> <%} else { %>/img/missing.png<% } %>"
                                     title="<%= purchase.vendor_name %> " /></a>
                         </div>
                         <div class="card-text">

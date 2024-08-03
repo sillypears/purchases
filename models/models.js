@@ -173,12 +173,13 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
-    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, ig_post, mainColors, retail, self_host_image) => {
+    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, ig_post, mainColors, retail, self_host_image, released_month, released_year, tracking) => {
         let newTags = tags.split(',')
         let newColors = mainColors.split(',')
         conn = await db.getConnection();
-        console.log((self_host_image == 'on') ? true : false)
-        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false});`)
+        console.log(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage, released_month, released_year, tracking_info) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false}, ${released_month}, ${released_year}, '${tracking}');`)
+        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage, released_month, released_year, tracking_info) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false}, ${released_month}, ${released_year}, '${tracking}');`)
+        
         console.log(purchaseId)
         newTags.forEach(tag => {
             let tagId = conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.tags (tagname, purchaseId) VALUES ('${tag}', ${purchaseId.insertId})`)
@@ -338,6 +339,8 @@ module.exports = {
         if (purch.released_year != data.releasedYear) { update = true; sql+=`released_year=${data.releasedYear},\n` }
         if (purch.retail_price != data.retailPrice) { update = true; sql+=`retail_price='${data.retailPrice}',\n` }
         if (purch.selfHostedImage != data.selfHostedImage) { update = true; sql+=`selfHostedImage=${(data.selfHostedImage) ? true: false},\n` }
+        // if (purch.tracking_info != data.trackingInfo) { update = true; sql+=`tracking_info=${data.trackingInfo},\n`}
+
         const test = sql.charAt(sql.length - 2)
         if (test == ",") { 
             sql = sql.slice(0,-2)

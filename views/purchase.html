@@ -40,8 +40,12 @@
 
                 </div>
                 <div class="card-title">
-                    <img class="big-card-image"
-                        src="<% if (purchase.image) {%> <%= purchase.image %> <%} else { %>/img/missing.png<% } %>" />
+                 
+                        <% if (purchase.selfHostedImage) { %>
+                            <img class="big-card-image" src="<% if (purchase.image) {%><%= purchase.image %><%} else { %>/img/missing.png<% } %>" />
+                        <% } else { %>
+                            <img class="big-card-image" src="<% if (purchase.image_720) {%> <%= purchase.image_720 %> <%} else { %>/img/missing.png<% } %>" />
+                        <% } %>
                 </div>
 
                 <div class="card-text">
@@ -97,7 +101,7 @@
                                 src="/img/www.png"></a>
                     </span>
                     <span class="text-right col-md-7">
-                        <%= purchase.saleType %>
+                        <%= purchase.sale_type %>
                     </span>
                     <span class="text-right col-md-2"
                         title="$<%= (purchase.price + purchase.adjustments).toFixed(2) %>">

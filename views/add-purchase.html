@@ -94,7 +94,7 @@
 
     <div id='ticker'>
         <% if (ticker.insertId) { %>
-            <div class="alert-success">Added id: <%= ticker.insertId %>
+            <div class="alert-success">Added id: <a href="/purchase/<%= ticker.insertId %>"><%= ticker.insertId %></a>
             </div>
             <% } %>
                 <% if (ticker.error) { %>

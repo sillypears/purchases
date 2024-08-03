@@ -348,7 +348,7 @@ router.post('/add-purchase', async (ctx, next) => {
     if (a.adjustments < 0) {
         a.adjustments = 0
     }
-    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags, a.ig_post, a.mainColors, a.retailPrice, a.selfHostedImage);
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags, a.ig_post, a.mainColors, a.retailPrice, a.selfHostedImage, a.releasedMonth, a.releasedYear, "None");
     let meta = { 'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name }
     let m = await models.getMakers();
     let v = await models.getVendors();

@@ -63,13 +63,25 @@ def get_catalog():
 def parse_src(data, maker, sculpt, cw, cw_id):
     img = ''
     for x in data['sculpts']:
+        n = x['name']
         if x['name'].lower() == sculpt.lower():
             for color in x['colorways']:
-                if cw == 'Poltergeist': print(x)
-                if color['id'].lower().strip() == cw_id.lower().strip():
-                    img = color['img']
-                elif color['name'].lower().strip() == cw.lower().strip():
-                    img = color['img']
+                cn = color['name']
+                ci = color['img']
+                try:
+                    if cw == 'S. Lime': 
+                        print(x['name'], color['name'], color['id'], sculpt, cw, cw_id, color['img'])
+                    if cw_id:
+                        if color['id'].lower().strip() == cw_id.lower().strip():
+                            img = color['img']
+                    elif color['name'].lower().strip() == cw.lower().strip():
+                        img = color['img']
+                    else:
+                        pass
+
+                except Exception as e:
+                    print(f"Failed because : {e}")
+    # if img != '': print(img)
     return img
 
 def cleanup_connections(conn):
@@ -109,36 +121,57 @@ def main():
     for purchase in purchases:
         m_id = purchase[10]
         if m_id in keycap:
-            p_id = purchase[0]
-            sculpt = purchase[4]
-            cw = purchase[3]
-            cw_id = purchase[8]
-            maker = keycap[m_id]
-            pic = purchase[32]
-            self_hosted = purchase[41]
+            try:
+                p_id = purchase[0]
+            except:
+                p_id = purchase[0]
+                print(f"Failed to get p_id")
+            try:
+                sculpt = purchase[4].strip()
+            except:
+                sculpt = purchase[4]
+                print(f"Failed to get sculpt: {purchase[4]}")
+            try:
+                cw = purchase[3].strip()
+            except:
+                cw = purchase[3]
+                print(f"Failed to strip cw: {purchase[3]}")            
+            try:
+                cw_id = None
+                if purchase[8]:
+                    cw_id = purchase[8].strip()
+                
+            except:
+                cw_id = purchase[8]
+                print(f"Failed to strip cw_id: {purchase[8]}")
+            try:
+                maker = keycap[m_id].strip()
+            except:
+                maker = keycap[m_id]
+                print(f"Failed to strip maker: {keycap[m_id]}")
+            try: 
+                pic = purchase[32]
+            except:
+                pic = purchase[32]
+                print(f"Failed to strip img: {purchase[32]}")
+            try:
+                self_hosted = purchase[40]
+            except:
+                print(self_hosted)
             # d = get_data(maker)
 
-            try:
-                lookup = catalog[maker_lookup[str(m_id)][5]]
-                # print(p_id, self_hosted)
-                if not self_hosted:
+            if self_hosted != 0:
+                try:
+                    lookup = catalog[maker_lookup[str(m_id)][5]]
                     # print(cw)
-                    i = parse_src(lookup, maker.strip(), sculpt.strip(), cw.strip(), cw_id.strip())
+                    i = parse_src(lookup, maker, sculpt, cw, cw_id)
                     if i != pic:
-                        print(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}; {maker}, {sculpt}, {cw}, {pic}")
+                        print(f"UPDATE keyboard.purchases SET image='{i}', image_250='{i.replace('keycaps/', 'keycaps/250/')}', image_720='{i.replace('keycaps/', 'keycaps/720/')}' WHERE id = {p_id}; {maker}, {sculpt}, {cw}, {pic}")
                         # print(maker, sculpt, cw, i)
-                        cur.execute(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}")
-            except:
-                pass
-                # print(f"Couldn't parse catalog for {maker}, {sculpt}, {cw}")
-            # if d:
-                # print( maker, sculpt, cw)
-                # i = parse_src(d, maker.strip(), sculpt.strip(), cw.strip())
-                # if i != pic:
-                    # print(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}; {maker}, {sculpt}, {cw}, {pic}")
-                    # print(maker, sculpt, cw, i)
-                    # cur.execute(f"UPDATE keyboard.purchases SET image = '{i}' WHERE id = {p_id}")
-
+                        cur.execute(f"UPDATE keyboard.purchases SET image='{i}', image_250='{i.replace('keycaps/', 'keycaps/250/')}', image_720='{i.replace('keycaps/', 'keycaps/720/')}' WHERE id = {p_id}")
+                except Exception as e:
+                    # pass
+                    print(f"Couldn't parse catalog for {maker}, {sculpt}, {cw}: {e}")
     conn.commit()
     cleanup_connections(conn)
     conn.close()
