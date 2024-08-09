@@ -632,6 +632,12 @@ router.get('/maker/sculpt/count/:id', async (ctx, next) => {
     try {
         let sculptCount = await models.getSculptCountByMaker(ctx.params.id);
         if (sculptCount) {
+            let total = 0
+            sculptCount.forEach((sculpt) => {
+                total += sculpt.count
+            })
+            console.log(total)
+            sculptCount.push({'sculpt': 'Total', 'count': total})
             ctx.body = sculptCount
             ctx.status = 200
         } else {

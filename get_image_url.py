@@ -3,8 +3,18 @@ import json
 import requests
 import argparse
 import mariadb
+from decimal import Decimal
 from dotenv import dotenv_values, load_dotenv
-from datetime import datetime
+from datetime import date, datetime
+
+def custom_serializer(obj):
+    """Convert non-serializable objects like Decimal and datetime to serializable types."""
+    if isinstance(obj, Decimal):
+        return float(obj)  # or str(obj) if you prefer
+    if isinstance(obj, (date, datetime)):
+        return obj.isoformat()  # Converts date/datetime to an ISO 8601 string
+    raise TypeError(f"Type {type(obj)} not serializable")
+
 
 # config = dotenv_values(".env.prod")
 load_dotenv('.env.prod')
@@ -69,8 +79,8 @@ def parse_src(data, maker, sculpt, cw, cw_id):
                 cn = color['name']
                 ci = color['img']
                 try:
-                    if cw == 'S. Lime': 
-                        print(x['name'], color['name'], color['id'], sculpt, cw, cw_id, color['img'])
+                    # if cw == 'S. Lime': 
+                    #     print(x['name'], color['name'], color['id'], sculpt, cw, cw_id, color['img'])
                     if cw_id:
                         if color['id'].lower().strip() == cw_id.lower().strip():
                             img = color['img']
@@ -111,6 +121,11 @@ def main():
     purchases = cur.fetchall()
     keycap = {}
     maker_lookup = {}
+    columns = [desc[0] for desc in cur.description]
+    result = [dict(zip(columns, purch)) for purch in purchases]
+    json_result = json.dumps(result, indent=4, default=custom_serializer)
+    with open('results_output.json', 'w') as f:
+        f.write(json_result)
     for maker in makers:
         if maker[5]: maker_lookup[str(maker[0])] = maker
         if maker[4] != "":
@@ -118,60 +133,19 @@ def main():
     print(f"Makers: {len(makers)}")
     print(f"Purchases: {len(purchases)}")
     catalog = get_catalog()
-    for purchase in purchases:
-        m_id = purchase[10]
-        if m_id in keycap:
-            try:
-                p_id = purchase[0]
-            except:
-                p_id = purchase[0]
-                print(f"Failed to get p_id")
-            try:
-                sculpt = purchase[4].strip()
-            except:
-                sculpt = purchase[4]
-                print(f"Failed to get sculpt: {purchase[4]}")
-            try:
-                cw = purchase[3].strip()
-            except:
-                cw = purchase[3]
-                print(f"Failed to strip cw: {purchase[3]}")            
-            try:
-                cw_id = None
-                if purchase[8]:
-                    cw_id = purchase[8].strip()
-                
-            except:
-                cw_id = purchase[8]
-                print(f"Failed to strip cw_id: {purchase[8]}")
-            try:
-                maker = keycap[m_id].strip()
-            except:
-                maker = keycap[m_id]
-                print(f"Failed to strip maker: {keycap[m_id]}")
-            try: 
-                pic = purchase[32]
-            except:
-                pic = purchase[32]
-                print(f"Failed to strip img: {purchase[32]}")
-            try:
-                self_hosted = purchase[40]
-            except:
-                print(self_hosted)
-            # d = get_data(maker)
-
-            if self_hosted != 0:
+    for p in json.loads(json_result):
+            if p['selfHostedImage'] == 0:
                 try:
-                    lookup = catalog[maker_lookup[str(m_id)][5]]
-                    # print(cw)
-                    i = parse_src(lookup, maker, sculpt, cw, cw_id)
-                    if i != pic:
-                        print(f"UPDATE keyboard.purchases SET image='{i}', image_250='{i.replace('keycaps/', 'keycaps/250/')}', image_720='{i.replace('keycaps/', 'keycaps/720/')}' WHERE id = {p_id}; {maker}, {sculpt}, {cw}, {pic}")
-                        # print(maker, sculpt, cw, i)
-                        cur.execute(f"UPDATE keyboard.purchases SET image='{i}', image_250='{i.replace('keycaps/', 'keycaps/250/')}', image_720='{i.replace('keycaps/', 'keycaps/720/')}' WHERE id = {p_id}")
+                    lookup = catalog[p['archivist_id']]
+                    i = parse_src(lookup, p['maker_name'], p['entity'], p['detail'], p['ka_id'])
+                    if i != p['image']:
+                        print(f"UPDATE keyboard.purchases SET image='{i}', image_250='{i.replace('keycaps/', 'keycaps/250/')}', image_720='{i.replace('keycaps/', 'keycaps/720/')}' WHERE id = {p['id']}; {p['maker_id']}, {p['sculpt']}, {p['detail']}, {p['image']}")
+                        cur.execute(f"UPDATE keyboard.purchases SET image='{i}', image_250='{i.replace('keycaps/', 'keycaps/250/')}', image_720='{i.replace('keycaps/', 'keycaps/720/')}' WHERE id = {p['id']}")
                 except Exception as e:
                     # pass
-                    print(f"Couldn't parse catalog for {maker}, {sculpt}, {cw}: {e}")
+                    print(f"Couldn't parse catalog for {p['maker_name']}, {p['sculpt']}, {p['detail']}: {e}")
+            # else:
+            #     print(self_hosted)
     conn.commit()
     cleanup_connections(conn)
     conn.close()

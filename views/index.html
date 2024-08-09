@@ -50,11 +50,17 @@
                                 </div>
                             </div>
                             <div class="card-text mt-auto mx-auto" >
-                                <% if (purchase.series_total > 0) { %>
-                                    <% if (purchase.series_num > 0 ) { %>
-                                        <%= purchase.series_num %>
+                                <% if (purchase.series_total === -1282) { %>
+                                    <span id="series_num">🍐</span>
+                                    /                            
+                                    <span id="series_num">🍐</span>
+                                <% } else { %>
+                                    <% if (purchase.series_total > 0) { %>
+                                        <% if (purchase.series_num > 0 ) { %>
+                                            <%= purchase.series_num %>
+                                        <% } %>
+                                        / <%= purchase.series_total %>
                                     <% } %>
-                                    / <%= purchase.series_total %>
                                 <% } %>
                             </div>
                         </div>

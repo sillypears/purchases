@@ -7,9 +7,10 @@ $(async function () {
     let maker = await getData(`/api/maker/id/${window.location.pathname.split('/').at(-1)}`)
     {
         const maker_id = window.location.pathname.split('/').at(-1)
-        const sculptCounts = await getData(`/api/maker/sculpt/count/${maker_id}`)
+        let sculptCounts = await getData(`/api/maker/sculpt/count/${maker_id}`)
+        let check = sculptCounts.pop() 
         let table = `<table class="table border odd">`
-        table += `<tr><th>Sculpt</th><th>Count</th></tr>`
+        table += `<tr><th>Sculpt</th><th>Count (${check.count})</th></tr>`
         sculptCounts.forEach(function(s) {
             table += `<tr><td>${s.sculpt}</td><td>${s.count}</td></tr>`    
         })
@@ -81,8 +82,9 @@ $(async function () {
     //yearlyWinCountByMaker
     {
         const maker_id = window.location.pathname.split('/').at(-1)
-        const sculptCounts = await getData(`/api/maker/sculpt/count/${maker_id}`)
+        let sculptCounts = await getData(`/api/maker/sculpt/count/${maker_id}`)
         let data = []
+        sculptCounts.pop()
         sculptCounts.forEach(function(s) {
             data.push({ value: s.count, name: s.sculpt})    
         })

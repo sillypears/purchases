@@ -226,3 +226,5 @@ dist
 
 pyenv/*
 failures.csv
+results_output.json
+get_image_url_backup.py

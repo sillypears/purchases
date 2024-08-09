@@ -25,9 +25,13 @@
                             class="fa fa-times">&nbsp;o</i></span>
                     <div class="card-body">
                         <div class="card-title">
-                            <a href="/purchase/<%= purchase.id %>"><img class="card-image rounded-3" loading="lazy"
-                                    src="<% if (purchase.image_250) {%> <%= purchase.image_250 %> <%} else { %>/img/missing.png<% } %>"
-                                    title="<%= purchase.vendor_name %> " /></a>
+                            <a href="/purchase/<%= purchase.id %>">
+                                <% if (purchase.selfHostedImage) { %> 
+                                    <img class="card-image" loading="lazy" height=250px src="<%= (purchase.image) ? purchase.image : '/img/missing.png' %>" />
+                                <% } else { %>
+                                    <img class="card-image" loading="lazy" src="<%= purchase.image_250  ? purchase.image_250 : '/img/missing.png' %>" />
+                                <% } %>  
+                            </a>
                         </div>
                         <div class="card-text">
                             <%= purchase.sculpt %>
