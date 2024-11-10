@@ -140,10 +140,13 @@
             <div class="card-footer" data-bs-toggle="collapse" data-bs-target="#notesId" aria-expanded="false"
                 aria-controls="notesId">
                 <div class="row">
+                    <span class="text-center col-md-1">
+                        <a href="/api/purchase/<%= purchase.id %>" target="_blank"><img height="24px" src="/img/json.png"></a>
+                    </span>
                     <span class="text-center col-md-2">
                         Notes<% if (purchase.notes) { %>*<% }%>:
                     </span>
-                    <span id="notesId" class="collapse align-left col-md-8">
+                    <span id="notesId" class="collapse align-left col-md-7">
                         <%= purchase.notes %> &emsp; $<%= purchase.salePrice %>
                     </span>
                     <span id="soldPrice" class="collapse align-left col-md-2">

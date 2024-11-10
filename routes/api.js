@@ -2307,6 +2307,60 @@ router.get('/graph/avgPurchasePricesByYear/:year?', async (ctx, next) => {
     }
 });
 
+// api/graph/purchasesByColor
+router.get('/graph/purchasesByColor', async (ctx, next) => {
+    try {
+        let colors = await models.getPurchasesByColor()
+        headers = ['Color', 'Count']
+        let finalColors = {}
+        colors.forEach((item) => {
+            let t = item.mainColors.split(',')
+            for (let x in t) {
+                if (t[x] != "" || t[x].length > 1) { 
+                    if (finalColors[t[x]]) {
+                        finalColors[t[x]] += 1
+                    } else {
+                        finalColors[t[x]] = 1
+                    }
+                }            
+            }
+        })
+
+        // for (let x in makerByPriceData) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        let finalData = {
+            status: 'OK',
+            headers: headers,
+            data: [],
+            data2: []
+        }
+        for (let x in finalColors) {
+            let ob = {}
+            let t = {}
+            ob[x] = finalColors[x]
+            finalData.data.push(ob)
+            t["name"] = x
+            t["y"] = finalColors[x]
+            t["color"] = x
+            finalData.data2.push(t)
+        }
+        for (let x in finalColors.data) {
+    
+        }
+        ctx.body = finalData
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
+
+
 function toMonthName(monthNumber) {
     const date = new Date();
     date.setMonth(monthNumber - 1);

@@ -21,11 +21,8 @@ $(async function () {
     {
         const topSculptData = await getData("/api/graph/topSculpts")
         let tableSculpt = `<table class='table border hover'><thead>`
-        console.log('a')
-        console.log(topSculptData)
-        console.log('b')
+        // console.log(topSculptData)
         for (h of topSculptData.headers) {
-            console.log(h)
             tableSculpt += `<th>${h}</th>`
         }
         tableSculpt += '</thead><tbody>'
@@ -54,7 +51,7 @@ $(async function () {
         const totalMakerData = await getData("/api/graph/totalMakers")
         const totalSculptData = await getData("/api/graph/totalSculpts")
         const totalArtisansIHaveCount = await getData("/api/graph/artisansIHaveCount")
-        console.log(totalMakerData)
+        // console.log(totalMakerData)
         let totalCounts = `<table class='table border hover'><thead>`
         totalCounts += `<th class="text-center">Total Makers</th>`
         totalCounts += `<th class="text-center">Have Sculpts</th>`
@@ -74,7 +71,7 @@ $(async function () {
     //artisansByCount
     {
         const artisanData = await getData("/api/graph/haveArtisansByCount")
-        console.log(artisanData)
+        // console.log(artisanData)
         $('#artisan-count-chart').highcharts({
             chart: {
                 type: 'pie',
@@ -136,7 +133,7 @@ $(async function () {
     //artisansByCount
     {
         const saleTypeWins = await getData("/api/graph/saleTypeWins")
-        console.log(saleTypeWins)
+        // console.log(saleTypeWins)
         $('#artisan-pie-sales').highcharts({
             chart: {
                 type: 'pie',
@@ -205,6 +202,7 @@ $(async function () {
             }]
         })
     }
+    // AllMakerCountries
     {
         const countries = await getData(`/api/graph/getAllMakerCountries`)
         $('#maker-countries').highcharts({
@@ -230,6 +228,37 @@ $(async function () {
         })
 
     }
+    // purchasesByColor
+    {
+        const colors = await getData(`/api/graph/purchasesByColor`)
+        console.log(colors)
+        colors.data2.sort(function(a, b) {
+            return b.y - a.y;
+        });
+        $('#color-count').highcharts({
+            chart: {
+                type: 'pie',
+                backgroundColor: 'transparent'
+            },
+            title: {
+                text: "Count of Purchase Colors"
+            },
+
+            tooltip: {
+                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+            },
+            legend: {
+                enabled: true
+            },
+            series: [{
+                name: "Color",
+                colorByPoint: true,
+                data: colors.data2
+            }]
+        })
+
+    }
+    
 });
 
 async function getData(url) {

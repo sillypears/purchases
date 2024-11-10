@@ -107,6 +107,9 @@
                 <option value="bs" <% if (purchase.stem == "bs") { %> selected <% } %> >BS</option>
                 <option value="alps" <% if (purchase.stem == "alps") { %> selected <% } %> >Alps</option>
             </select>
+            <input type="checkbox" name="forever_cap" id="forever_cap" <% if (purchase.forever_cap) { %> checked <% } %> />
+            <label for="forever_cap">Forever</label>
+
         </div>
         <div id="img-container">
             <input type="text" id="image" name="image" size=80 placeholder="Link to image" value="<%= purchase.image %>" />

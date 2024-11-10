@@ -173,12 +173,13 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
-    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, ig_post, mainColors, retail, self_host_image, released_month, released_year, tracking) => {
+    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, ig_post, mainColors, retail, self_host_image, released_month, released_year, tracking, forever_cap) => {
         let newTags = tags.split(',')
-        let newColors = mainColors.split(',')
+        let newColors = mainColors.split(',');
+        let foreverCap = (forever_cap == "on") ? 1 : 0;
         conn = await db.getConnection();
-        console.log(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage, released_month, released_year, tracking_info) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false}, ${released_month}, ${released_year}, '${tracking}');`)
-        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage, released_month, released_year, tracking_info) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false}, ${released_month}, ${released_year}, '${tracking}');`)
+        console.log(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage, released_month, released_year, tracking_info, forever_cap) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false}, ${released_month}, ${released_year}, '${tracking}', ${foreverCap});`)
+        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage, released_month, released_year, tracking_info, forever_cap) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false}, ${released_month}, ${released_year}, '${tracking}', ${foreverCap});`)
         
         console.log(purchaseId)
         newTags.forEach(tag => {
@@ -339,6 +340,7 @@ module.exports = {
         if (purch.released_year != data.releasedYear) { update = true; sql+=`released_year=${data.releasedYear},\n` }
         if (purch.retail_price != data.retailPrice) { update = true; sql+=`retail_price='${data.retailPrice}',\n` }
         if (purch.selfHostedImage != data.selfHostedImage) { update = true; sql+=`selfHostedImage=${(data.selfHostedImage) ? true: false},\n` }
+        if (purch.forever_cap != data.forever_cap) {update = true; sql+=`forever_cap=${(data.forever_cap == "on") ? 1 : 0},\n` } 
         // if (purch.tracking_info != data.trackingInfo) { update = true; sql+=`tracking_info=${data.trackingInfo},\n`}
 
         const test = sql.charAt(sql.length - 2)
@@ -673,6 +675,12 @@ module.exports = {
         let prices = await conn.query(`SELECT YEAR(p.purchaseDate) as year, (SUM(p.price)/COUNT(p.id)) as avg_price FROM all_purchases p WHERE YEAR(p.purchaseDate) = ${year} AND p.sale_type IN ("Raffle", "FCFS", "Group Buys", "Aftermarket", "Extras", "Fullfilment") GROUP BY YEAR(p.purchaseDate)`)
         if (conn) conn.release()
         return prices
+    },
+    getPurchasesByColor: async() => {
+        conn = await db.getConnection()
+        let colors = await conn.query(`SELECT mainColors FROM all_purchases WHERE mainColors != ""`)
+        if (conn) conn.release()
+        return colors
     }
 }
 // Pricing table
