@@ -2306,6 +2306,30 @@ router.get('/graph/avgPurchasePricesByYear/:year?', async (ctx, next) => {
         }
     }
 });
+// api/graph/countByTooling
+router.get('/graph/countByTooling', async (ctx, next) => {
+    try {
+        let toolingTable = await models.getTooling()
+        headers = ['Tooling', 'Count']
+        // for (let x in toolingTable['toolingCount']) {
+        //     if (!headers.includes(makerByPriceData[x].display_name)) {
+        //         headers.push(makerByPriceData[x].display_name)
+        //     }
+        // }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: toolingTable.toolingCount,
+            totalData: toolingTable.totalCount
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+});
 
 // api/graph/purchasesByColor
 router.get('/graph/purchasesByColor', async (ctx, next) => {

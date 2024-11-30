@@ -117,7 +117,8 @@ router.get('/add-purchase', async (ctx, next) => {
     let m = await models.getMakers();
     let v = await models.getVendors();
     let c = await models.getCategories();
-    let s = await models.getSaleTypes();
+    let st = await models.getSaleTypes();
+    let s = await models.getSculptTypes();
     let maxSet = await models.getLatestSet();
     return ctx.render('add-purchase', {
         title: "Add Purchase",
@@ -127,7 +128,8 @@ router.get('/add-purchase', async (ctx, next) => {
         makers: m,
         vendors: v,
         categories: c,
-        saleTypes: s,
+        saleTypes: st,
+        sculptTypes: s,
         maxSet: maxSet
     });
 });
@@ -164,7 +166,9 @@ router.get('/purchase/:id/edit', async (ctx, next) => {
     const m = await models.getMakers();
     const v = await models.getVendors();
     const c = await models.getCategories();
-    const s = await models.getSaleTypes();
+    const st = await models.getSaleTypes();
+    const s = await models.getSculptTypes();
+    let t = await models.getToolingTypes();
     const maxSet = await models.getLatestSet();
     const purchase = await models.getPurchase(ctx.params.id)
     return ctx.render('edit-purchase', {
@@ -175,7 +179,9 @@ router.get('/purchase/:id/edit', async (ctx, next) => {
         makers: m,
         vendors: v,
         categories: c,
-        saleTypes: s,
+        saleTypes: st,
+        sculptTypes: s,
+        toolingTypes: t,
         purchase: purchase,
         maxSet: maxSet,
         moment: moment
@@ -348,12 +354,13 @@ router.post('/add-purchase', async (ctx, next) => {
     if (a.adjustments < 0) {
         a.adjustments = 0
     }
-    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags, a.ig_post, a.mainColors, a.retailPrice, a.selfHostedImage, a.releasedMonth, a.releasedYear, "None", a.forever_cap);
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags, a.ig_post, a.mainColors, a.retailPrice, a.selfHostedImage, a.releasedMonth, a.releasedYear, "None", a.forever_cap, a.sculptType);
     let meta = { 'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name }
     let m = await models.getMakers();
     let v = await models.getVendors();
     let c = await models.getCategories();
-    let s = await models.getSaleTypes();
+    let st = await models.getSaleTypes();
+    let s = await models.getSculptTypes();
     let maxSet = await models.getLatestSet();
 
     return ctx.render('add-purchase', {
@@ -364,7 +371,8 @@ router.post('/add-purchase', async (ctx, next) => {
         makers: m,
         vendors: v,
         categories: c,
-        saleTypes: s,
+        saleTypes: st,
+        sculptTypes: s,
         maxSet: maxSet
     });
 });

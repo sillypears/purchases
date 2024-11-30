@@ -34,6 +34,20 @@
             <input type="text" id="tags" name="tags" class="tags" size=40 placeholder="Tags" data-role="tagsinput" value="<%= purchase.tags %>" />
         </div>
         <div>
+            <select id="sculptType" name="sculptType">
+                <option id="option-default" name="default" value="-1" disabled>Select Sculpt Style</option>
+                <% for ( let sculpt of sculptTypes) { %>
+                    <option id="option-<%= sculpt.name %>" name="sculptType" value="<%= sculpt.id %>" <% if (sculpt.id  == purchase.sculpt_id) { %> selected <% } %>><%= sculpt.display_name %></option>
+                <% } %>
+            </select>
+            <select id="toolingType" name="toolingType">
+                <option id="option-default" name="default" value="-1" disabled <% if (purchase.tool_id == null) { %> selected <% } %>>Select Tooling</option>
+                <% for ( let tooling of toolingTypes) { %>
+                    <option id="option-<%= tooling.display_name %>" name="toolingType" value="<%= tooling.id %>" <% if (tooling.id  == purchase.tooling_id) { %> selected <% } %>><%= tooling.display_name %></option>
+                <% } %>
+            </select>
+        </div>
+        <div>
             <input type="number" id="series_num" name="series_num" size=5 placeholder="total" value=<%= purchase.series_num %> />
             /
             <input type="number" id="series_total" name="series_total" size=5 placeholder="num" value=<%= purchase.series_total %> />

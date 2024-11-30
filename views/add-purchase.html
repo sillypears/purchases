@@ -34,6 +34,14 @@
             <input type="text" id="tags" name="tags" class="tags" size=40 placeholder="Tags" data-role="tagsinput" value="" />
         </div>
         <div>
+            <select id="sculptType" name="sculptType">
+                <option id="option-default" name="default" value="-1" disabled>Select Sculpt Style</option>
+                <% for ( let sculpt of sculptTypes) { %>
+                    <option id="option-<%= sculpt.name %>" name="sculptType" value="<%= sculpt.id %>" <% if (sculpt.name =="sculpted") { %> selected <% } %>><%= sculpt.display_name %></option>
+                <% } %>
+            </select>
+        </div>
+        <div>
             <select class="select" id="maker" name="maker">
                 <option id="option-default" name="default" value="-1">Select Maker</option>
                 <% for ( let maker of makers) { %>

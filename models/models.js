@@ -107,6 +107,18 @@ module.exports = {
         if (conn) conn.release()
         return saleTypes
     },
+    getSculptTypes: async () => {
+        conn = await db.getConnection();
+        let sculptTypes = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.styles;`)
+        if (conn) conn.release()
+        return sculptTypes
+    },
+    getToolingTypes: async () => {
+        conn = await db.getConnection();
+        let toolingTypes = await conn.query(`SELECT * FROM ${process.env.DB_SCHEMA}.tooling;`)
+        if (conn) conn.release()
+        return toolingTypes
+    },
     getSaleTypeIdByName: async (name) => {
         conn = await db.getConnection();
         let saleTypes = await conn.query(`SELECT id FROM ${process.env.DB_SCHEMA}.sale_types WHERE name = '${name}';`)
@@ -173,13 +185,13 @@ module.exports = {
         if (conn) conn.release()
         return purchases
     },
-    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, ig_post, mainColors, retail, self_host_image, released_month, released_year, tracking, forever_cap) => {
+    insertPurchase: async (category, detail, archivist, sculpt, ka_id, maker, vendor, price, adjustments, saletype, received, purchaseDate, expectedDate, orderSet, image, tags, ig_post, mainColors, retail, self_host_image, released_month, released_year, tracking, forever_cap, sculptType) => {
         let newTags = tags.split(',')
         let newColors = mainColors.split(',');
         let foreverCap = (forever_cap == "on") ? 1 : 0;
         conn = await db.getConnection();
-        console.log(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage, released_month, released_year, tracking_info, forever_cap) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false}, ${released_month}, ${released_year}, '${tracking}', ${foreverCap});`)
-        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage, released_month, released_year, tracking_info, forever_cap) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false}, ${released_month}, ${released_year}, '${tracking}', ${foreverCap});`)
+        console.log(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage, released_month, released_year, tracking_info, forever_cap, style) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false}, ${released_month}, ${released_year}, '${tracking}', ${foreverCap}, ${sculptType});`)
+        let purchaseId = await conn.query(`INSERT INTO ${process.env.DB_SCHEMA}.purchases (category, detail, entity, entity_display, ka_id, maker, vendor, price, adjustments, saleType, received, purchaseDate, receivedDate, orderSet, ig_post, retail_price, selfHostedImage, released_month, released_year, tracking_info, forever_cap, style) VALUES (${category}, ${conn.escape(detail)}, ${conn.escape(archivist)}, ${conn.escape(sculpt)}, ${conn.escape(ka_id)}, ${maker}, ${vendor}, ${price}, ${adjustments}, ${saletype}, ${received}, FROM_UNIXTIME(${new Date(purchaseDate).getTime() / 1000}+86400), FROM_UNIXTIME(${new Date(expectedDate).getTime() / 1000}+86400), ${orderSet}, ${conn.escape(ig_post)}, ${retail}, ${(self_host_image == 'on') ? true : false}, ${released_month}, ${released_year}, '${tracking}', ${foreverCap}, ${sculptType});`)
         
         console.log(purchaseId)
         newTags.forEach(tag => {
@@ -341,6 +353,9 @@ module.exports = {
         if (purch.retail_price != data.retailPrice) { update = true; sql+=`retail_price='${data.retailPrice}',\n` }
         if (purch.selfHostedImage != data.selfHostedImage) { update = true; sql+=`selfHostedImage=${(data.selfHostedImage) ? true: false},\n` }
         if (purch.forever_cap != data.forever_cap) {update = true; sql+=`forever_cap=${(data.forever_cap == "on") ? 1 : 0},\n` } 
+        if (purch.style != data.sculptType) {update = true; sql+=`style=${data.sculptType},\n` } 
+        if (purch.tooling_id != data.toolingType) {update = true; sql+=`tooling_id=${data.toolingType},\n` } 
+
         // if (purch.tracking_info != data.trackingInfo) { update = true; sql+=`tracking_info=${data.trackingInfo},\n`}
 
         const test = sql.charAt(sql.length - 2)
@@ -681,7 +696,14 @@ module.exports = {
         let colors = await conn.query(`SELECT mainColors FROM all_purchases WHERE mainColors != ""`)
         if (conn) conn.release()
         return colors
-    }
+    },
+    getTooling: async() => {
+        conn = await db.getConnection()
+        let toolingCount = await conn.query(`SELECT tooling_name as name, count(tooling_name) as y FROM all_purchases WHERE tooling_id IS NOT NULL GROUP BY tooling_name`)
+        let totalCount = await conn.query(`SELECT count(id) as count FROM all_purchases WHERE isSold = 0 `)
+        if (conn) conn.release()
+        return {"toolingCount": toolingCount, "totalCount": totalCount}
+       }
 }
 // Pricing table
 // SELECT MAX(price) as max_price, MIN(price) as min_price, AVG(price) as avg_price FROM keyboard.all_purchases WHERE isSold = 0 AND price > 0;
