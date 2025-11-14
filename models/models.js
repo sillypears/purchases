@@ -478,9 +478,21 @@ module.exports = {
         if (conn) conn.release()
         return data
     },
+    getPieHaveArtisansByCount: async () => {
+        conn = await db.getConnection();
+        let data = await conn.query(`SELECT p.entity as name, count(p.entity) as count FROM ${process.env.DB_SCHEMA}.purchases p LEFT JOIN ${process.env.DB_SCHEMA}.categories c ON c.id = p.category WHERE c.name = 'artisan' AND p.isSold = 0 GROUP BY p.entity ORDER BY count(p.entity) DESC	`)
+        if (conn) conn.release()
+        return data
+    },
     getMakerByCount: async () => {
         conn = await db.getConnection();
         let data = await conn.query(`SELECT m.display_name as name, count(m.display_name) as y FROM ${process.env.DB_SCHEMA}.purchases p LEFT JOIN ${process.env.DB_SCHEMA}.categories c ON c.id = p.category LEFT JOIN ${process.env.DB_SCHEMA}.makers m ON m.id = p.maker WHERE c.name = 'artisan' GROUP BY m.display_name ORDER BY count(m.display_name) DESC`)
+        if (conn) conn.release()
+        return data
+    },
+    getPieMakerByCount: async () => {
+        conn = await db.getConnection();
+        let data = await conn.query(`SELECT m.display_name as name, count(m.display_name) as count FROM ${process.env.DB_SCHEMA}.purchases p LEFT JOIN ${process.env.DB_SCHEMA}.categories c ON c.id = p.category LEFT JOIN ${process.env.DB_SCHEMA}.makers m ON m.id = p.maker WHERE c.name = 'artisan' GROUP BY m.display_name ORDER BY count(m.display_name) DESC`)
         if (conn) conn.release()
         return data
     },

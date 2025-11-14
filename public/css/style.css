@@ -98,3 +98,10 @@ body {
     
     font-size: xx-small;
   }
+
+.no-link {
+    text-decoration: none;
+}
+.grey-text {
+    color: grey;
+}

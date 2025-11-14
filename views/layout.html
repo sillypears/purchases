@@ -111,16 +111,19 @@
             <script src="https://code.highcharts.com/modules/accessibility.js"></script>
         <% } %>
         <% if (nav=="artisan-count" ) { %>
-            <script src="/js/charts.js"></script>
+            <script src="/js/artisan-counts.js"></script>
         <% } %>
         <% if (nav=="maker" ) { %>
             <script src="/js/maker-charts.js"></script>
         <% } %>
             <script src="/js/index.js"></script>
-                <% if (nav=="edit-purchase" ) { %>
-                    <script src="/js/edit-purchase.js"></script>
-                <% } %>
-                        
+        <% if (nav=="edit-purchase" ) { %>
+            <script src="/js/edit-purchase.js"></script>
+        <% } %>
+        <% if (nav=="charts" ) { %>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script src="/js/charts.js"></script>
+        <% } %>                
 
 
                         <footer class="footer fixed-bottom">

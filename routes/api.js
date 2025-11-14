@@ -1802,6 +1802,52 @@ router.get('/graph/haveArtisansByCount', async (ctx, next) => {
     }
 });
 
+// api/graph/pieArtisansByCount
+router.get('/graph/pieArtisansBycount', async (ctx, next) => {
+    try {
+        let artisansByCountData = await models.getPieHaveArtisansByCount()
+        let headers = []
+        for (let x in artisansByCountData) {
+            if (!headers.includes(artisansByCountData[x].entity)) {
+                headers.push(artisansByCountData[x].entity)
+            }
+        }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: artisansByCountData,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+})
+// api/graph/pieMakersByCount
+router.get('/graph/pieMakersBycount', async (ctx, next) => {
+    try {
+        let artisansByCountData = await models.getPieMakerByCount()
+        let headers = []
+        for (let x in artisansByCountData) {
+            if (!headers.includes(artisansByCountData[x].entity)) {
+                headers.push(artisansByCountData[x].entity)
+            }
+        }
+        ctx.body = {
+            status: 'OK',
+            headers: headers,
+            data: artisansByCountData,
+        }
+        ctx.status = 200
+    } catch (err) {
+        ctx.body = {
+            'status': 'Failure',
+            'error': err
+        }
+    }
+})
 // api/graph/makerByCount
 router.get('/graph/makerByCount', async (ctx, next) => {
     try {

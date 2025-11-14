@@ -7,7 +7,6 @@ const models = require('../models/models');
 const multer = require('@koa/multer')
 const koaSwagger = require('koa2-swagger-ui');
 const moment = require('moment')
-const { Dropzone } = require("dropzone");
 const fs = require("fs");
 const path = require("path");
 const sharp = require('sharp')
@@ -280,6 +279,15 @@ router.get('/add-vendor', async (ctx, next) => {
         totals: 0
     });
 });
+
+router.get('/graph/charts', async (ctx, next) => {
+
+    return ctx.render('charts', {
+        title: "Charts!",
+        nav: "charts",
+        totals: 0
+    })
+})
 
 router.get('/graph/artisan-count', async (ctx, next) => {
     let artisanData = await models.getArtisansByCount()
