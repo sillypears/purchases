@@ -1,5 +1,5 @@
 const env = process.env.NODE_ENV || "dev"
-require('dotenv').config({path: `../.env.${env}`})
+require('dotenv').config({path: `./.env.${env}`})
 const mariadb = require('mariadb');
 
 const pool = 
