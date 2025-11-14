@@ -1,24 +1,33 @@
 body {
     background-color: lightgrey;
     font-family: "Rubik", sans-serif;
+    min-width: fit-content;
 }
 
-.container-fluid {
-    /* margin: 20px 50px; */
-}
 .card {
     width: 15rem;
     height: 25rem;
     margin: 0px 0px 10px 10px;
+
+}
+.all {
+    display: flex;
+    flex-wrap: wrap;
 }
 
+.card-sm {
+    width: 10rem;
+    height: 15rem;
+    margin: 0px 0px 10px 10px;
+}
 .card-big {
     width: 75%;
     margin: 0px 0px 10px 10px;
 }
 
 .card-image {
-    width: 150px;
+    width: 120px;
+    height: auto;
 
 }
 
@@ -31,26 +40,68 @@ body {
     height: 32px;
 }
 
-.green {
+.arrived {
     border-left: 5px solid #73BD07;
 }
-.red {
+
+.waiting {
     border-left: 5px solid #dd0202;
 }
 
 .toggle-icon {
     cursor: pointer;
-  }
+}
 
-  .spoiler-text {
+.spoiler-text {
     color: transparent;
     cursor: grab;
     user-select: none;
     transition: background 0.3s ease 0.2s, color 0.2s ease 0.25s;
-  }
-  
-  .spoiler-text:hover,
-  .spoiler-text:focus {
+}
+
+.spoiler-text:hover,
+.spoiler-text:focus {
     background: #e8e8e8;
     color: inherit;
+}
+
+.dropzones {
+    background: white;
+    border-radius: 5px;
+    border: 2px dashed rgb(0, 135, 247);
+    border-image: none;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.bootstrap-tagsinput .tag {
+    margin-right: 2px;
+    color: white !important;
+    background-color: #0d6efd;
+    padding: 0.2rem;
   }
+
+  @media screen and (max-width:900px) {
+    .container {
+      flex-wrap: nowrap;
+      width: 100%;
+    }
+    .card {
+        width: 8rem;
+        height: 15rem;
+        margin: 0px 0px 10px 10px;
+    }
+  }
+
+  .timeSince {
+    
+    font-size: xx-small;
+  }
+
+.no-link {
+    text-decoration: none;
+}
+.grey-text {
+    color: grey;
+}

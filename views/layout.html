@@ -1,15 +1,22 @@
+<!DOCTYPE html>
 <html>
 
 <head>
     <title>
-        <%= title %>
+        <%= title %> <% if (nav=="index") { %> (<%= missingPurchases.length %>) <% } %>
     </title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/css/bootstrap4-toggle.min.css"
         rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Rubik">
     <link rel="stylesheet" href="https://uicdn.toast.com/chart/latest/toastui-chart.min.css" />
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.css"
+        integrity="sha512-xmGTNt20S0t62wHLmQec2DauG9T+owP9e6VU8GigI0anN7OXLip9i7IwEhelasml2osdxX71XcYm6BQunTQeQg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <link rel="stylesheet" href="/css/style.css" />
     <style>
         .highlight {
@@ -18,10 +25,9 @@
     </style>
 </head>
 
-<body>
-    <nav class="nav navbar-expand-lg navbar-dark bg-dark">
-        <!-- <a class="navbar-brand" href="#"><img width="30" height="30" src="/img/brand.gif" /></a> -->
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+<body width="100%">
+    <nav class="nav fixed-top navbar-expand-lg navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -30,12 +36,6 @@
                 <li class="nav-item">
                     <a class="nav-link" id="navbar-home" href="/">Home</a>
                 </li>
-
-                <!-- <li class="nav-item">
-                    <a class="nav-link" id="navbar-raffles" href="/add-purchase">Add Purchase</a>
-                </li> -->
-
-
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                         data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -43,6 +43,7 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/add-purchase">Purchase</a>
+                        <a class="dropdown-item" href="/add-purchase-bulk">Bulk Burchase</a>
                         <a class="dropdown-item" href="/add-maker">Maker</a>
                         <a class="dropdown-item" href="/add-vendor">Vendor</a>
 
@@ -61,9 +62,8 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <a class="dropdown-item" href="/graph/artisan-count">Artisan Count</a>
-                        <!-- <a class="dropdown-item" href="/add-maker">Maker</a>
-                        <a class="dropdown-item" href="/add-vendor">Vendor</a> -->
-
+                        <a class="dropdown-item" href="/totalSculpts">Sculpts</a>
+                        <!-- <a class="dropdown-item" href="/add-vendor">Vendor</a>  -->
                     </div>
                 </li>
                 <li class="nav-item">
@@ -72,9 +72,15 @@
                 <li class="nav-item">
                     <a class="nav-link" id="navbar-vendors" href="/notforsale">Not For Sale</a>
                 </li>
-
+                 <li class="nav-item">
+                    <a class="nav-link" id="navbar-api" href="/api/api-docs" target="_blank">Docs</a>
+                </li>
             </ul>
-            <ul class="navbar-nav me-right">
+            <form class="my-1" action="/search" method="POST">
+                <input type="search" id=searchTag name="searchTag" size=20 class="form-control me-2" aria-label="Search"
+                    placeholder="Search Tags" />
+            </form>
+            <ul class="navbar-nav">
                 <li class="nav-item">
                     <a id=picRefresh class="nav-link" href="#" onclick="picRefresh();return false;">Refresh!</a>
                 </li>
@@ -85,26 +91,43 @@
     <%- body %>
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"
             integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"
-            integrity="sha512-2rNj2KJ+D8s1ceNasTIex6z4HWyOnEYLVC3FigGOmyQCZc2eBXKgOxQmo3oKLHyfcj53uz4QMsRCWNbLd32Q1g=="
-            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
             integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
             crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"
+            integrity="sha512-2rNj2KJ+D8s1ceNasTIex6z4HWyOnEYLVC3FigGOmyQCZc2eBXKgOxQmo3oKLHyfcj53uz4QMsRCWNbLd32Q1g=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap4-toggle@3.6.1/js/bootstrap4-toggle.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-        <% if (nav=="artisan-count" ) { %>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-tagsinput/0.8.0/bootstrap-tagsinput.js"
+            integrity="sha512-VvWznBcyBJK71YKEKDMpZ0pCVxjNuKwApp4zLF3ul+CiflQi6aIJR+aZCP/qWsoFBA28avL5T5HA+RE+zrGQYg=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <% if (nav == "artisan-count" || nav == "maker") {%>
             <script src="https://code.highcharts.com/highcharts.js"></script>
+            <script src="https://code.highcharts.com/highcharts-more.js"></script>
             <script src="https://code.highcharts.com/modules/exporting.js"></script>
             <script src="https://code.highcharts.com/modules/export-data.js"></script>
             <script src="https://code.highcharts.com/modules/accessibility.js"></script>
+        <% } %>
+        <% if (nav=="artisan-count" ) { %>
+            <script src="/js/artisan-counts.js"></script>
+        <% } %>
+        <% if (nav=="maker" ) { %>
+            <script src="/js/maker-charts.js"></script>
+        <% } %>
+            <script src="/js/index.js"></script>
+        <% if (nav=="edit-purchase" ) { %>
+            <script src="/js/edit-purchase.js"></script>
+        <% } %>
+        <% if (nav=="charts" ) { %>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             <script src="/js/charts.js"></script>
-            <% } %>
-                <script src="/js/index.js"></script>
+        <% } %>                
 
 
-                <footer class="footer">
-                </footer>
+                        <footer class="footer fixed-bottom">
+                        </footer>
 </body>
 
 </html>

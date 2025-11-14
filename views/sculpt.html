@@ -1,0 +1,90 @@
+<!-- views/index.html -->
+<div class="container my-5">
+    <div class="h1">
+        All '<%= sculpt %>' Sculpts
+    </div>
+        <div class="row ">
+            <% sculpts.forEach((sculpt, index)=> { %>
+
+                <div class="col d-flex" >
+                    <div id="card-<%= sculpt.id %>" class="card text-center d-flex <% if (sculpt.received) { %> arrived <% } else {%> waiting <%} %>" data-status="<% if (sculpt.received) {%>received<%}else { %>waiting<%}%>">
+                        <span class="toggle-icon clickable text-left" data-id="<%= sculpt.id %>" data-type="receive">
+                            <i title="Toggle Status" class="fa fa-times">&nbsp;o</i>
+                        </span>
+                        <div class="card-body d-flex flex-column">
+                            <div class="card-title">
+                                <a href="/purchase/<%= sculpt.id %>"><img class="card-image" loading="lazy"
+                                        src="<% if (sculpt.image_250) {%> <%= sculpt.image_250 %> <%} else { %>/img/missing.png<% } %>"
+                                        title="<%= sculpt.vendor_name %> " /></a>
+                            </div>
+                            <div class="card-text">
+                                <%= sculpt.sculpt %>
+                                    <br />
+                                    <%= sculpt.detail %>
+                            </div>
+                            <div class="card-text mt-auto mx-auto" >
+                                <div class="small"><%= sculpt.maker_name %></div>
+                            </div>
+                            <div class="card-text mt-auto mx-auto" >
+                                <% if (sculpt.series_total > 0) { %>
+                                    <% if (sculpt.series_num > 0 ) { %>
+                                        <%= sculpt.series_num %>
+                                    <% } %>
+                                    / <%= sculpt.series_total %>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="will-sell toggle-icon col-md-6 clickable" data-id="<%= sculpt.id %>"
+                                    data-type="willSell">
+                                    <% if (sculpt.willSell) {%>
+                                        <div id="sell-<%= sculpt.id %>"
+                                            class="bg-secondary font-weight-bold text-white small" title="Sell">Sell
+                                        </div>
+                                        <% } else { %>
+                                            <div id="sell-<%= sculpt.id %>"
+                                                class="bg-success font-weight-bold text-white small" title="Keep">Keep
+                                            </div>
+                                            <% } %>
+                                </div>
+                                <div class="is-sold toggle-icon col-md-6" data-id="<%= sculpt.id %>"
+                                    data-type="isSold">
+                                    <% if (sculpt.isSold) {%>
+                                        <div id="sold-<%= sculpt.id %>"
+                                            class="bg-secondary font-weight-bold text-white small" title="Sold">Sold
+                                        </div>
+                                        <% } else { %>
+                                            <div id="sold-<%= sculpt.id %>"
+                                                class="bg-success font-weight-bold text-white small" title="Have">Have
+                                            </div>
+                                            <% } %>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <span class="text-center col-md-2">
+                                    <a href="https://instagram.com/<%= sculpt.instagram %>" target="_blank"><img
+                                            class="card-link ig-link" src="/img/ig.png"></a>
+                                </span>
+                                <span class="text-center col-md-2">
+                                    <a href="https://keycap-archivist.com/maker/<%= sculpt.archivist %>"
+                                        target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
+                                </span>
+                                <!-- <span class="text-center col-md-2">
+                                <a href="<%= sculpt.link %>" target="_blank"><img class="card-link www-link"
+                                        src="/img/www.png"></a>
+                            </span> -->
+                                <span class="text-right col-md-6">
+                                    <!-- $<%= (sculpt.price+sculpt.adjustments).toFixed(2) %> -->
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <% }) %>
+        </div>
+
+</div>

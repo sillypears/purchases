@@ -1,0 +1,16 @@
+<!-- views/artisan-count.html -->
+<div class="container my-5">
+    <h1 class="h1">
+        <%= title %> <span class="small">
+                <% if (totals> 0) { %> (<%= totals %>) <% } %>
+            </span>
+    </h1>
+    <div class="row">
+        <div class="col-6-lg" style="width: 50%; max-width: 800px; margin: 0 auto;">
+            <canvas id="pieSculptCount"></canvas>
+        </div>
+        <div class="col-6-lg" style="width: 50%; max-width: 800px; margin: 0 auto;">
+            <canvas id="pieMakerCount"></canvas>
+        </div>
+    </div>
+</div>

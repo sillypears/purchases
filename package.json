@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./index.js",
-    "test": "jest"
+    "test": "jest",
+    "watch": "npx nodemon index.js --watch ./ --ext '*.js'",
+    "swagger": "swagger-jsdoc -d ./index.js -o ./api-doc.json"
   },
   "repository": {
     "type": "git",
@@ -20,22 +22,26 @@
   "dependencies": {
     "@koa/multer": "^3.0.0",
     "axios": "^0.21.1",
+    "chart.js": "^4.4.8",
+    "csv-string": "^4.1.0",
     "dotenv": "^10.0.0",
+    "dropzone": "^6.0.0-beta.2",
     "jest": "^27.0.6",
     "koa": "^2.13.1",
     "koa-better-body": "^3.3.9",
     "koa-bodyparser": "^4.3.0",
     "koa-ejs": "^4.3.0",
     "koa-favicon": "^2.1.0",
+    "koa-json": "^2.0.2",
     "koa-logger": "^3.2.1",
     "koa-response-time": "^2.1.0",
     "koa-router": "^10.0.0",
     "koa-static": "^5.0.0",
-    "koa2-swagger-ui": "^5.2.0",
+    "koa2-swagger-ui": "^5.8.0",
     "mariadb": "^2.5.4",
     "multer": "^1.4.2",
-    "swagger-autogen": "^2.11.1",
-    "swagger-ui": "^3.51.2"
+    "sharp": "^0.29.3",
+    "swagger-jsdoc": "^6.2.8"
   },
   "devDependencies": {
     "babel-jest": "^27.0.6",

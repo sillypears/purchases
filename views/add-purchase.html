@@ -1,61 +1,120 @@
 <!-- views/index.html -->
-<h1 class="h1">
-    <%= title %> <span class="small">
-            <% if (totals> 0) { %> (<%= totals %>) <% } %>
-        </span>
-</h1>
-<form class="form" action="/add-purchase"  enctype="multipart/form-data" method="POST">
-    <select class="select" id="category" name="category">
-        <option id="option-default" name="default" value="-1">Select Category</option>
-        <% for ( let category of categories) { %><
-            <option id="option-<%= category.name %>" name="category" value="<%= category.id %>" <% if (category.display_name == "Artisan") { %> selected <% } %> ><%= category.display_name %> </option>
-        <% }; %>
-    </select><br />
-    <input type="text" id="detail" name="detail" placeholder="Detail"/><br />
-    <input type="text" id="archivist" name="archivist" placeholder="Keycap Archivist Sculpt"/><br />
-    <input type="text" id="set" name="set" placeholder="Display Name"/><br />
+<div class="container my-5">
 
-    <select class="select" id="maker" name="maker">
-        <option id="option-default" name="default" value="-1">Select Maker</option>
-
-        <% for ( let maker of makers) { %>
-            <option id="option-<%= maker.name %>" name="maker" value=<%= maker.id %> ><%= maker.display_name %> </option>
-        <% }; %>
-    </select><br />
-    
-    <select class="select" id="vendor" name="vendor">
-        <option id="option-default" name="default" value="-1">Select Vendor</option>
-
-        <% for ( let vendor of vendors) { %>
-            <option id="option-<%= vendor.name %>" name="vendor" value=<%= vendor.id  %> ><%= vendor.display_name %> </option>
-        <% }; %>
-    </select><br />
-    <input type="number" id="price" name="price" step="0.01" placeholder="Price $"/><br />
-    <input type="number" id="adjustments" name="adjustments" step="0.01" placeholder="Adjustments $"/><br />
-
-    <select class="select" id="saletype" name="saletype">
-        <option id="option-default" name="default" value="-1">Select Sale Type</option>
-
-        <% for ( let saleType of saleTypes) { %>
-            <option id="option-<%= saleType.name %>" name="saleType" value=<%= saleType.id %> ><%= saleType.display_name %> </option>
-        <% }; %>
-    </select><br />
-
-    <input type="text" id="purchaseDate" class="date" name="purchaseDate" placeholder="Purchase Date" onfocus="(this.type='date'); let nowp = new Date(); (this.value=nowp.toISOString().split('T')[0])"/><br />
-    <input type="text" id="expectedDate" class="date" name="expectedDate" placeholder="Expected Date" onfocus="(this.type='date'); let nowe = new Date(); nowe.setDate(nowe.getDate()+7); (this.value=nowe.toISOString().split('T')[0])"/><br />
-    <input type="number" id="orderSet" name="orderSet" placeholder="Set Number" value="<%= maxSet %>"/><br />
-    <input type="text" id="image" name="image" placeholder="Link to image" /><br />
-    <button type="submit" id="submit" class="btn-success">Add Purchase!</button>
-</form>
-
-<div id='ticker'>
-    <% if (ticker.insertId) { %>
-        <div class="alert-success">Added id: <%= ticker.insertId %>
+    <h1 class="h1">
+        <%= title %> <span class="small">
+                <% if (totals> 0) { %> (<%= totals %>) <% } %>
+            </span>
+    </h1>
+    <form class="form" action="" method="POST">
+        <div>    
+            <select class="select" id="category" name="category" size="1">
+                <option id="option-default" name="default" value="-1">Select Category</option>
+                <% for ( let category of categories) { %>
+                <option id="option-<%= category.name %>" name="category" value="<%= category.id %>" <% if (category.display_name=="Artisan" ) { %> selected <% } %> ><%= category.display_name %></option>
+                <% }; %>
+            </select>
         </div>
-    <% } %>
-    <% if (ticker.error) { %>
-        <div class="alert-danger">
-            <%= ticker.error %>
+        <div>
+            <input autofocus type="text" id="detail" name="detail" size=20 placeholder="Detail" />
         </div>
-    <% } %>
+        <div>
+            <input type="text" id="archivist" name="archivist" size=20 placeholder="Keycap Archivist Sculpt" />
+        </div>
+        <div>
+            <input type="text" id="set" name="set" size=20 placeholder="Display Name" />
+        </div>
+        <div>
+            <input type="text" id="ka_id" name="ka_id" size=20 placeholder="Archivist ID" />
+        </div>
+        <div>
+            <input type="text" id="mainColors" name="mainColors" class="tags" size=40 placeholder="Main Colors" data-role="tagsinput" value="" />
+        </div>
+        <div>
+            <input type="text" id="tags" name="tags" class="tags" size=40 placeholder="Tags" data-role="tagsinput" value="" />
+        </div>
+        <div>
+            <select id="sculptType" name="sculptType">
+                <option id="option-default" name="default" value="-1" disabled>Select Sculpt Style</option>
+                <% for ( let sculpt of sculptTypes) { %>
+                    <option id="option-<%= sculpt.name %>" name="sculptType" value="<%= sculpt.id %>" <% if (sculpt.name =="sculpted") { %> selected <% } %>><%= sculpt.display_name %></option>
+                <% } %>
+            </select>
+        </div>
+        <div>
+            <select class="select" id="maker" name="maker">
+                <option id="option-default" name="default" value="-1">Select Maker</option>
+                <% for ( let maker of makers) { %>
+                <option id="option-<%= maker.name %>" name="maker" value=<%=maker.id %> ><%= maker.display_name %></option>
+                <% }; %>
+            </select>
+        </div>    
+        <div>
+            <select class="select" id="vendor" name="vendor">
+                <option id="option-default" name="default"  value="-1">Select Vendor</option>
+                <% for ( let vendor of vendors) { %>
+                <option id="option-<%= vendor.name %>" name="vendor" value=<%=vendor.id %> ><%= vendor.display_name %></option>
+                <% }; %>
+            </select>
+        <div>
+            <input type="number" id="price" name="price" step="0.01" size=20 placeholder="Price $" />
+        </div>
+        <div>
+            <input type="number" id="adjustments" name="adjustments" step="0.01" size=20 placeholder="Adjustments $" />
+        </div>
+        <div>
+            <input type="decimal" id="retailPrice" name="retailPrice" step="0.01" size=20 placeholder="Retail Price" onfocus="this.value=document.getElementById('price').value"/><br />
+        </div>
+        <div>
+            <select class="select" id="saletype" name="saletype">
+                <option id="option-default" name="default" value="-1">Select Sale Type</option>
+                <% for ( let saleType of saleTypes) { %>
+                <option id="option-<%= saleType.name %>" name="saleType" value=<%=saleType.id %> ><%=saleType.display_name %></option>
+                <% }; %>
+            </select>
+        </div>            
+        <div>
+            <input type="text" id="purchaseDate" class="date" name="purchaseDate" size=20 placeholder="Purchase Date" onfocus="(this.type='date'); let nowp = new Date(); (this.value=nowp.toISOString().split('T')[0])" /><br />
+        </div>        
+        <div>
+            <input type="text" id="expectedDate" class="date" name="expectedDate" size=20 placeholder="Expected Date" onfocus="(this.type='date'); let nowe = new Date(); nowe.setDate(nowe.getDate()+7); (this.value=nowe.toISOString().split('T')[0])" /><br />
+        </div>
+        <div>
+            <input type="text" id="releasedMonth" class="number" name="releasedMonth" placeholder="Month Released" size=9 value="<%= (new Date().getMonth()+1) %>" />
+            <input type="text" id="releasedYear" class="number" name="releasedYear" placeholder="Year Released" size=9 value="<%= (new Date()).getFullYear() %>" />
+        </div>
+        <div>
+            <input type="number" id="orderSet" name="orderSet" placeholder="Set Number" value="<%= maxSet %>" /><br />
+        </div>
+        <div>
+            <input type="text" id="ig_post" name="ig_post" placeholder="Instagram Post" />
+        </div>
+
+        <div>
+            <input type="text" id="image" name="image"  placeholder="Link to image" value="" />
+            <input type="checkbox" id="selfHostedImage" name="selfHostedImage"  >
+            <label for="selfHostedImage">Self Hosted Image</label>
+        </div>
+        <div>
+            <input type="checkbox" id="forever_cap"/>
+            <label for="forever_cap">Forever</label>
+        </div>
+        <div>
+            <button type="submit" id="submit" class="btn-success">Add Purchase!</button>
+        </div>
+
+    </form>
+
+    <div id='ticker'>
+        <% if (ticker.insertId) { %>
+            <div class="alert-success">Added id: <a href="/purchase/<%= ticker.insertId %>"><%= ticker.insertId %></a>
+            </div>
+            <% } %>
+                <% if (ticker.error) { %>
+                    <div class="alert-danger">
+                        <%= ticker.error %>
+                    </div>
+                    <% } %>
+    </div>
+
 </div>

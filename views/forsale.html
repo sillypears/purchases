@@ -1,4 +1,6 @@
-<h1 class="h1">
+<div class="container my-5">
+
+    <h1 class="h1">
     <%= title %> <span class="small spoiler-text">
             <% if (totals> 0) { %> (<%= totals %>) <% } %>
     </span>
@@ -6,7 +8,7 @@
 <table class="table hover border">
 <% sale.forEach((item, index) => { %>
     <tr>
-        <td><%= item.detail %></td>
+        <td><a href="/purchase/<%= item.id %>"><%= item.detail %></a></td>
         <td><%= item.sculpt %></td>
         <td>
             <a class="link-success" href="/maker/id/<%= item.maker_id %>">
@@ -18,3 +20,4 @@
     </tr>
 <% }) %>
 </table>
+</div>

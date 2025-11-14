@@ -1,133 +1,183 @@
 <!-- views/index.html -->
-<div class="row no-gutters">
-    <div class="col-md-3">
-        <h1 class="h1">
-            <%= title %> <span class="small spoiler-text">
-                    <% if (totals> 0) { %> (<%= totals %>) <% } %>
+<div class="container my-5" width="100%">
+    <div class="row no-gutters">
+        <div class="col-md-3">
+            <h1 class="h1">
+                <%= title %>
+            </h1>
+        </div>
+        <div class="col-md-2">
+            <span class="small spoiler-text">
+                <% if (allHaveTotals> 0) { %> Have: <%= allHaveTotals %>
+                        <% } %>
+                            <% if (allTotals> 0) { %> Total: <%= allTotals %>
+                                    <% } %>
             </span>
-        </h1>
+        </div>
+        <div class="col-md-7">
+            <input id="toggle-box" type="checkbox" checked data-toggle="toggle" data-size="sm" data-on="All"
+                data-off="Missing" data-offstyle="danger">
+        </div>
     </div>
-    <div class="col-md-9">
-        <input id="toggle-box" type="checkbox" checked data-toggle="toggle" data-size="sm" data-on="All"
-            data-off="Missing" data-offstyle="danger">
-    </div>
-</div>
-<div id="all" class="container-fluid ">
-    <div class="row  ">
-        <% purchases.forEach((purchase, index)=> { %>
-            <div class="col" title="<%= purchase.purchaseDate.toDateString() %>">
-                <div id="card-<%= purchase.id %>"
-                    class="card text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
-                    <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"><i title="Toggle Status"
-                            class="fa fa-times">&nbsp;o</i></span>
-                    <div class="card-body">
-                        <div class="card-title">
-                            <a href="/purchase/<%= purchase.id %>"><img class="card-image" loading="lazy"
-                                    src="<% if (purchase.image) {%> <%= purchase.image %> <%} else { %>/img/missing.png<% } %>"
-                                    title="<%= purchase.vendor_name %> " /></a>
-                        </div>
-                        <div class="card-text">
-                            <%= purchase.sculpt %>
-                                <br />
-                                <%= purchase.detail %>
-                        </div>
-
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <div class="will-sell toggle-icon col-md-6 clickable" data-id="<%= purchase.id %>"
-                                data-type="willSell">
-                                <% if (purchase.willSell) {%>
-                                    <div id="sell-<%= purchase.id %>"
-                                        class="bg-secondary font-weight-bold text-white small" title="Sell">Sell
-                                    </div>
+    <div id="all" class="d-flex all ">
+            <% purchases.forEach((purchase, index)=> { %>
+                <div class="card-box" title="<%= purchase.purchaseDate.toDateString() %><% if (purchase.received) { %>&#013<%= purchase.receivedDate.toDateString() %><% } %>">
+                    <div id="card-<%= purchase.id %>"
+                        class="card text-center <% if (purchase.received) { %> arrived <% } else {%> waiting <%} %>" data-status="<% if (purchase.received) {%>received<%}else { %>waiting<%}%>">
+                        <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"
+                            data-type="receive"><span title="Toggle Status" class="fa fa-times">&nbsp;💌</span></span>
+                        <div class="card-body d-flex flex-column" >
+                            <div class="card-title" >
+                                <a href="/purchase/<%= purchase.id %>">
+                                    <% if (purchase.selfHostedImage) { %> 
+                                        <img class="card-image" loading="lazy" height=250px src="<%= (purchase.image) ? purchase.image : '/img/missing.png' %>" />
                                     <% } else { %>
+                                        <img class="card-image" loading="lazy" src="<%= purchase.image_250  ? purchase.image_250 : '/img/missing.png' %>" />
+                                    <% } %>                               
+                                </a>
+                            </div>
+                            <div class="card-text">
+                                <div>
+                                    <div class="align-top">
+                                        <%= purchase.sculpt %>
+                                            <br />
+                                            <%= purchase.detail %>
+
+                                    </div>
+                                    <div class="align-bottom text-muted small truncated">
+                                        <a class="no-link grey-text" href="/maker/id/<%= purchase.maker_id %>">
+                                            <%= purchase.maker_name %>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card-text mt-auto mx-auto" >
+                                <% if (purchase.series_total === -1282) { %>
+                                    <span id="series_num">🍐</span>
+                                    /                            
+                                    <span id="series_num">🍐</span>
+                                <% } else { %>
+                                    <% if (purchase.series_total > 0) { %>
+                                        <% if (purchase.series_num > 0 ) { %>
+                                            <%= purchase.series_num %>
+                                        <% } %>
+                                        / <%= purchase.series_total %>
+                                    <% } %>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="card-text mt-auto mx-auto timeSince spoiler-text" id="timeSince-<%= purchase.id %>">
+
+                        </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <div class="will-sell toggle-icon col-md-6 clickable" data-id="<%= purchase.id %>"
+                                    data-type="willSell">
+                                    <% if (purchase.willSell) {%>
                                         <div id="sell-<%= purchase.id %>"
-                                            class="bg-success font-weight-bold text-white small" title="Keep">Keep
+                                            class="bg-secondary font-weight-bold text-white small" title="Sell">Sell
                                         </div>
-                                        <% } %>
-                            </div>
-                            <div class="is-sold toggle-icon col-md-6" data-id="<%= purchase.id %>" data-type="isSold">
-                                <% if (purchase.isSold) {%>
-                                    <div id="sold-<%= purchase.id %>"
-                                        class="bg-secondary font-weight-bold text-white small" title="Sold">Sold
-                                    </div>
-                                    <% } else { %>
+                                        <% } else { %>
+                                            <div id="sell-<%= purchase.id %>"
+                                                class="bg-success font-weight-bold text-white small" title="Keep">
+                                                Keep
+                                            </div>
+                                            <% } %>
+                                </div>
+                                <div class="is-sold toggle-icon col-md-6" data-id="<%= purchase.id %>"
+                                    data-type="isSold">
+                                    <% if (purchase.isSold) {%>
                                         <div id="sold-<%= purchase.id %>"
-                                            class="bg-success font-weight-bold text-white small" title="Have">Have
+                                            class="bg-secondary font-weight-bold text-white small" title="Sold">Sold
                                         </div>
-                                        <% } %>
+                                        <% } else { %>
+                                            <div id="sold-<%= purchase.id %>"
+                                                class="bg-success font-weight-bold text-white small" title="Have">
+                                                Have
+                                            </div>
+                                            <% } %>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <span class="text-center col-md-4">
-                                <a href="https://instagram.com/<%= purchase.instagram %>" target="_blank"><img
-                                        class="card-link ig-link" src="/img/ig.png"></a>
-                            </span>
-                            <span class="text-center col-md-4">
-                                <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>"
-                                    target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
-                            </span>
-                            <span class="text-center col-md-4">
-                                <a href="<%= purchase.link %>" target="_blank"><img class="card-link www-link"
-                                        src="/img/www.png"></a>
-                            </span>
-                            <span class="text-right col-md-6">
-                                <!-- $<%= (purchase.price+purchase.adjustments).toFixed(2) %> -->
-                            </span>
-                        </div>
-                    </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <span class="text-center col-md-4">
+                                    <a href="https://instagram.com/<%= purchase.instagram %>" target="_blank"><img
+                                            class="card-link ig-link" src="/img/ig.png"></a>
+                                </span>
+                                <span class="text-center col-md-4">
+                                    <% if (purchase.archivist) { %>
+                                    <a href="https://keycap-archivist.com/maker/<%= purchase.archivist.replace('.','') %>"
+                                        target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
+                                    <% } %>
+                                </span>
+                                <span class="text-center col-md-4">
+                                    <% if (purchase.ig_post) { %>
+                                        <a href="<%= purchase.ig_post %>" target="_blank">
+                                            <img class="card-link ig-link" src="/img/camera.png" />
+                                        </a>
+                                    <% } %>
+                                </span>
+                                <span class="text-right col-md-6">
+                                    <!-- $<%= (purchase.price+purchase.adjustments).toFixed(2) %> -->
+                                </span>
 
-            </div>
-    </div>
-    <% }) %>
-</div>
-</div>
-<div id="missing" class="container-fluid">
-    <div class="row  ">
-        <% missingPurchases.forEach((purchase, index)=> { %>
-
-            <div class="col" title="<%= purchase.purchaseDate.toDateString() %>">
-                <div id="card-<%= purchase.id %>"
-                    class="card text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
-                    <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"><i title="Toggle Status"
-                            class="fa fa-times">&nbsp;o</i></span>
-                    <div class="card-body">
-                        <div class="card-title">
-                            <a href="/purchase/<%= purchase.id %>"><img class="card-image" loading="lazy"
-                                    src="<% if (purchase.image) {%> <%= purchase.image %> <%} else { %>/img/missing.png<% } %>"
-                                    title="<%= purchase.vendor_name %> " /></a>
+                            </div>
                         </div>
-                        <div class="card-text">
-                            <%= purchase.sculpt %>
-                                <br />
-                                <%= purchase.detail %>
-                        </div>
+                        <hidden class="purchaseDate d-none" id="purchaseDate-<%= purchase.id %>">
+                            <%= purchase.purchaseDate %>
+                        </hidden>
+                        <hidden class="purchaseId d-none" id="purchaseId-<%= purchase.id %>">
+                            <%= purchase.id %>
+                        </hidden>
                     </div>
-                    <div class="card-footer">
-                        <div class="row">
-                            <span class="text-center col-md-2">
-                                <a href="https://instagram.com/<%= purchase.instagram %>" target="_blank"><img
-                                        class="card-link ig-link" src="/img/ig.png"></a>
-                            </span>
-                            <span class="text-center col-md-2">
-                                <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>"
-                                    target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
-                            </span>
-                            <span class="text-center col-md-2">
-                                <a href="<%= purchase.link %>" target="_blank"><img class="card-link www-link"
-                                        src="/img/www.png"></a>
-                            </span>
-                            <span class="text-right col-md-6">
-                                <!-- $<%= (purchase.price+purchase.adjustments).toFixed(2) %> -->
-                            </span>
-                        </div>
-                    </div>
-
                 </div>
-            </div>
-            <% }) %>
+                <% }) %>
+        </div>
     </div>
+    <!-- <div id="missing" class="container-fluid">
+        <div class="row  ">
+            <% missingPurchases.forEach((purchase, index)=> { %>
+
+                <div class="col" title="<%= purchase.purchaseDate.toDateString() %>">
+                    <div id="card-<%= purchase.id %>"
+                        class="card text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
+                        <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"><i
+                                title="Toggle Status" class="fa fa-times">&nbsp;o</i></span>
+                        <div class="card-body">
+                            <div class="card-title">
+                                <a href="/purchase/<%= purchase.id %>"><img class="card-image" loading="lazy"
+                                        src="<% if (purchase.image) {%> <%= purchase.image %> <%} else { %>/img/missing.png<% } %>"
+                                        title="<%= purchase.vendor_name %> " /></a>
+                            </div>
+                            <div class="card-text">
+                                <%= purchase.sculpt %>
+                                    <br />
+                                    <%= purchase.detail %>
+                            </div>
+                        </div>
+                        <div class="card-footer">
+                            <div class="row">
+                                <span class="text-center col-md-2">
+                                    <a href="https://instagram.com/<%= purchase.instagram %>" target="_blank"><img
+                                            class="card-link ig-link" src="/img/ig.png"></a>
+                                </span>
+                                <span class="text-center col-md-2">
+                                    <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>"
+                                        target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
+                                </span>
+                                <span class="text-center col-md-2">
+                                    <a href="<%= purchase.link %>" target="_blank"><img class="card-link www-link"
+                                            src="/img/www.png"></a>
+                                </span>
+                                <span class="text-right col-md-6">
+                                    $<%= (purchase.price+purchase.adjustments).toFixed(2) %> 
+                                </span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <% }) %>
+    </div> -->
 </div>

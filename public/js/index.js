@@ -25,41 +25,31 @@ $(function () {
        ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒▒  
          ▒▒▒▒▒▒▒▒▒▒████▒▒▒▒▒▒▒▒    
            ▒▒▒▒▒▒▒▒██▒▒▒▒▒▒ `)
+
+
     $('.toggle-icon').on('click', function () {
-        console.log(this.dataset.id)
+        // console.log(this.dataset.id, this.dataset.type)
+        if (this.dataset.type !== "receive") { return }
         $.ajax({
             'url': `/api/receiveToggle/${this.dataset.id}`,
             'type': 'GET',
             'success': function (result) {
                 if (result.message == 1) {
-                    $(`#card-${result.purchaseId}`).addClass('green')
-                    $(`#card-${result.purchaseId}`).removeClass('red')
+                    $(`#card-${result.purchaseId}`).addClass('arrived')
+                    $(`#card-${result.purchaseId}`).removeClass('waiting')
                 } else {
-                    $(`#card-${result.purchaseId}`).addClass('red')
-                    $(`#card-${result.purchaseId}`).removeClass('green')
+                    $(`#card-${result.purchaseId}`).addClass('waiting')
+                    $(`#card-${result.purchaseId}`).removeClass('arrived')
 
                 }
             }
         });
-    })
-    $.ajax({
-        'url': '/api/picRefreshStatus',
-        'type': 'GET',
-        'success': function (result) {
-            console.log(result.message)
-            if (result.message) {
-                $('#picRefresh').addClass('disabled');
-            } else {
-                $('#picRefresh').removeClass('disabled');
-            }
-        }
     })
     setInterval(function () {
         $.ajax({
             'url': '/api/picRefreshStatus',
             'type': 'GET',
             'success': function (result) {
-                console.log(result.message)
                 if (result.message) {
                     $('#picRefresh').addClass('disabled');
                 } else {
@@ -131,9 +121,44 @@ $(function () {
             }
         });
     })
-    $('#toggle-box').change(function () {
-        swap()
+    $('#toggle-box').change(function (dir) {
+        // swap()
+        flip()
     })
+    $('[data-toggle="tooltip"]').tooltip()
+    $('input.tags')
+        .on('change', function (event) {
+            var $element = $(event.target);
+            var $container = $element.closest('.example');
+            console.log($element)
+
+            if (!$element.data('tagsinput')  ) return;
+
+            var val = $element.val();
+            if (val === null) val = 'null';
+            var items = $element.tagsinput('items');
+
+            $('code', $('pre.val', $container)).html(
+                $.isArray(val)
+                ? JSON.stringify(val)
+                : '"' + val.replace('"', '\\"') + '"'
+            );
+            $('code', $('pre.items', $container)).html(
+                JSON.stringify($element.tagsinput('items'))
+            );
+            })
+        .trigger('change');
+    $('.purchaseDate').each((i, time) => {
+
+        let t = moment(time.textContent)
+        let now = moment()
+        let p = $(time.parentElement)
+        if ($(p).hasClass('waiting')) {
+            $(p.find('.timeSince')).text(`${now.diff(t, 'days')} days since invoice`)
+        }
+        
+    })
+
 })
 
 function swap() {
@@ -158,6 +183,22 @@ function swap() {
     }
 }
 
+function flip() {
+    const trans = 500
+    const allMissing = $('div.card.waiting')
+    const allReceived = $('div.card.arrived')
+    const toggleState = $('#toggle-box')
+    if (!$('#toggle-box').is(':checked')) {
+        allReceived.each(function(e) {
+            allReceived[e].style.display = 'none'
+            
+        })
+    } else {
+        allReceived.each(function(e){
+            allReceived[e].style.display = 'block'
+        })
+    }
+}
 function picRefresh() {
     console.log('refreshing')
     $.ajax({

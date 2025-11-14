@@ -1,54 +1,64 @@
 <!-- views/artisan-count.html -->
-<h1 class="h1">
-    <%= title %> <span class="small">
-            <% if (totals> 0) { %> (<%= totals %>) <% } %>
-        </span>
-</h1>
-<div class="row">
-    <div id="artisan-price-table" class="col-lg-6" style="width:960px; height:180px" data-json="">
+<div class="container my-5">
 
+    <h1 class="h1">
+        <%= title %> <span class="small">
+                <% if (totals> 0) { %> (<%= totals %>) <% } %>
+            </span>
+    </h1>
+    <div class="row">
+        <div id="artisan-price-table" class="col-lg-4" data-json="">
+
+        </div>
+        <div id="artisan-total-counts" class="col-lg-4" data-json="">
+            <div></div>
+        </div>
+        <div id="artisan-total-farts" class="col-lg-4" data-json="">
+            <div></div>
+        </div>
     </div>
-    <div id="artisan-total-counts" class="col-lg-6" style="width:960px; height:180px" data-json="">
+    <div class="row">
+        <div id="artisan-top-maker" class="col-lg-4" data-json="">
 
-    </div>
+        </div>
+        <div id="artisan-top-sculpt" class="col-lg-4" data-json="">
 
-</div>
-<div class="row">
-    <div id="artisan-top-maker" class="col-lg-4" style="width:640px; height:360px" data-json="">
+        </div>
+        <div id="artisan-sale-types" class="col-lg-4" data-json="">
 
-    </div>
-    <div id="artisan-top-sculpt" class="col-lg-4" style="width:640px; height:360px" data-json="">
-
-    </div>
-    <div id="artisan-sale-types" class="col-lg-4" style="width:640px; height:360px" data-json="">
-
-    </div>
-
-</div>
-<!-- <div class="row">
-
-
-    <div id="artisan-total-maker" class="col-lg-6" style="width:960px; height:540px" data-json="">
-
-    </div>
-</div> -->
-<div class="row">
-    <div id="artisan-count-chart" class="col-lg-6" style="width:960px; height:540px" data-json="">
-
-    </div>
-    <div id="maker-count-chart" class="col-lg-6" style="width:960px; height:540px" data-json="">
+        </div>
 
     </div>
 </div>
-<div class="row">
-    <div id="artisan-price-chart" class="col-lg-6" style="width:960px; height:540px" data-json="">
-
+    <div class="row">
+        <div class="col-lg-6 col-md-4 col-sm-2">
+            <div id="artisan-count-chart" data-json="">
+            </div>
+        </div>
+        <div class="col-lg-6 col-md-4 col-sm-2">
+            <div id="maker-count-chart" data-json="">
+            </div>
+        </div>
     </div>
-    <div id="maker-price-chart" class="col-lg-6" style="width:960px; height:540px" data-json="">
-
+    <div class="row">
+        <div class="col-lg-6 col-md-4 col-sm-2">
+            <div id="artisan-pie-sales" data-json=""></div>
+        </div>
+        <div class="col-lg-6 col-md-4 col-sm-2">
+            <div id="maker-countries" data-json=""></div>
+        </div>
     </div>
-</div>
-<div class="row">
-
-
+    <div class="row">
+        <div class="col-lg-6 col-md-4 col-sm-2">
+            <div id="monthy-purchase-chart" data-json=""></div>
+        </div>
+        <div class="col-lg-6 col-md-4 col-sm-2">
+            <div id="" data-json=""></div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-md-4 col-sm-2">
+            <div id="color-count" data-json=""></div>
+        </div>
+    </div>
 </div>

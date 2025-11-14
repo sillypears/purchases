@@ -1,133 +1,164 @@
 $(async function () {
-    var formatter = new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
 
-    });
+        // Function to fetch data from your API endpoint
+        function fetchDataFromAPI(url) {
+          return $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json'
+          }).fail(function(error) {
+            console.error('Error fetching data:', error);
+            return {};
+          });
+        }
+      
+        // Process the data to group items with value 1
+        function processDataForPieChart(dataArray) {
+          let mainItems = {};
+          let otherCount = 0;
+          const data = {};
+          dataArray['data'].forEach(item => {
+            data[item.name] = item.count;
+          });
+          // Separate items into main items and "Other"
+          for (const [key, value] of Object.entries(data)) {
+            if (value > 1) {
+              mainItems[key] = value;
+            } else {
+              otherCount++;
+            }
+          }
+        //   mainItems = data;
+          // Convert to Chart.js format
+          const labels = [...Object.keys(mainItems)];
+          const values = [...Object.values(mainItems)];
+          
+          // Add "Other" category if there are items with value 1
+          if (otherCount > 0) {
+            labels.push("Only 1");
+            values.push(otherCount);
+          }
+          
+          return { labels, values };
+        }
+      
+        // Generate random colors for the chart
+        function generateColors(count) {
+          const colors = [];
+          for (let i = 0; i < count; i++) {
+            const r = Math.floor(Math.random() * 200);
+            const g = Math.floor(Math.random() * 200);
+            const b = Math.floor(Math.random() * 200);
+            colors.push(`rgba(${r}, ${g}, ${b}, 0.7)`);
+          }
+          return colors;
+        }
+      
+        // Create the pie chart with data from API
+        function createPieChartSculptCount() {
+          const ctx = $('#pieSculptCount').get(0).getContext('2d');
+          
+          // Show loading state (optional)
+          ctx.font = '16px Arial';
+          ctx.fillText('Loading data...', ctx.canvas.width/2 - 60, ctx.canvas.height/2);
+          
+          // Fetch and process the data
+          fetchDataFromAPI('/api/graph/pieArtisansBycount').then(function(rawData) {
+            const { labels, values } = processDataForPieChart(rawData);
+            const backgroundColors = generateColors(labels.length);
+            
+            // Create the chart
+            new Chart(ctx, {
+              type: 'pie',
+              data: {
+                labels: labels,
+                datasets: [{
+                  data: values,
+                  backgroundColor: backgroundColors,
+                  borderColor: backgroundColors.map(color => color.replace('0.7', '1')),
+                  borderWidth: 1
+                }]
+              },
+              options: {
+                responsive: true,
+                plugins: {
+                  legend: {
+                    display: false,
+                    position: 'right',
+                  },
+                  tooltip: {
+                    callbacks: {
+                      label: function(context) {
+                        const label = context.label || '';
+                        const value = context.raw || 0;
+                        const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                        const percentage = Math.round((value / total) * 100);
+                        return `${label}: ${value} (${percentage}%)`;
+                      }
+                    }
+                  },
+                  title: {
+                    display: true,
+                    text: 'Sculpt Count'
+                  }
+                }
+              }
+            });
+          });
+        }
+        function createPieChartMakerCount() {
+            const ctx = $('#pieMakerCount').get(0).getContext('2d');
+            
+            // Show loading state (optional)
+            ctx.font = '16px Arial';
+            ctx.fillText('Loading data...', ctx.canvas.width/2 - 60, ctx.canvas.height/2);
+            
+            // Fetch and process the data
+            fetchDataFromAPI('/api/graph/pieMakersBycount').then(function(rawData) {
+              const { labels, values } = processDataForPieChart(rawData);
+              const backgroundColors = generateColors(labels.length);
+              
+              // Create the chart
+              new Chart(ctx, {
+                type: 'pie',
+                data: {
+                  labels: labels,
+                  datasets: [{
+                    data: values,
+                    backgroundColor: backgroundColors,
+                    borderColor: backgroundColors.map(color => color.replace('0.7', '1')),
+                    borderWidth: 1
+                  }]
+                },
+                options: {
+                  responsive: true,
+                  plugins: {
+                    legend: {
+                      display: false,
+                      position: 'right',
+                    },
+                    tooltip: {
+                      callbacks: {
+                        label: function(context) {
+                          const label = context.label || '';
+                          const value = context.raw || 0;
+                          const total = context.dataset.data.reduce((acc, val) => acc + val, 0);
+                          const percentage = Math.round((value / total) * 100);
+                          return `${label}: ${value} (${percentage}%)`;
+                        }
+                      }
+                    },
+                    title: {
+                      display: true,
+                      text: 'Maker Count'
+                    }
+                  }
+                }
+              });
+            });
+          }
+        // Initialize the chart
+        createPieChartSculptCount();
+        createPieChartMakerCount();
 
-    // Price Data
-    {
-        const priceData = await getData("/api/graph/getPricingTable")
-        let table = `<table class='table border'><thead>`
-        for (h of priceData.headers) {
-            table += `<th>${h}</th>`
-        }
-        table += '</thead><tbody>'
-        table += `<tr><td>${formatter.format(priceData.data[0].max_price)}</td><td>${formatter.format(priceData.data[0].min_price)}</td><td>${formatter.format(priceData.data[0].avg_price)}</td></tr>`
-        table += '</tbody></table>'
-        $('#artisan-price-table').append(table)
-    }
-    // Top Sculpts
-    {
-        const topSculptData = await getData("/api/graph/topSculpts")
-        let tableSculpt = `<table class='table border hover'><thead>`
-        for (h of topSculptData.headers) {
-            console.log(h)
-            tableSculpt += `<th>${h}</th>`
-        }
-        tableSculpt += '</thead><tbody>'
-        for (x of topSculptData.data) {
-            tableSculpt += `<tr><td>${x.sculpt}</td><td>${x.total}</td></tr>`
-        }
-        tableSculpt += '</tbody></table>'
-        $('#artisan-top-sculpt').append(tableSculpt)
-    }
-    // Top Makers
-    {
-        const topMakerData = await getData("/api/graph/topMakers")
-        let tableMaker = `<table class='table border hover'><thead>`
-        for (h of topMakerData.headers) {
-            tableMaker += `<th>${h}</th>`
-        }
-        tableMaker += '</thead><tbody>'
-        for (x of topMakerData.data) {
-            tableMaker += `<tr><td>${x.maker_name}</td><td>${x.total}</td></tr>`
-        }
-        tableMaker += '</tbody></table>'
-        $('#artisan-top-maker').append(tableMaker)
-    }
-    // total Maker/Sculpts
-    {
-        const totalMakerData = await getData("/api/graph/totalMakers")
-        const totalSculptData = await getData("/api/graph/totalSculpts")
-        console.log(totalMakerData)
-        let totalCounts = `<table class='table border hover'><thead>`
-        totalCounts += `<th>Total Makers</th>`
-        totalCounts += `<th>Total Sculpts</th>`
-        totalCounts += '</thead><tbody><tr>'
-
-        totalCounts += `<td>${totalMakerData.data.count.count}</td>`
-        totalCounts += `<td>${totalSculptData.data.count.count}</td>`
-
-        totalCounts += '</tr></tbody></table>'
-        $('#artisan-total-counts').append(totalCounts)
-    }
-    //artisansByCount
-    {
-        const artisanData = await getData("/api/graph/haveArtisansByCount")
-        $('#artisan-count-chart').highcharts({
-            chart: {
-                type: 'pie'
-            },
-            title: {
-                text: 'Count By Sculpt'
-            },
-
-            tooltip: {
-                pointFormat: '{series.name}: <b>{point.y}</b>'
-            },
-            legend: {
-                enabled: true
-            },
-            series: [{
-                name: "Sculpts",
-                colorByPoint: true,
-                data: artisanData.data
-            }]
-        })
-    }
-    //makerByCount
-    {
-        const makerData = await getData("/api/graph/makerHaveByCount")
-        $('#maker-count-chart').highcharts({
-            chart: {
-                type: 'pie'
-            },
-            title: {
-                text: 'Count By Maker'
-            },
-
-            tooltip: {
-                pointFormat: '{series.name}: <b>{point.y}</b>'
-            },
-            series: [{
-                name: "Makers",
-                colorByPoint: true,
-                data: makerData.data
-            }]
-        })
-    }
-    // Sale Types
-    {
-        const saleTypeWins = await getData("/api/graph/saleTypeWins")
-        let tableMaker = `<table class='table border hover'><thead>`
-        for (h of saleTypeWins.headers) {
-            tableMaker += `<th>${h}</th>`
-        }
-        tableMaker += '</thead><tbody>'
-        for (x of saleTypeWins.data) {
-            tableMaker += `<tr><td>${x.sale_type}</td><td>${x.count}</td></tr>`
-        }
-        tableMaker += '</tbody></table>'
-        $('#artisan-sale-types').append(tableMaker)
-    }
-});
-
-async function getData(url) {
-    let result;
-    result = await $.ajax({
-        url: url,
-        type: 'GET'
-    });
-    return result;
-}
+    })

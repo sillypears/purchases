@@ -1,37 +1,54 @@
 <!-- views/index.html -->
-<div class="row">
-    <div class="col-md-11">
-        <h1 class="h1">
-            <%= title %> <span class="small">
-                    <% if (totals> 0) { %> (<%= totals %>) <% } %>
-                </span>
-        </h1>
+<div class="container my-5">
+    <div class="row">
+        <div class="col-10">
+            <h1 class="h1">
+                <%= title %> <a href="https://instagram.com/<%= maker.instagram %>" target="_blank"><img class="ig-link" src="/img/ig.png"></a>
+                <span class="small">
+                        <% if (totals> 0) { %> (<%= totals %>) <% } %>
+                    </span>
+            </h1>
+        </div >
+        <div class="col-1">
+            Avg Price: $<span id="avgPrice"><%= avg[0].avg_price %></span> (<span id="avgPricePurchaseCount"><%= avg[0].purchases %></span>)
+        </div>
+        <div class="col-1">
+            <a href="/maker/id/<%= maker.id %>/edit" class="btn btn-primary">Edit Maker</a>
+        </div>
     </div>
-    <div class="col-md-1">
-        <a href="/maker/id/<%= maker.id %>/edit" class="btn btn-primary">Edit Maker</a>
-    </div>
-</div>
-<a href="https://instagram.com/<%= maker.instagram %>" target="_blank"><img class="ig-link" src="/img/ig.png"></a>
-<div class="container-fluid ">
-    <div class="row ">
+    <div class="d-flex flex-wrap">
         <% purchases.forEach((purchase, index)=> { %>
-
-            <div class="col" title="<%= purchase.purchaseDate.toDateString() %>">
+            <div class="" title="<%= purchase.purchaseDate.toDateString() %>">
                 <div id="card-<%= purchase.id %>"
-                    class="card text-center <% if (purchase.received) { %> green <% } else {%> red <%} %>">
-                    <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>"><i title="Toggle Status"
+                    class="card text-center  <% if (purchase.received) { %> arrived <% } else {%> waiting <%} %>" data-status="<% if (purchase.received) {%>received<%}else { %>waiting<%}%>">
+                    <span class="toggle-icon clickable text-left" data-id="<%= purchase.id %>" data-type="receive"><i title="Toggle Status"
                             class="fa fa-times">&nbsp;o</i></span>
                     <div class="card-body">
                         <div class="card-title">
-                            <a href="/purchase/<%= purchase.id %>"><img class="card-image" loading="lazy"
-                                    src="<% if (purchase.image) {%> <%= purchase.image %> <%} else { %>/img/missing.png<% } %>"
-                                    title="<%= purchase.vendor_name %> " /></a>
+                            <a href="/purchase/<%= purchase.id %>">
+                                <% if (purchase.selfHostedImage) { %> 
+                                    <img class="card-image" loading="lazy" height=250px src="<%= (purchase.image) ? purchase.image : '/img/missing.png' %>" />
+                                <% } else { %>
+                                    <img class="card-image" loading="lazy" src="<%= purchase.image_250  ? purchase.image_250 : '/img/missing.png' %>" />
+                                <% } %>  
+                            </a>
                         </div>
                         <div class="card-text">
                             <%= purchase.sculpt %>
                                 <br />
                                 <%= purchase.detail %>
                         </div>
+                        <div class="card-text mt-auto mx-auto">
+                            <% if (purchase.series_total > 0) { %>
+                                <% if (purchase.series_num > 0 ) { %>
+                                    <%= purchase.series_num %>
+                                <% } %>
+                                / <%= purchase.series_total %>
+                            <% } %>
+                        </div>
+                    </div>
+                    <div class="card-text mt-auto mx-auto timeSince spoiler-text" id="timeSince-<%= purchase.id %>">
+
                     </div>
                     <div class="card-footer">
                         <div class="row">
@@ -67,21 +84,52 @@
                                         class="card-link ig-link" src="/img/ig.png"></a>
                             </span>
                             <span class="text-center col-md-2">
-                                <a href="https://keycap-archivist.com/maker/<%= purchase.archivist %>"
+                                <a href="https://keycap-archivist.com/maker/<%= purchase.archivist.replace('.','') %>"
                                     target="_blank"><img class="card-link ig-link" src="/img/archivist.png"></a>
                             </span>
-                            <!-- <span class="text-center col-md-2">
-                                <a href="<%= purchase.link %>" target="_blank"><img class="card-link www-link"
-                                        src="/img/www.png"></a>
-                            </span> -->
+                            <span class="text-center col-md-4">
+                                <% if (purchase.ig_post) { %>
+                                    <a href="<%= purchase.ig_post %>" target="_blank">
+                                        <img class="card-link ig-link" src="/img/camera.png" />
+                                    </a>
+                                <% } %>
+                            </span>
                             <span class="text-right col-md-6">
                                 <!-- $<%= (purchase.price+purchase.adjustments).toFixed(2) %> -->
                             </span>
                         </div>
+    
                     </div>
-
+                    <hidden class="purchaseDate d-none" id="purchaseDate-<%= purchase.id %>">
+                        <%= purchase.purchaseDate %>
+                    </hidden>
+                    <hidden class="purchaseId d-none" id="purchaseId-<%= purchase.id %>">
+                        <%= purchase.id %>
+                    </hidden>
                 </div>
             </div>
             <% }) %>
+    </div>
+    <div class="row" >
+        <div id="sculptBubble" class="col-4">
+
+        </div>
+        <div id="monthlyPurch" class="col-4">
+
+        </div>
+        <div id="yearWinsChart" class="col-4">
+
+        </div>
+    </div>
+    <div class="row" >
+        <div id="sculptTable" class="col-4">
+
+        </div>
+        <div id="" class="col-4">
+
+        </div>
+        <div id="" class="col-4">
+
+        </div>
     </div>
 </div>

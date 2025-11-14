@@ -1,65 +1,162 @@
 <!-- views/index.html -->
-<h1 class="h1">
-    <%= title %> <span class="small">
-            <% if (totals> 0) { %> (<%= totals %>) <% } %>
-        </span>
-</h1>
-<form class="form" action="" method="POST">
-    <select class="select" id="category" name="category">
-        <option id="option-default" name="default"  value="-1">Select Category</option>
-        <% for ( let category of categories) { %><
-            <option id="option-<%= category.name %>" name="category" value="<%= category.id %>" <% if (category.id == purchase.category_id) { %> selected <% } %> ><%= category.display_name %> </option>
-        <% }; %>
-    </select><br />
-    <input type="text" id="detail" name="detail" size=40 placeholder="Detail" value="<%= purchase.detail %>"/><br />
-    <input type="text" id="archivist" name="archivist" size=40 placeholder="Keycap Archivist Sculpt" value="<%= purchase.entity %>"/><br />
-    <input type="text" id="set" name="set" size=40 placeholder="Display Name" value="<%= purchase.sculpt %>"/><br />
+<div class="container my-5">
 
-    <select class="select" id="maker" name="maker" >
-        <option id="option-default" name="default" value="-1">Select Maker</option>
-
-        <% for ( let maker of makers) { %>
-            <option id="option-<%= maker.name %>" name="maker" value=<%= maker.id %> <% if (maker.id == purchase.maker_id) { %> selected <% } %>><%= maker.display_name %> </option>
-        <% }; %>
-    </select><br />
-    
-    <select class="select" id="vendor" name="vendor" >
-        <option id="option-default" name="default" value="-1">Select Vendor</option>
-
-        <% for ( let vendor of vendors) { %>
-            <option id="option-<%= vendor.name %>" name="vendor" value=<%= vendor.id  %> <% if (vendor.id == purchase.vendor_id) { %> selected <% } %> ><%= vendor.display_name %> </option>
-        <% }; %>
-    </select><br />
-    <input type="number" id="price" name="price" size=40 step="0.01" placeholder="Price $" value="<%= purchase.price %>"/><br />
-    <input type="number" id="adjustments" name="adjustments" size=40 step="0.01" placeholder="Adjustments $" value="<%= purchase.adjustments %>"/><br />
-
-    <select class="select" id="saletype" name="saletype" >
-        <option id="option-default" name="default" value="-1">Select Sale Type</option>
-
-        <% for ( let saleType of saleTypes) { %>
-            <option id="option-<%= saleType.name %>" name="saleType" value=<%= saleType.id %> <% if (saleType.id == purchase.sale_id) { %> selected <% } %>><%= saleType.display_name %> </option>
-        <% }; %>
-    </select><br />
-
-    <input type="date" id="purchaseDate" class="date" name="purchaseDate" size=40 placeholder="Purchase Date" value="<%= moment(purchase.purchaseDate).format('YYYY-MM-DD') %>"/><br />
-    <input type="date" id="expectedDate" class="date" name="expectedDate" size=40 placeholder="Expected Date" value="<%= moment(purchase.receivedDate).format('YYYY-MM-DD')  %>"/><br />
-    <input type="date" id="soldDate" class="date" name="soldDate" size=40 placeholder="Sold Date" value="<%= moment(purchase.soldDate).format('YYYY-MM-DD') %>"/><br />
-    <input type="number" id="salePrice" name="salePrice" size=40 step="0.01" placeholder="Sale Price $" value="<%= purchase.salePrice %>"/><br />
-    <input type="number" id="orderSet" name="orderSet" size=40 placeholder="Set Number" value="<%= purchase.orderSet %>"/><br />
-    <input type="text" id="image" name="image" size=80 placeholder="Link to image" value="<%= purchase.image %>"/><br />
-    <input type="textarea" id="notes" name="notes" size=80 placeholder="Notes!" value="<%= purchase.notes %>"/><br />
-
-    <button type="submit" id="submit" class="btn-success">Update Purchase!</button>
-</form>
-
-<div id='ticker'>
-    <% if (ticker.insertId) { %>
-        <div class="alert-success">Added id: <%= ticker.insertId %>
+    <h1 class="h1">
+        <%= title %> <span class="small">
+                <% if (totals> 0) { %> (<%= totals %>) <% } %>
+            </span>
+    </h1>
+    <form class="form" action="" method="POST">
+        <div>
+            <select class="select" id="category" name="category">
+                <option id="option-default" name="default" value="-1">Select Category</option>
+                <% for ( let category of categories) { %>
+                <option id="option-<%= category.name %>" name="category" value="<%= category.id %>" <% if (category.id==purchase.category_id) { %> selected <% } %>><%= category.display_name %></option>
+                <% }; %>
+            </select>
         </div>
-    <% } %>
-    <% if (ticker.error) { %>
-        <div class="alert-danger">
-            <%= ticker.error %>
+        <div>
+            <input type="text" id="detail" name="detail" size=40 placeholder="Detail" value="<%= purchase.detail %>" />
         </div>
-    <% } %>
-</div>
+        <div>
+            <input type="text" id="archivist" name="archivist" size=40 placeholder="Keycap Archivist Sculpt" value="<%= purchase.entity %>" />
+        </div>
+        <div>
+            <input type="text" id="set" name="set" size=40 placeholder="Display Name" value="<%= purchase.sculpt %>" />
+        </div>
+        <div>
+            <input type="text" id="ka_id" name="ka_id" size=40 placeholder="Archivist ID" value="<%= purchase.ka_id %>" />
+        </div>
+        <div>
+            <input type="text" id="mainColors" name="mainColors" class="tags" size=40 placeholder="Main Colors" data-role="tagsinput" value="<%= purchase.mainColors %>" />
+        </div>
+        <div>
+            <input type="text" id="tags" name="tags" class="tags" size=40 placeholder="Tags" data-role="tagsinput" value="<%= purchase.tags %>" />
+        </div>
+        <div>
+            <select id="sculptType" name="sculptType">
+                <option id="option-default" name="default" value="-1" disabled>Select Sculpt Style</option>
+                <% for ( let sculpt of sculptTypes) { %>
+                    <option id="option-<%= sculpt.name %>" name="sculptType" value="<%= sculpt.id %>" <% if (sculpt.id  == purchase.sculpt_id) { %> selected <% } %>><%= sculpt.display_name %></option>
+                <% } %>
+            </select>
+            <select id="toolingType" name="toolingType">
+                <option id="option-default" name="default" value="-1" disabled <% if (purchase.tool_id == null) { %> selected <% } %>>Select Tooling</option>
+                <% for ( let tooling of toolingTypes) { %>
+                    <option id="option-<%= tooling.display_name %>" name="toolingType" value="<%= tooling.id %>" <% if (tooling.id  == purchase.tooling_id) { %> selected <% } %>><%= tooling.display_name %></option>
+                <% } %>
+            </select>
+        </div>
+        <div>
+            <input type="number" id="series_num" name="series_num" size=5 placeholder="total" value=<%= purchase.series_num %> />
+            /
+            <input type="number" id="series_total" name="series_total" size=5 placeholder="num" value=<%= purchase.series_total %> />
+        </div>
+        <div>
+            <select class="select" id="maker" name="maker">
+                <option id="option-default" name="default" value="-1">Select Maker</option>
+                <% for ( let maker of makers) { %>
+                <option id="option-<%= maker.name %>" name="maker" value=<%=maker.id %> <% if (maker.id==purchase.maker_id) { %> selected <% } %>><%= maker.display_name %></option>
+                <% }; %>
+            </select>
+        </div>
+        <div>
+            <select class="select" id="vendor" name="vendor">
+                <option id="option-default" name="default" value="-1">Select Vendor</option>
+                <% for ( let vendor of vendors) { %>
+                <option id="option-<%= vendor.name %>" name="vendor" value=<%=vendor.id %><% if (vendor.id==purchase.vendor_id) { %> selected <% } %> ><%= vendor.display_name %> </option>
+                <% }; %>
+            </select>
+        </div>
+        <div>
+            <input type="number" id="price" name="price" size=40 step="0.01" placeholder="Price $"
+                value="<%= purchase.price %>" />
+        </div>
+        <div>
+            <input type="number" id="adjustments" name="adjustments" size=40 step="0.01" placeholder="Adjustments $"
+                value="<%= purchase.adjustments %>" />
+        </div>
+        <div>
+            <input type="number" id="retailPrice" name="retailPrice" size=40 step="0.01" placeholder="Retail Price $"
+                value="<%= purchase.retail_price %>" />
+        </div>
+        <div>
+            <select class="select" id="saletype" name="saletype">
+                <option id="option-default" name="default" value="-1">Select Sale Type</option>
+                <% for ( let saleType of saleTypes) { %>
+
+                <option id="option-<%= saleType.name %>" name="saleType" value=<%=saleType.id %>  <% if (saleType.id==purchase.sale_id) { %> selected <% } %>><%= saleType.display_name %></option>
+                <% }; %>
+            </select>
+        </div>
+        <div>
+            <input type="date" id="purchaseDate" class="date" name="purchaseDate" size=40 placeholder="Purchase Date"
+                value="<%= moment(purchase.purchaseDate).format('YYYY-MM-DD') %>" />
+        </div>
+        <div>   
+            <input type="date" id="expectedDate" class="date" name="expectedDate" size=40 placeholder="Expected Date"
+                value="<%= moment(purchase.receivedDate).format('YYYY-MM-DD')  %>" />
+        </div>
+        <div>
+            <input type="date" id="soldDate" class="date" name="soldDate" size=40 placeholder="Sold Date"
+                value="<%= moment(purchase.soldDate).format('YYYY-MM-DD') %>" />
+        </div>
+        <div>
+            <input type="number" id="salePrice" name="salePrice" size=40 step="0.01" placeholder="Sale Price $"
+                value="<%= purchase.salePrice %>" />
+        </div>
+        <div>
+            <input type="text" id="releasedMonth" class="number" name="releasedMonth" placeholder="Month Released" size=9 value="<%= purchase.released_month %>" />
+            <input type="text" id="releasedYear" class="number" name="releasedYear" placeholder="Year Released" size=9 value="<%= purchase.released_year %>" />
+        </div>
+        <div>
+            <input type="number" id="orderSet" name="orderSet" size=40 placeholder="Set Number"
+                value="<%= purchase.orderSet %>" />
+        </div>
+        <div>
+            <select id="stemType" name="stemType" size=1>
+                <option disabled value="none">Stem</option>
+                <option value="mx" <% if (purchase.stem == "mx") { %> selected <% } %> >MX</option>
+                <option value="topre" <% if (purchase.stem == "topre") { %> selected <% } %> >Topre</option>
+                <option value="bs" <% if (purchase.stem == "bs") { %> selected <% } %> >BS</option>
+                <option value="alps" <% if (purchase.stem == "alps") { %> selected <% } %> >Alps</option>
+            </select>
+            <input type="checkbox" name="forever_cap" id="forever_cap" <% if (purchase.forever_cap) { %> checked <% } %> />
+            <label for="forever_cap">Forever</label>
+
+        </div>
+        <div id="img-container">
+            <input type="text" id="image" name="image" size=80 placeholder="Link to image" value="<%= purchase.image %>" />
+            <%if (purchase.image) { %>
+            <img class="clickable biggify" src="<%= purchase.image %>" width="32px" height="32px" />
+            <% } %>
+            <input type="checkbox" id="selfHostedImage" name="selfHostedImage" <% if (purchase.selfHostedImage) { %> checked <% } %> >
+            <label for="selfHostedImage">Self Hosted</label>
+        </div>
+        <div>
+            <input type="text" id="ig_post" name="ig_post" size=80 placeholder="Instagram Post" value="<%= purchase.ig_post %>"/>
+        </div>
+        <div>
+            <input type="textarea" id="notes" name="notes" size=80 placeholder="Notes!" value="<%= purchase.notes %>" />
+        </div>
+        <div class="row">
+            <div class="col-6">
+                <button type="submit" id="submit" class="btn-success">Update Purchase!</button>
+            </div>
+            <div class="col-6">
+                <button type="button" id="pls-delet" class="btn-danger pls-delet" data-id=<%= purchase.id %> >Delete Purchase!</button>
+            </div>
+        </div>
+    </form>
+
+    <div id='ticker'>
+        <% if (ticker.insertId) { %>
+            <div class="alert-success">Added id: <%= ticker.insertId %>
+            </div>
+            <% } %>
+                <% if (ticker.error) { %>
+                    <div class="alert-danger">
+                        <%= ticker.error %>
+                    </div>
+                    <% } %>
+    </div>

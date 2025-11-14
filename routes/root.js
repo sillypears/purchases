@@ -6,18 +6,27 @@ const db = require('../db');
 const models = require('../models/models');
 const multer = require('@koa/multer')
 const koaSwagger = require('koa2-swagger-ui');
-const upload = multer()
 const moment = require('moment')
+const fs = require("fs");
+const path = require("path");
+const sharp = require('sharp')
+const CSV = require('csv-string');
+
+const upload = multer();
 
 router.get('/', async (ctx, next) => {
     let purchases = await models.getPurchases()
+    let haves = await models.getPurchasesIStillHave()
     let missingPurchases = await models.getPurchasesThatAreMissing()
+    let tDate = new Date()
     return ctx.render('index', {
         title: "Purchases",
         nav: "index",
+        tDate: tDate,
         purchases: purchases,
         missingPurchases: missingPurchases,
-        totals: purchases.length
+        allHaveTotals: haves.length,
+        allTotals: purchases.length
     });
 });
 
@@ -45,13 +54,17 @@ router.get('/makers', async (ctx, next) => {
 router.get('/maker/:type/:id', async (ctx, next) => {
     let maker = await models.getMakerTotal(ctx.params.type, ctx.params.id)
     let purchases = await models.getMakerPurchases(ctx.params.type, ctx.params.id)
-
+    let monthlyPurchases = await models.getWinCountByYearByMaker(ctx.params.id)
+    let avgPriceByMaker = await models.getAvgPriceByMaker(ctx.params.id)
+    console.log(avgPriceByMaker[0])
     return ctx.render('maker', {
         title: `Maker - ${maker.display_name} -$${maker.total}`,
         nav: "maker",
         maker: maker,
         purchases: purchases,
-        totals: purchases.length
+        monthly: monthlyPurchases,
+        totals: purchases.length,
+        avg: avgPriceByMaker
     });
 });
 
@@ -64,7 +77,6 @@ router.get('/maker/id/:id/edit', async (ctx, next) => {
         ticker: ''
     });
 });
-
 
 router.get('/vendors', async (ctx, next) => {
 
@@ -104,9 +116,9 @@ router.get('/add-purchase', async (ctx, next) => {
     let m = await models.getMakers();
     let v = await models.getVendors();
     let c = await models.getCategories();
-    let s = await models.getSaleTypes();
+    let st = await models.getSaleTypes();
+    let s = await models.getSculptTypes();
     let maxSet = await models.getLatestSet();
-    console.log(maxSet)
     return ctx.render('add-purchase', {
         title: "Add Purchase",
         nav: "add-purchase",
@@ -115,11 +127,22 @@ router.get('/add-purchase', async (ctx, next) => {
         makers: m,
         vendors: v,
         categories: c,
-        saleTypes: s,
+        saleTypes: st,
+        sculptTypes: s,
         maxSet: maxSet
     });
 });
 
+router.get('/add-purchase-bulk', async (ctx, next) => {
+    let maxSet = await models.getLatestSet();
+    return ctx.render('add-purchase-bulk', {
+        title: "Bulk Add Purchase",
+        nav: "add-purchase-bulk",
+        totals: 0,
+        ticker: "",
+        maxSet: maxSet
+    });
+});
 
 router.get('/purchase/:id', async (ctx, next) => {
     // let purchase = await axios.get(`http://${process.env.HOSTNAME}:${process.env.PORT}/api/purchase/${ctx.params.id}`);
@@ -142,10 +165,11 @@ router.get('/purchase/:id/edit', async (ctx, next) => {
     const m = await models.getMakers();
     const v = await models.getVendors();
     const c = await models.getCategories();
-    const s = await models.getSaleTypes();
+    const st = await models.getSaleTypes();
+    const s = await models.getSculptTypes();
+    let t = await models.getToolingTypes();
     const maxSet = await models.getLatestSet();
     const purchase = await models.getPurchase(ctx.params.id)
-    console.log(purchase.purchaseDate, purchase.soldDate)
     return ctx.render('edit-purchase', {
         title: "Edit Purchase",
         nav: "edit-purchase",
@@ -154,11 +178,85 @@ router.get('/purchase/:id/edit', async (ctx, next) => {
         makers: m,
         vendors: v,
         categories: c,
-        saleTypes: s,
+        saleTypes: st,
+        sculptTypes: s,
+        toolingTypes: t,
         purchase: purchase,
         maxSet: maxSet,
         moment: moment
     });
+});
+
+router.get('/sculpts', async (ctx, next) => {
+    let sculpts = await models.getTotalSculpts()
+    return ctx.render('sculpts', {
+        title: `Sculpts`,
+        nav: 'sculpts',
+        totals: sculpts.length,
+        ticker: "",
+        sculpts: sculpts.sculpts,
+        moment: moment
+    })
+})
+
+router.get('/sculpt/:sculpt', async (ctx, next) => {
+    let sculpts = await models.getSculptByName(ctx.params.sculpt)
+    return ctx.render('sculpt', {
+        title: `All '${ctx.params.sculpt}' sculpts`,
+        nav: 'sculpts',
+        totals: 0,
+        ticker: "",
+        sculpt: ctx.params.sculpt,
+        sculpts: sculpts,
+        moment: moment
+    })
+})
+
+router.get('/sales', async (ctx, next) => {
+    let sales = await models.getTotalSales()
+    return ctx.render('sales', {
+        title: `Sales`,
+        nav: 'sales',
+        totals: sales.length,
+        ticker: "",
+        sales: sales,
+        moment: moment
+    })
+})
+
+router.get('/sales/:type', async (ctx, next) => {
+    let sales = await models.getSaleByName(ctx.params.type)
+    return ctx.render('sale', {
+        title: `All '${ctx.params.sale}' sales`,
+        nav: 'sale',
+        totals: 0,
+        ticker: "",
+        sale: ctx.params.sale,
+        sales: sales,
+        moment: moment
+    })
+})
+router.get('/search', async (ctx, next) => {
+
+    return ctx.render('search', {
+        title: "Search",
+        nav: "search",
+        totals: 0,
+        purchases: {},
+        header: ""
+    })
+});
+
+router.post('/search', async (ctx, next) => {
+
+    let purchases = await models.getPurchasesByTag(ctx.request.body.searchTag)
+    return ctx.render('search', {
+        title: `Search for '${ctx.request.body.searchTag}'`,
+        nav: "search-tag",
+        totals: 0,
+        purchases: purchases,
+        header: `Found ${purchases.length} with the '${ctx.request.body.searchTag}' tag`
+    })
 });
 
 router.get('/add-maker', async (ctx, next) => {
@@ -181,6 +279,15 @@ router.get('/add-vendor', async (ctx, next) => {
         totals: 0
     });
 });
+
+router.get('/graph/charts', async (ctx, next) => {
+
+    return ctx.render('charts', {
+        title: "Charts!",
+        nav: "charts",
+        totals: 0
+    })
+})
 
 router.get('/graph/artisan-count', async (ctx, next) => {
     let artisanData = await models.getArtisansByCount()
@@ -216,20 +323,52 @@ router.get('/notforsale', async (ctx, next) => {
     });
 });
 
-router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
+router.get('/totalSculpts', async (ctx, next) => {
+    let sculpts = await models.getTotalSculpts();
+    console.log(sculpts.sculpts)
+    return ctx.render('totalsculpts', {
+        title: "All The Sculpts",
+        nav: "totalsculpts",
+        sculpts: sculpts.sculptCount,
+        totals: sculpts.sculptsNotArrived
+    })
+});
+
+router.get('/export/csv', async (ctx, next) => {
+    let purchases = await models.getPurchases();
+    let data = `id,category_name,detail,entity,sculpt,maker_name,instagram,archivist,vendor_name,price,adjustments,total,sale_type,salePrice,purchaseDate,retail_price,mainColors,tags\n`
+    for (let purch of purchases) {
+        data += `${purch.id},${purch.category_name},${purch.detail},${purch.entity},${purch.sculpt},${purch.maker_name},${purch.instagram},${purch.archivist},${purch.vendor_name},${purch.price},${purch.adjustments},${purch.total},${purch.sale_type},${purch.salePrice},${purch.purchaseDate},${purch.retail_price},${purch.mainColors},${purch.tags}\n`
+    }
+    filename = 'allPurchases'
+    ctx.response.set('Content-disposition', `attachment; filename=${filename}.csv`)
+    ctx.response.set('Content-Type', 'text/csv')
+    ctx.statusCode = 200;
+    ctx.body = data
+});
+
+router.get('/export/json', async (ctx, next) => {
+    let purchases = await models.getPurchases();
+    const data = purchases
+    filename = 'allPurchases'
+    ctx.response.set('Content-disposition', `attachment; filename=${filename}.json`)
+    ctx.response.set('Content-Type', 'application/json')
+    ctx.statusCode = 200;
+    ctx.body = JSON.stringify(data)
+});
+
+router.post('/add-purchase', async (ctx, next) => {
     let a = ctx.request.body
-    if (a.adjustments < 0) { 
+    if (a.adjustments < 0) {
         a.adjustments = 0
     }
-    console.log(`adjustments: ${a.adjustments} --`)
-    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, a.image);
-    // let insertId = await models.insertPurchaseImage(a.category, a.detail, a.set, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, ctx.file);
-
-    console.log(insertId)
+    let insertId = await models.insertPurchase(a.category, a.detail, a.archivist, a.set, a.ka_id, a.maker, a.vendor, a.price, a.adjustments, a.saletype, 0, a.purchaseDate, a.expectedDate, a.orderSet, '', a.tags, a.ig_post, a.mainColors, a.retailPrice, a.selfHostedImage, a.releasedMonth, a.releasedYear, "None", a.forever_cap, a.sculptType);
+    let meta = { 'detail': a.detail.replaceAll(" ", "_").replaceAll(":", "-"), 'set': a.set.replaceAll(" ", "_").replaceAll(":", "-"), 'maker': (await models.getMakerById(a.maker)).name }
     let m = await models.getMakers();
     let v = await models.getVendors();
     let c = await models.getCategories();
-    let s = await models.getSaleTypes();
+    let st = await models.getSaleTypes();
+    let s = await models.getSculptTypes();
     let maxSet = await models.getLatestSet();
 
     return ctx.render('add-purchase', {
@@ -240,14 +379,33 @@ router.post('/add-purchase', upload.single('image'), async (ctx, next) => {
         makers: m,
         vendors: v,
         categories: c,
-        saleTypes: s,
+        saleTypes: st,
+        sculptTypes: s,
+        maxSet: maxSet
+    });
+});
+
+router.post('/add-purchase-bulk', async (ctx, next) => {
+    const data = ctx.request.body.bulkData
+    let maxSet = await models.getLatestSet();
+    const newPurchases = await parseBulk(data)
+    console.log('a', newPurchases)
+    return ctx.render('add-purchase-bulk', {
+        title: "Bulk Add Purchase",
+        nav: "add-purchase-bulk",
+        totals: 0,
+        ticker: 0,
+        // makers: m,
+        // vendors: v,
+        // categories: c,
+        // saleTypes: s,
         maxSet: maxSet
     });
 });
 
 router.post('/add-maker', async (ctx, next) => {
     let ticker;
-    let makerId = await models.insertMaker(ctx.request.body.name, ctx.request.body.displayName, ctx.request.body.ka_name, ctx.request.body.ka_id, ctx.request.body.instagram)
+    let makerId = await models.insertMaker(ctx.request.body.name, ctx.request.body.displayName, ctx.request.body.ka_name, ctx.request.body.ka_id, ctx.request.body.city, ctx.request.body.state, ctx.request.body.country, ctx.request.body.instagram)
     if (makerId.insertId > 0) {
         ticker = { makerId: makerId.insertId }
     } else {
@@ -267,7 +425,7 @@ router.post('/add-vendor', async (ctx, next) => {
     if (vendorId > 0) {
         ticker = { vendorId: vendorId }
     } else if (vendorId == 0) {
-        ticker = { error: "Vendor exists!"}
+        ticker = { error: "Vendor exists!" }
     } else {
         ticker = { error: "Unsuccessful adding vendor" }
     }
@@ -280,22 +438,24 @@ router.post('/add-vendor', async (ctx, next) => {
 });
 
 router.post('/purchase/:id/edit', async (ctx, next) => {
-    let purch = await models.updatePurchaseById(ctx.params.id, ctx.request.body)
+    const a = ctx.request.body
+    const tags = await models.getTagsByPurchaseId(ctx.params.id)
+    const mainColors = await models.getMainColorsByPurchaseId(ctx.params.id)
+    let purch = await models.updatePurchaseById(ctx.params.id, a, tags, mainColors)
     if (purch) {
         ctx.status = 301
-        ctx.redirect(`purchase/${ctx.params.id}`)    
-    } 
+        ctx.redirect(`purchase/${ctx.params.id}`)
+    }
     ctx.status = 209
     ctx.redirect(`/purchase/${ctx.params.id}`)
-
 });
 
 router.post('/maker/id/:id/edit', async (ctx, next) => {
     let purch = await models.updateMakerById(ctx.params.id, ctx.request.body)
     if (purch) {
         ctx.status = 301
-        ctx.redirect(`/maker/id/${ctx.params.id}`)    
-    } 
+        ctx.redirect(`/maker/id/${ctx.params.id}`)
+    }
     ctx.status = 209
     ctx.redirect(`/maker/id/${ctx.params.id}`)
 
@@ -306,10 +466,57 @@ router.post('/vendor/id/:id/edit', async (ctx, next) => {
 
     if (purch) {
         ctx.status = 301
-        ctx.redirect(`/vendor/id/${ctx.params.id}`)    
-    } 
+        ctx.redirect(`/vendor/id/${ctx.params.id}`)
+    }
     ctx.status = 209
     ctx.redirect(`/vendor/id/${ctx.params.id}`)
 
 });
+
+async function parseBulk(data) {
+    let parsed = []
+    const parsedCsv = CSV.parse(data);
+    parsedCsv.forEach(async (item) => {
+        let temp = {}
+        temp['categoryName'] = item[0]
+        try {
+            temp['categoryId'] = (await models.getCategoryFromName(item[0]))[0].id
+        } catch (err) {
+            temp['categoryId']
+            console.log(err)
+        }
+        temp['colorway'] = item[1]
+        temp['sculpt'] = item[2]
+        temp['makerName'] = item[3]
+        try {
+            temp['makerId'] = (await models.getMakerFromName(item[3]))[0].id
+        } catch (err) {
+            temp['makerId'] = -2
+            console.log(err)
+        }
+        temp['vendorName'] = item[4]
+        try {
+            temp['vendorId'] = (await models.getVendorFromName(item[4]))[0].id
+        } catch (err) {
+            temp['vendorId'] = -2
+            console.log(err)
+        }
+        temp['price'] = item[5]
+        temp['adjustments'] = item[6]
+        temp['saleTypeName'] = item[8]
+        try {
+            temp['saleTypeId'] = (await models.getSaleTypeFromName(item[8]))[0].id
+        } catch (err) {
+            temp['saleTypeId'] = -2
+            console.log(err)
+        }
+        temp['received'] = (item[9] == 'Yes') ? true : false
+        temp['purchaseDate'] = new Date(Date.parse(item[10]))
+        temp['receivedDate'] = new Date(new Date(Date.parse(item[10])).setDate(new Date(Date.parse(item[10])).getDate() + 7)) //+7
+        temp['orderSet'] = item[12]
+        parsed.push(temp)
+    })
+    console.log('b', parsed)
+    return parsed
+}
 module.exports = router;

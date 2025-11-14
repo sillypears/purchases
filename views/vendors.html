@@ -1,36 +1,39 @@
 <!-- views/makers.html -->
-<h1 class="h1">
-    <%= title %> <span class="small">
-            <% if (totals> 0) { %> (<%= totals %>) <% } %>
-        </span>
-</h1>
-<div class="container">
-    <div class="row">
-        <% vendors.forEach((vendor, index)=> { %>
-            <% if (index % 4==0 && index !=0) { %>
-    </div>
-    <div class="row">
-        <% } %>
-            <div class="col-md-3 d-flex align-items-stretch">
-                <div class="card text-center">
-                    <div class="card-body">
+<div class="container my-5">
 
-                        <div class="card-title">
-                            <a href="/vendor/id/<%= vendor.id %>">
-                                <%= vendor.display_name %>
-                            </a>
+    <h1 class="h1">
+        <%= title %> <span class="small">
+                <% if (totals> 0) { %> (<%= totals %>) <% } %>
+            </span>
+    </h1>
+    <div class="container">
+        <div class="row">
+            <% vendors.forEach((vendor, index)=> { %>
+                <% if (index % 4==0 && index !=0) { %>
+        </div>
+        <div class="row">
+            <% } %>
+                <div class="col-md-3 d-flex align-items-stretch">
+                    <div class="card text-center">
+                        <div class="card-body">
+
+                            <div class="card-title">
+                                <a href="/vendor/id/<%= vendor.id %>">
+                                    <%= vendor.display_name %>
+                                </a>
+                            </div>
+                            <div class="card-text">
+                                $<%= vendor.total %>
+                            </div>
                         </div>
-                        <div class="card-text">
-                            $<%= vendor.total %>
-                        </div>
-                    </div>
                         <div class="card-footer">
-                            <a href="https://instagram.com/<%= vendor.link %>" target="_blank"><img class="card-link ig-link" src="/img/www.png"></a>
+                            <a href="https://instagram.com/<%= vendor.link %>" target="_blank"><img
+                                    class="card-link ig-link" src="/img/www.png"></a>
                         </div>
-                    
+
+                    </div>
                 </div>
-            </div>
-            <% }) %>
+                <% }) %>
+        </div>
     </div>
-</div>
 </div>
