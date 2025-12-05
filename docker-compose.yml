@@ -1,0 +1,9 @@
+services:
+  purchases:
+    build: .
+    image: purchases:latest
+    container_name: purchases
+    restart: unless-stopped
+    ports:
+      - 3003:3003
+    env_file: ".env.prod"

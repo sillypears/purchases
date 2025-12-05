@@ -1700,7 +1700,8 @@ router.get('/spreadsheetOutput', async (ctx, next) => {
 router.get('/picRefresh', async (ctx, next) => {
     var dataToSend;
     // try {
-    var py = spawn('/usr/local/bin/python3.9', ['/opt/keyboard-purchases/get_image_url.py'])
+    console.log("Trying to get images")
+    var py = spawn('venv/bin/python', ['get_image_url.py'])
     // var py = spawn('ls')
     py.on('close', function (c) {
         dataToSend = c
